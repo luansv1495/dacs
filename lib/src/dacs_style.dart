@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' as vmath;
+import 'parsers/class_parser.dart';
 import 'tokens/variants.dart';
 
 /// Direction for a linear gradient.
@@ -33,27 +34,27 @@ enum DacsGradientDirection {
 
   /// The start [Alignment] for this gradient direction.
   Alignment get begin => switch (this) {
-    toR => Alignment.centerLeft,
-    toL => Alignment.centerRight,
-    toT => Alignment.bottomCenter,
-    toB => Alignment.topCenter,
-    toTR => Alignment.bottomLeft,
-    toTL => Alignment.bottomRight,
-    toBR => Alignment.topLeft,
-    toBL => Alignment.topRight,
-  };
+        toR => Alignment.centerLeft,
+        toL => Alignment.centerRight,
+        toT => Alignment.bottomCenter,
+        toB => Alignment.topCenter,
+        toTR => Alignment.bottomLeft,
+        toTL => Alignment.bottomRight,
+        toBR => Alignment.topLeft,
+        toBL => Alignment.topRight,
+      };
 
   /// The end [Alignment] for this gradient direction.
   Alignment get end => switch (this) {
-    toR => Alignment.centerRight,
-    toL => Alignment.centerLeft,
-    toT => Alignment.topCenter,
-    toB => Alignment.bottomCenter,
-    toTR => Alignment.topRight,
-    toTL => Alignment.topLeft,
-    toBR => Alignment.bottomRight,
-    toBL => Alignment.bottomLeft,
-  };
+        toR => Alignment.centerRight,
+        toL => Alignment.centerLeft,
+        toT => Alignment.topCenter,
+        toB => Alignment.bottomCenter,
+        toTR => Alignment.topRight,
+        toTL => Alignment.topLeft,
+        toBR => Alignment.bottomRight,
+        toBL => Alignment.bottomLeft,
+      };
 }
 
 /// Holds parsed utility class values from DACS string expressions.
@@ -193,6 +194,64 @@ class DacsStyle {
   /// Theme color key for gradient end color.
   String? gradientToThemeColor;
 
+  /// Gap/spacing between flex/grid children (e.g. `gap-4` → 16.0).
+  double? gap;
+
+  /// Flex factor (e.g. `flex-1` → 1, `flex` → `true`).
+  /// `null` means not set; `0.0` means `flex: 0` (default).
+  int? flex;
+
+  /// Flex direction (e.g. `flex-col` → [Axis.vertical]).
+  Axis? flexDirection;
+
+  /// Whether to allow wrapping (e.g. `flex-wrap` → `true`).
+  bool? flexWrap;
+
+  /// Align items (e.g. `items-center` → [CrossAxisAlignment.center]).
+  CrossAxisAlignment? alignItems;
+
+  /// Justify content (e.g. `justify-between` → [MainAxisAlignment.spaceBetween]).
+  MainAxisAlignment? justifyContent;
+
+  /// Minimum width constraint (e.g. `min-w-0` … `min-w-96`, `min-w-full`).
+  double? minWidth;
+
+  /// Maximum width constraint (e.g. `max-w-0` … `max-w-96`, `max-w-full`).
+  double? maxWidth;
+
+  /// Minimum height constraint (e.g. `min-h-0` … `min-h-96`, `min-h-full`).
+  double? minHeight;
+
+  /// Maximum height constraint (e.g. `max-h-0` … `max-h-96`, `max-h-full`).
+  double? maxHeight;
+
+  /// Aspect ratio (e.g. `aspect-square` → 1.0, `aspect-video` → 16/9).
+  double? aspectRatio;
+
+  /// Box fit for images (e.g. `object-cover` → [BoxFit.cover]).
+  BoxFit? boxFit;
+
+  /// Alignment (e.g. `align-center`, `align-topLeft`).
+  AlignmentGeometry? alignment;
+
+  /// Overflow behavior (e.g. `overflow-hidden` → [Clip.hardEdge]).
+  Clip? overflow;
+
+  /// When `true`, variant overrides are ignored for this style group
+  /// (triggered by `!important` suffix).
+  bool isImportant = false;
+
+  /// Creates a [DacsStyle] with no values set.
+  DacsStyle();
+
+  /// Parses [classes] into a [DacsStyle], providing a convenient way to
+  /// define reusable style groups.
+  ///
+  /// ```dart
+  /// final cardStyle = DacsStyle.apply('bg-white rounded-lg shadow-md p-4');
+  /// ```
+  factory DacsStyle.apply(String classes) => ClassParser().parse(classes);
+
   /// Converts transform properties (scale, rotate, translate, skew)
   /// into a single [Matrix4] for use with [Transform.transform].
   vmath.Matrix4 toMatrix4() {
@@ -246,7 +305,8 @@ class DacsStyle {
     if (gradientDirection == null || gradientToColor == null) return null;
     final colors = <Color>[
       gradientFromColor ?? const Color(0x00000000),
-      ?gradientViaColor,
+      // ignore: use_null_aware_elements
+      if (gradientViaColor != null) gradientViaColor!,
       gradientToColor!,
     ];
     final stops = gradientViaColor != null ? [0.0, 0.5, 1.0] : [0.0, 1.0];
@@ -278,6 +338,58 @@ class DacsStyle {
       border: border,
       boxShadow: boxShadow,
     );
+  }
+
+  /// Converts border fields into a [BoxBorder], or `null` if neither
+  /// [borderColor] nor [borderWidth] is set.
+  BoxBorder? toBorder() {
+    if (borderColor == null && borderWidth == null) return null;
+    return Border.all(
+      color: borderColor ?? const Color(0xFF000000),
+      width: borderWidth ?? 1.0,
+    );
+  }
+
+  /// Converts border fields into a [BorderSide], or `null` if neither
+  /// [borderColor] nor [borderWidth] is set.
+  BorderSide? toBorderSide() {
+    if (borderColor == null && borderWidth == null) return null;
+    return BorderSide(
+      color: borderColor ?? const Color(0xFF000000),
+      width: borderWidth ?? 1.0,
+    );
+  }
+
+  /// Returns [borderRadius] directly, or `null`.
+  BorderRadiusGeometry? toRadius() => borderRadius;
+
+  /// Builds [BoxConstraints] from width, height, and min/max fields.
+  ///
+  /// Returns `null` when none of the constraint fields are set.
+  BoxConstraints? toConstraints() {
+    if (width == null &&
+        height == null &&
+        minWidth == null &&
+        maxWidth == null &&
+        minHeight == null &&
+        maxHeight == null) {
+      return null;
+    }
+    return BoxConstraints(
+      minWidth: minWidth ?? (width != null ? width! : 0.0),
+      maxWidth: maxWidth ?? (width != null ? width! : double.infinity),
+      minHeight: minHeight ?? (height != null ? height! : 0.0),
+      maxHeight: maxHeight ?? (height != null ? height! : double.infinity),
+    );
+  }
+
+  /// Returns [alignment] directly, or `null`.
+  AlignmentGeometry? toAlignment() => alignment;
+
+  /// Builds a [ShapeBorder] from [borderRadius], or `null`.
+  ShapeBorder? toShapeBorder() {
+    if (borderRadius == null) return null;
+    return RoundedRectangleBorder(borderRadius: borderRadius!);
   }
 
   /// Resolves all `*ThemeColor` string keys to concrete [Color] values
@@ -316,7 +428,8 @@ class DacsStyle {
       'onErrorContainer' => s.onErrorContainer,
       'surface' => s.surface,
       'onSurface' => s.onSurface,
-      'surfaceVariant' => s.surfaceContainerHighest,
+      // ignore: deprecated_member_use
+      'surfaceVariant' => s.surfaceVariant,
       'onSurfaceVariant' => s.onSurfaceVariant,
       'outline' => s.outline,
       'outlineVariant' => s.outlineVariant,
@@ -377,7 +490,7 @@ class DacsStyle {
 
         if (allMatch) {
           if (remaining.isEmpty) {
-            result.mergeFrom(variant);
+            result._mergeVariant(variant);
           } else {
             final newKey = remaining.join(':');
             result.variants ??= {};
@@ -388,18 +501,25 @@ class DacsStyle {
         if (screenWidth != null && dacsBreakpoints.containsKey(key)) {
           final minWidth = dacsBreakpoints[key] ?? double.infinity;
           if (screenWidth >= minWidth) {
-            result.mergeFrom(variant);
+            result._mergeVariant(variant);
           }
         } else if (brightness != null && (key == 'dark' || key == 'light')) {
           final expected = key == 'dark' ? Brightness.dark : Brightness.light;
           if (brightness == expected) {
-            result.mergeFrom(variant);
+            result._mergeVariant(variant);
           }
         }
       }
     }
 
     return result;
+  }
+
+  /// Merges a variant into this style, respecting [isImportant].
+  /// When [isImportant] is true, the variant does not override base values.
+  void _mergeVariant(DacsStyle variant) {
+    if (isImportant) return;
+    mergeFrom(variant);
   }
 
   /// Returns a deep copy of this [DacsStyle] including all fields and variants.
@@ -460,10 +580,27 @@ class DacsStyle {
     gradientViaThemeColor =
         source.gradientViaThemeColor ?? gradientViaThemeColor;
     gradientToThemeColor = source.gradientToThemeColor ?? gradientToThemeColor;
+    gap = source.gap ?? gap;
+    flex = source.flex ?? flex;
+    flexDirection = source.flexDirection ?? flexDirection;
+    flexWrap = source.flexWrap ?? flexWrap;
+    alignItems = source.alignItems ?? alignItems;
+    justifyContent = source.justifyContent ?? justifyContent;
+    overflow = source.overflow ?? overflow;
+    if (source.isImportant) isImportant = true;
     if (source.variants != null) {
       variants ??= {};
       variants!.addAll(source.variants!);
     }
+  }
+
+  /// Creates a new [DacsStyle] with the same field values as this instance,
+  /// optionally overriding with the given [style].
+  DacsStyle copyWith(DacsStyle? style) {
+    if (style == null) return this;
+    final result = clone();
+    result.mergeFrom(style);
+    return result;
   }
 }
 

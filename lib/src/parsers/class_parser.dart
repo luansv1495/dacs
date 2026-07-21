@@ -10,6 +10,9 @@ import 'position_parser.dart';
 import 'transform_parser.dart';
 import 'gradient_parser.dart';
 import 'arbitrary_parser.dart';
+import 'flex_parser.dart';
+import 'aspect_parser.dart';
+import 'alignment_parser.dart';
 
 /// Orchestrates parsing of utility class strings into [DacsStyle] objects.
 ///
@@ -20,17 +23,20 @@ class ClassParser {
   static final _instance = ClassParser._();
   factory ClassParser() => _instance;
   ClassParser._()
-    : _parsers = [
-        TypographyParser(),
-        ColorParser(),
-        SpacingParser(),
-        BorderParser(),
-        PositionParser(),
-        TransformParser(),
-        GradientParser(),
-        LayoutParser(),
-        ArbitraryParser(),
-      ];
+      : _parsers = [
+          TypographyParser(),
+          ColorParser(),
+          SpacingParser(),
+          BorderParser(),
+          PositionParser(),
+          TransformParser(),
+          GradientParser(),
+          LayoutParser(),
+          FlexParser(),
+          AspectParser(),
+          AlignmentParser(),
+          ArbitraryParser(),
+        ];
 
   final List<DacsParser> _parsers;
   static final _cache = <String, DacsStyle>{};
@@ -58,15 +64,19 @@ class ClassParser {
 
   DacsStyle _doParse(String input) {
     final base = DacsStyle();
-    final tokens = input.split(' ');
+    final tokens = _tokenize(input);
     for (final token in tokens) {
       final trimmed = token.trim();
       if (trimmed.isEmpty) continue;
 
-      List<String>? variantPrefixes;
-      String classPart = trimmed;
+      bool isImportant = trimmed.endsWith('!');
+      final clean =
+          isImportant ? trimmed.substring(0, trimmed.length - 1) : trimmed;
 
-      final parts = trimmed.split(':');
+      List<String>? variantPrefixes;
+      String classPart = clean;
+
+      final parts = clean.split(':');
       if (parts.length > 1) {
         final last = parts.last;
         final prefixes = parts.take(parts.length - 1).toList();
@@ -80,19 +90,35 @@ class ClassParser {
         }
       }
 
-      if (variantPrefixes == null) {
+      void applyTo(DacsStyle target) {
+        if (isImportant) target.isImportant = true;
         for (final parser in _parsers) {
-          if (parser.parse(classPart, base)) break;
+          if (parser.parse(classPart, target)) break;
         }
+      }
+
+      if (variantPrefixes == null) {
+        applyTo(base);
       } else {
         final key = variantPrefixes.join(':');
         base.variants ??= {};
         final variantStyle = base.variants!.putIfAbsent(key, () => DacsStyle());
-        for (final parser in _parsers) {
-          if (parser.parse(classPart, variantStyle)) break;
-        }
+        applyTo(variantStyle);
       }
     }
     return base;
+  }
+
+  List<String> _tokenize(String input) {
+    final md = RegExp(r'^d/responsive\((.+)\)$').firstMatch(input.trim());
+    if (md != null) {
+      final inner = md.group(1)!;
+      return inner
+          .split('_')
+          .map((s) => s.trim())
+          .where((s) => s.isNotEmpty)
+          .toList();
+    }
+    return input.split(' ');
   }
 }

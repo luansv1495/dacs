@@ -35,6 +35,15 @@ class SpacingParser extends DacsParser {
       return true;
     }
 
+    final gapMatch = RegExp(r'^gap-(.+)$').firstMatch(token);
+    if (gapMatch != null) {
+      final sizeKey = gapMatch.group(1)!;
+      final size = dacsSpacing(sizeKey);
+      if (size == null) return false;
+      style.gap = size;
+      return true;
+    }
+
     return false;
   }
 

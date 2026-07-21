@@ -22,11 +22,24 @@ double? _radiusSize(String key) {
   return dacsSpacing(key);
 }
 
-/// Parses border tokens: border radius (`rounded-*` with directional variants)
-/// and border width (`border`, `border-2`…`border-8`).
+/// Parses border tokens: border radius (`rounded-*` with directional variants
+/// including RTL-aware logical corners) and border width (`border`,
+/// `border-2`…`border-8`).
 class BorderParser extends DacsParser {
   @override
   bool parse(String token, DacsStyle style) {
+    final roundedRtlMatch = RegExp(
+      r'^rounded-(ts|te|bs|be|ss|se|es|ee)(-(.+))?$',
+    ).firstMatch(token);
+    if (roundedRtlMatch != null) {
+      final corner = roundedRtlMatch.group(1)!;
+      final sizeKey = roundedRtlMatch.group(3) ?? '';
+      final size = _radiusSize(sizeKey);
+      if (size == null) return false;
+      style.borderRadius = _buildRtlRadius(corner, size);
+      return true;
+    }
+
     final roundedMatch = RegExp(
       r'^rounded(-(t|b|l|r|tl|tr|bl|br))?(-(.+))?$',
     ).firstMatch(token);
@@ -59,6 +72,20 @@ class BorderParser extends DacsParser {
     }
 
     return false;
+  }
+
+  BorderRadiusGeometry _buildRtlRadius(String corner, double size) {
+    return switch (corner) {
+      'ts' => BorderRadius.only(topLeft: Radius.circular(size)),
+      'te' => BorderRadius.only(topRight: Radius.circular(size)),
+      'bs' => BorderRadius.only(bottomLeft: Radius.circular(size)),
+      'be' => BorderRadius.only(bottomRight: Radius.circular(size)),
+      'ss' => BorderRadiusDirectional.only(topStart: Radius.circular(size)),
+      'se' => BorderRadiusDirectional.only(topEnd: Radius.circular(size)),
+      'es' => BorderRadiusDirectional.only(bottomStart: Radius.circular(size)),
+      'ee' => BorderRadiusDirectional.only(bottomEnd: Radius.circular(size)),
+      _ => BorderRadius.circular(size),
+    };
   }
 
   BorderRadiusGeometry _buildBorderRadius(String? direction, double size) {

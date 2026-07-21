@@ -768,24 +768,24 @@ void main() {
 
     test('resolve applies dark mode variant', () {
       final style = 'text-lg dark:text-white'.dStyle.resolve(
-        brightness: Brightness.dark,
-      );
+            brightness: Brightness.dark,
+          );
       expect(style.fontSize, 18);
       expect(style.color, const Color(0xFFFFFFFF));
     });
 
     test('resolve applies light mode variant', () {
       final style = 'text-lg dark:text-white light:text-black'.dStyle.resolve(
-        brightness: Brightness.light,
-      );
+            brightness: Brightness.light,
+          );
       expect(style.fontSize, 18);
       expect(style.color, const Color(0xFF000000));
     });
 
     test('resolve does not apply dark variant in light mode', () {
       final style = 'text-lg dark:text-white'.dStyle.resolve(
-        brightness: Brightness.light,
-      );
+            brightness: Brightness.light,
+          );
       expect(style.color, isNull);
     });
 
@@ -801,16 +801,16 @@ void main() {
 
     test('resolve applies overlapping breakpoints (latest wins)', () {
       final style = 'sm:text-sm md:text-base lg:text-lg'.dStyle.resolve(
-        screenWidth: 1200,
-      );
+            screenWidth: 1200,
+          );
       expect(style.fontSize, 18);
     });
 
     test('resolve merges dark variant over breakpoint', () {
       final style = 'text-sm md:text-lg dark:text-xl'.dStyle.resolve(
-        brightness: Brightness.dark,
-        screenWidth: 900,
-      );
+            brightness: Brightness.dark,
+            screenWidth: 900,
+          );
       expect(style.fontSize, 20);
     });
 
@@ -927,32 +927,32 @@ void main() {
 
     test('resolve applies chained dark:md variant', () {
       final style = 'text-sm dark:md:text-lg'.dStyle.resolve(
-        brightness: Brightness.dark,
-        screenWidth: 800,
-      );
+            brightness: Brightness.dark,
+            screenWidth: 800,
+          );
       expect(style.fontSize, 18);
     });
 
     test('resolve does not apply chained dark:md in wrong brightness', () {
       final style = 'text-sm dark:md:text-lg'.dStyle.resolve(
-        brightness: Brightness.light,
-        screenWidth: 800,
-      );
+            brightness: Brightness.light,
+            screenWidth: 800,
+          );
       expect(style.fontSize, 14);
     });
 
     test('resolve does not apply chained dark:md at small screen', () {
       final style = 'text-sm dark:md:text-lg'.dStyle.resolve(
-        brightness: Brightness.dark,
-        screenWidth: 700,
-      );
+            brightness: Brightness.dark,
+            screenWidth: 700,
+          );
       expect(style.fontSize, 14);
     });
 
     test('resolve re-maps chained variant with WidgetState condition', () {
       final result = 'bg-blue-500 dark:hover:bg-blue-700'.dStyle.resolve(
-        brightness: Brightness.dark,
-      );
+            brightness: Brightness.dark,
+          );
       expect(result.backgroundColor, const Color(0xFF3B82F6));
       expect(result.variants, isNotNull);
       expect(result.variants!['hover'], isNotNull);
@@ -964,8 +964,8 @@ void main() {
 
     test('resolve does not merge WidgetState compound variant into base', () {
       final result = 'bg-blue-500 dark:hover:bg-blue-700'.dStyle.resolve(
-        brightness: Brightness.dark,
-      );
+            brightness: Brightness.dark,
+          );
       expect(result.backgroundColor, const Color(0xFF3B82F6));
     });
   });
@@ -1020,6 +1020,227 @@ void main() {
       final a = 'text-lg'.dStyle;
       final b = 'font-bold'.dStyle;
       expect(identical(a, b), isFalse);
+    });
+  });
+
+  group('Gap', () {
+    test('parses gap-4', () {
+      final style = 'gap-4'.dStyle;
+      expect(style.gap, 16);
+    });
+
+    test('parses gap-0', () {
+      expect('gap-0'.dStyle.gap, 0);
+    });
+
+    test('parses gap-px', () {
+      expect('gap-px'.dStyle.gap, 1);
+    });
+
+    test('parses gap-2', () {
+      expect('gap-2'.dStyle.gap, 8);
+    });
+  });
+
+  group('Flex helpers', () {
+    test('parses flex', () {
+      expect('flex'.dStyle.flex, 1);
+    });
+
+    test('parses flex-col', () {
+      expect('flex-col'.dStyle.flexDirection, Axis.vertical);
+    });
+
+    test('parses flex-row', () {
+      expect('flex-row'.dStyle.flexDirection, Axis.horizontal);
+    });
+
+    test('parses flex-wrap', () {
+      expect('flex-wrap'.dStyle.flexWrap, isTrue);
+    });
+
+    test('parses flex-nowrap', () {
+      expect('flex-nowrap'.dStyle.flexWrap, isFalse);
+    });
+
+    test('parses items-center', () {
+      expect('items-center'.dStyle.alignItems, CrossAxisAlignment.center);
+    });
+
+    test('parses items-start', () {
+      expect('items-start'.dStyle.alignItems, CrossAxisAlignment.start);
+    });
+
+    test('parses items-end', () {
+      expect('items-end'.dStyle.alignItems, CrossAxisAlignment.end);
+    });
+
+    test('parses items-stretch', () {
+      expect('items-stretch'.dStyle.alignItems, CrossAxisAlignment.stretch);
+    });
+
+    test('parses justify-center', () {
+      expect('justify-center'.dStyle.justifyContent, MainAxisAlignment.center);
+    });
+
+    test('parses justify-between', () {
+      expect(
+        'justify-between'.dStyle.justifyContent,
+        MainAxisAlignment.spaceBetween,
+      );
+    });
+
+    test('parses justify-around', () {
+      expect(
+        'justify-around'.dStyle.justifyContent,
+        MainAxisAlignment.spaceAround,
+      );
+    });
+
+    test('parses justify-evenly', () {
+      expect(
+        'justify-evenly'.dStyle.justifyContent,
+        MainAxisAlignment.spaceEvenly,
+      );
+    });
+
+    test('parses justify-start', () {
+      expect('justify-start'.dStyle.justifyContent, MainAxisAlignment.start);
+    });
+
+    test('parses justify-end', () {
+      expect('justify-end'.dStyle.justifyContent, MainAxisAlignment.end);
+    });
+  });
+
+  group('Overflow', () {
+    test('parses overflow-hidden', () {
+      expect('overflow-hidden'.dStyle.overflow, Clip.hardEdge);
+    });
+
+    test('parses overflow-scroll', () {
+      expect('overflow-scroll'.dStyle.overflow, Clip.hardEdge);
+    });
+
+    test('parses overflow-visible', () {
+      expect('overflow-visible'.dStyle.overflow, Clip.none);
+    });
+
+    test('parses overflow-clip', () {
+      expect('overflow-clip'.dStyle.overflow, Clip.antiAlias);
+    });
+  });
+
+  group('RTL border-radius', () {
+    test('parses rounded-ts-lg (top-start)', () {
+      final br = 'rounded-ts-lg'.dStyle.borderRadius as BorderRadius;
+      expect(br.topLeft.x, 8);
+      expect(br.topRight.x, 0);
+    });
+
+    test('parses rounded-te-lg (top-end)', () {
+      final br = 'rounded-te-lg'.dStyle.borderRadius as BorderRadius;
+      expect(br.topRight.x, 8);
+      expect(br.topLeft.x, 0);
+    });
+
+    test('parses rounded-bs-lg (bottom-start)', () {
+      final br = 'rounded-bs-lg'.dStyle.borderRadius as BorderRadius;
+      expect(br.bottomLeft.x, 8);
+      expect(br.bottomRight.x, 0);
+    });
+
+    test('parses rounded-be-lg (bottom-end)', () {
+      final br = 'rounded-be-lg'.dStyle.borderRadius as BorderRadius;
+      expect(br.bottomRight.x, 8);
+      expect(br.bottomLeft.x, 0);
+    });
+
+    test('parses rounded-ss-lg (top-start logical)', () {
+      final br = 'rounded-ss-lg'.dStyle.borderRadius;
+      expect(br, isA<BorderRadiusDirectional>());
+      final directional = br as BorderRadiusDirectional;
+      expect(directional.topStart.x, 8);
+    });
+
+    test('parses rounded-se-lg (top-end logical)', () {
+      final br = 'rounded-se-lg'.dStyle.borderRadius;
+      expect(br, isA<BorderRadiusDirectional>());
+      final directional = br as BorderRadiusDirectional;
+      expect(directional.topEnd.x, 8);
+    });
+  });
+
+  group('Important', () {
+    test('sets isImportant with ! suffix', () {
+      final style = 'text-red-500!'.dStyle;
+      expect(style.isImportant, isTrue);
+      expect(style.color, const Color(0xFFEF4444));
+    });
+
+    test('important prevents variant override', () {
+      final style = 'text-red-500! dark:text-blue-300'.dStyle;
+      final resolved = style.resolve(brightness: Brightness.dark);
+      expect(resolved.color, const Color(0xFFEF4444));
+    });
+
+    test('important does not affect non-important', () {
+      final style = 'text-lg'.dStyle;
+      expect(style.isImportant, isFalse);
+    });
+
+    test('variant with important', () {
+      final style = 'text-lg dark:text-white!'.dStyle;
+      final resolved = style.resolve(brightness: Brightness.dark);
+      expect(resolved.color, const Color(0xFFFFFFFF));
+    });
+  });
+
+  group('DacsStyle.apply', () {
+    test('apply parses classes into DacsStyle', () {
+      final style = DacsStyle.apply('text-lg font-bold p-4');
+      expect(style.fontSize, 18);
+      expect(style.fontWeight, FontWeight.w700);
+      expect(style.padding?.left, 16);
+    });
+
+    test('apply with empty string', () {
+      final style = DacsStyle.apply('');
+      expect(style.fontSize, isNull);
+    });
+  });
+
+  group('DacsStyleTween', () {
+    test('lerp at t=0 returns begin', () {
+      final tween = DacsStyleTween(
+        begin: DacsStyle()..fontSize = 10,
+        end: DacsStyle()..fontSize = 20,
+      );
+      expect(tween.lerp(0).fontSize, 10);
+    });
+
+    test('lerp at t=1 returns end', () {
+      final tween = DacsStyleTween(
+        begin: DacsStyle()..fontSize = 10,
+        end: DacsStyle()..fontSize = 20,
+      );
+      expect(tween.lerp(1).fontSize, 20);
+    });
+
+    test('lerp at t=0.5 interpolates', () {
+      final tween = DacsStyleTween(
+        begin: DacsStyle()..fontSize = 10,
+        end: DacsStyle()..fontSize = 20,
+      );
+      expect(tween.lerp(0.5).fontSize, 15);
+    });
+
+    test('lerp handles null fields', () {
+      final tween = DacsStyleTween(
+        begin: DacsStyle(),
+        end: DacsStyle()..fontSize = 20,
+      );
+      expect(tween.lerp(0.5).fontSize, 10);
     });
   });
 
@@ -1155,9 +1376,254 @@ void main() {
       expect(br.bottomLeft.x, 0);
     });
 
-    test('parses gap-[10] returns false gracefully', () {
+    test('parses gap-[10]', () {
       final style = 'gap-[10]'.dStyle;
-      expect(style.fontSize, isNull);
+      expect(style.gap, 10);
+    });
+  });
+
+  group('Min/Max constraints', () {
+    test('parses min-w-4', () {
+      final s = 'min-w-4'.dStyle;
+      expect(s.minWidth, 16);
+    });
+
+    test('parses max-w-*', () {
+      final s = 'max-w-96 max-w-full'.dStyle;
+      expect(s.maxWidth, double.infinity);
+    });
+
+    test('parses min-h-*', () {
+      final s = 'min-h-12'.dStyle;
+      expect(s.minHeight, 48);
+    });
+
+    test('parses max-h-*', () {
+      final s = 'max-h-64'.dStyle;
+      expect(s.maxHeight, 256);
+    });
+
+    test('parses min-w-full as infinity', () {
+      final s = 'min-w-full'.dStyle;
+      expect(s.minWidth, double.infinity);
+    });
+
+    test('parses max-w-auto as 0', () {
+      final s = 'max-w-auto'.dStyle;
+      expect(s.maxWidth, 0);
+    });
+  });
+
+  group('Object fit', () {
+    test('parses object-cover', () {
+      final s = 'object-cover'.dStyle;
+      expect(s.boxFit, BoxFit.cover);
+    });
+
+    test('parses object-contain', () {
+      final s = 'object-contain'.dStyle;
+      expect(s.boxFit, BoxFit.contain);
+    });
+
+    test('parses object-fill', () {
+      final s = 'object-fill'.dStyle;
+      expect(s.boxFit, BoxFit.fill);
+    });
+
+    test('parses object-none', () {
+      final s = 'object-none'.dStyle;
+      expect(s.boxFit, BoxFit.none);
+    });
+
+    test('parses object-scale-down', () {
+      final s = 'object-scale-down'.dStyle;
+      expect(s.boxFit, BoxFit.scaleDown);
+    });
+  });
+
+  group('Aspect ratio', () {
+    test('parses aspect-square', () {
+      final s = 'aspect-square'.dStyle;
+      expect(s.aspectRatio, 1.0);
+    });
+
+    test('parses aspect-video', () {
+      final s = 'aspect-video'.dStyle;
+      expect(s.aspectRatio, closeTo(16 / 9, 1e-10));
+    });
+
+    test('parses aspect-[4/3]', () {
+      final s = 'aspect-[4/3]'.dStyle;
+      expect(s.aspectRatio, closeTo(4 / 3, 1e-10));
+    });
+
+    test('parses aspect-[16/9]', () {
+      final s = 'aspect-[16/9]'.dStyle;
+      expect(s.aspectRatio, closeTo(16 / 9, 1e-10));
+    });
+
+    test('unknown aspect returns null', () {
+      final s = 'aspect-unknown'.dStyle;
+      expect(s.aspectRatio, isNull);
+    });
+  });
+
+  group('Alignment', () {
+    test('parses align-center', () {
+      final s = 'align-center'.dStyle;
+      expect(s.alignment, Alignment.center);
+    });
+
+    test('parses align-topLeft', () {
+      final s = 'align-topLeft'.dStyle;
+      expect(s.alignment, Alignment.topLeft);
+    });
+
+    test('parses align-bottomRight', () {
+      final s = 'align-bottomRight'.dStyle;
+      expect(s.alignment, Alignment.bottomRight);
+    });
+
+    test('parses align-left (centerLeft)', () {
+      final s = 'align-left'.dStyle;
+      expect(s.alignment, Alignment.centerLeft);
+    });
+
+    test('parses align-top (topCenter)', () {
+      final s = 'align-top'.dStyle;
+      expect(s.alignment, Alignment.topCenter);
+    });
+
+    test('parses align-bottom (bottomCenter)', () {
+      final s = 'align-bottom'.dStyle;
+      expect(s.alignment, Alignment.bottomCenter);
+    });
+
+    test('parses align-right (centerRight)', () {
+      final s = 'align-right'.dStyle;
+      expect(s.alignment, Alignment.centerRight);
+    });
+  });
+
+  group('Conversion methods', () {
+    test('toBorder returns BoxBorder from borderColor', () {
+      final s = DacsStyle()
+        ..borderColor = const Color(0xFF0000FF)
+        ..borderWidth = 2;
+      final border = s.toBorder();
+      expect(border, isA<Border>());
+    });
+
+    test('toBorder returns null when no border fields set', () {
+      expect(DacsStyle().toBorder(), isNull);
+    });
+
+    test('toBorderSide returns BorderSide from borderColor', () {
+      final s = DacsStyle()
+        ..borderColor = const Color(0xFFFF0000)
+        ..borderWidth = 3;
+      final side = s.toBorderSide();
+      expect(side, isA<BorderSide>());
+      expect(side!.color, const Color(0xFFFF0000));
+      expect(side.width, 3);
+    });
+
+    test('toRadius returns borderRadius directly', () {
+      final s = DacsStyle()..borderRadius = BorderRadius.circular(12);
+      expect(s.toRadius(), BorderRadius.circular(12));
+    });
+
+    test('toConstraints combines width and height', () {
+      final s = DacsStyle()
+        ..width = 100
+        ..height = 200;
+      final c = s.toConstraints();
+      expect(c, isA<BoxConstraints>());
+      expect(c!.minWidth, 100);
+      expect(c.maxWidth, 100);
+      expect(c.minHeight, 200);
+      expect(c.maxHeight, 200);
+    });
+
+    test('toConstraints uses min/max when width is unset', () {
+      final s = DacsStyle()
+        ..minWidth = 50
+        ..maxWidth = 150;
+      final c = s.toConstraints();
+      expect(c!.minWidth, 50);
+      expect(c.maxWidth, 150);
+    });
+
+    test('toConstraints returns null when no constraint fields', () {
+      expect(DacsStyle().toConstraints(), isNull);
+    });
+
+    test('toAlignment returns alignment field', () {
+      final s = DacsStyle()..alignment = Alignment.centerRight;
+      expect(s.toAlignment(), Alignment.centerRight);
+    });
+
+    test('toShapeBorder returns RoundedRectangleBorder from borderRadius', () {
+      final s = DacsStyle()..borderRadius = BorderRadius.circular(8);
+      final shape = s.toShapeBorder();
+      expect(shape, isA<RoundedRectangleBorder>());
+    });
+
+    test('toShapeBorder returns null without borderRadius', () {
+      expect(DacsStyle().toShapeBorder(), isNull);
+    });
+  });
+
+  group('Extension getters (Phase 2)', () {
+    test('.dBorder returns BoxBorder', () {
+      final b = 'border-red-500 border-2'.dBorder;
+      expect(b, isA<Border>());
+    });
+
+    test('.dBorder returns null when no border', () {
+      expect('text-lg'.dBorder, isNull);
+    });
+
+    test('.dBorderSide returns BorderSide', () {
+      final s = 'border-blue-300 border-2'.dBorderSide;
+      expect(s, isA<BorderSide>());
+      expect(s!.color, const Color(0xFF93C5FD));
+      expect(s.width, 8);
+    });
+
+    test('.dRadius returns BorderRadiusGeometry', () {
+      final r = 'rounded-xl'.dRadius;
+      expect(r, isA<BorderRadiusGeometry>());
+    });
+
+    test('.dConstraints returns BoxConstraints', () {
+      final c = 'w-32 h-48'.dConstraints;
+      expect(c, isA<BoxConstraints>());
+      expect(c!.minWidth, 128);
+      expect(c.maxWidth, 128);
+      expect(c.minHeight, 192);
+      expect(c.maxHeight, 192);
+    });
+
+    test('.dConstraints with min/max', () {
+      final c = 'min-w-12 max-w-64'.dConstraints;
+      expect(c, isA<BoxConstraints>());
+      expect(c!.minWidth, 48);
+      expect(c.maxWidth, 256);
+    });
+
+    test('.dAlignment returns AlignmentGeometry', () {
+      final a = 'align-center'.dAlignment;
+      expect(a, Alignment.center);
+    });
+
+    test('.dShapeBorder returns ShapeBorder', () {
+      final s = 'rounded-lg'.dShapeBorder;
+      expect(s, isA<RoundedRectangleBorder>());
+    });
+
+    test('.dShapeBorder returns null without rounded', () {
+      expect('text-lg'.dShapeBorder, isNull);
     });
   });
 }

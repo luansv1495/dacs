@@ -144,7 +144,10 @@ Use any `ColorScheme` key as a color — no need to import or reference the them
 ```dart
 Text('Primary', style: 'text-primary font-bold'.dTextOf(context))
 Container(decoration: 'bg-surface rounded-lg border-outline'.dBoxOf(context))
-Checkbox(checkboxTheme: 'checked:bg-primary unchecked:bg-surface'.dCheckbox(context))
+CheckboxTheme(
+  data: 'checked:bg-primary unchecked:bg-surface'.dCheckbox(context),
+  child: Checkbox(value: true, onChanged: (_) {}),
+)
 ```
 
 Supported keys: `primary`, `onPrimary`, `primaryContainer`, `onPrimaryContainer`, `secondary`, `onSecondary`, `secondaryContainer`, `onSecondaryContainer`, `tertiary`, `onTertiary`, `tertiaryContainer`, `onTertiaryContainer`, `error`, `onError`, `errorContainer`, `onErrorContainer`, `surface`, `onSurface`, `surfaceVariant`, `onSurfaceVariant`, `outline`, `outlineVariant`, `inverseSurface`, `onInverseSurface`, `inversePrimary`, `shadow`, `scrim`
@@ -165,7 +168,8 @@ Use square brackets for one-off values:
 
 ### Material widget extensions
 
-Style Material widgets directly via context-aware methods:
+Style Material widgets via context-aware methods. WidgetState variant support
+(`hover:`, `focus:`, `disabled:`, etc.) varies by adapter — see the table below.
 
 ```dart
 ElevatedButton(
@@ -174,12 +178,14 @@ ElevatedButton(
   child: const Text('Submit'),
 )
 
-Checkbox(
-  theme: 'bg-primary hover:bg-primaryContainer'.dCheckbox(context),
+CheckboxTheme(
+  data: 'bg-primary hover:bg-primaryContainer'.dCheckbox(context),
+  child: Checkbox(value: true, onChanged: (_) {}),
 )
 
-Card(
-  theme: 'bg-surface rounded-xl shadow-md'.dCard(context),
+CardTheme(
+  data: 'bg-surface rounded-xl shadow-md'.dCard(context),
+  child: Card(child: Text('Content', style: 'text-base'.dText)),
 )
 ```
 
@@ -191,14 +197,15 @@ For Material widgets, use interactive state variants:
 
 ```dart
 ElevatedButton(
-  style: 'bg-primary hover:bg-primaryContainer disabled:bg-surface'.
-      dButton(context),
+  style: 'bg-primary hover:bg-primaryContainer disabled:bg-surface 
+          rounded-lg hover:rounded-xl'.dButton(context),
   onPressed: () {},
   child: const Text('Submit'),
 )
 ```
 
 State order: base → disabled → pressed → hover → focus → selected → error → dragged → scrolledUnder.
+Shape variants (`hover:rounded-xl`, `pressed:rounded-sm`) resolve dynamically via `_stateProp`.
 
 ### Chained compound variants
 
@@ -264,35 +271,36 @@ These accept a `BuildContext` to resolve dark/light mode, responsive breakpoints
 ### Material widget extensions
 
 These accept a `BuildContext` and return Material theme data with variant resolution.
+WidgetState support is marked per method.
 
-| Method | Returns |
-|---|---|
-| `.dButton(context)` | `ButtonStyle` |
-| `.dCheckbox(context)` | `CheckboxThemeData` |
-| `.dSwitch(context)` | `SwitchThemeData` |
-| `.dRadio(context)` | `RadioThemeData` |
-| `.dChip(context)` | `ChipThemeData` |
-| `.dAppBar(context)` | `AppBarTheme` |
-| `.dCard(context)` | `CardTheme` |
-| `.dListTile(context)` | `ListTileThemeData` |
-| `.dTabBar(context)` | `TabBarTheme` |
-| `.dBottomNav(context)` | `BottomNavigationBarThemeData` |
-| `.dInput(context)` | `InputDecoration` |
-| `.dProgress(context)` | `ProgressIndicatorThemeData` |
-| `.dTooltip(context)` | `TooltipThemeData` |
-| `.dDivider(context)` | `DividerThemeData` |
-| `.dScrollbar(context)` | `ScrollbarThemeData` |
-| `.dSnackBar(context)` | `SnackBarThemeData` |
-| `.dDialog(context)` | `DialogTheme` |
-| `.dBottomSheet(context)` | `BottomSheetThemeData` |
-| `.dExpansionTile(context)` | `ExpansionTileThemeData` |
-| `.dNavBar(context)` | `NavigationBarThemeData` |
-| `.dFab(context)` | `FloatingActionButtonThemeData` |
-| `.dDataTable(context)` | `DataTableThemeData` |
-| `.dSearchBar(context)` | `SearchBarThemeData` |
-| `.dMenu(context)` | `MenuStyle` |
-| `.dIcon(context)` | `IconThemeData` |
-| `.dShape(context)` | `ShapeDecoration` |
+| Method | Returns | WidgetState |
+|---|---|---|
+| `.dButton(context)` | `ButtonStyle` | full |
+| `.dCheckbox(context)` | `CheckboxThemeData` | partial |
+| `.dSwitch(context)` | `SwitchThemeData` | partial |
+| `.dRadio(context)` | `RadioThemeData` | partial |
+| `.dChip(context)` | `ChipThemeData` | only color |
+| `.dScrollbar(context)` | `ScrollbarThemeData` | partial |
+| `.dNavBar(context)` | `NavigationBarThemeData` | only label |
+| `.dDataTable(context)` | `DataTableThemeData` | partial |
+| `.dSearchBar(context)` | `SearchBarThemeData` | partial |
+| `.dMenu(context)` | `MenuStyle` | partial |
+| `.dAppBar(context)` | `AppBarTheme` | — |
+| `.dCard(context)` | `CardTheme` | — |
+| `.dListTile(context)` | `ListTileThemeData` | — |
+| `.dTabBar(context)` | `TabBarTheme` | — |
+| `.dBottomNav(context)` | `BottomNavigationBarThemeData` | — |
+| `.dInput(context)` | `InputDecoration` | — |
+| `.dProgress(context)` | `ProgressIndicatorThemeData` | — |
+| `.dTooltip(context)` | `TooltipThemeData` | — |
+| `.dDivider(context)` | `DividerThemeData` | — |
+| `.dSnackBar(context)` | `SnackBarThemeData` | — |
+| `.dDialog(context)` | `DialogTheme` | — |
+| `.dBottomSheet(context)` | `BottomSheetThemeData` | — |
+| `.dExpansionTile(context)` | `ExpansionTileThemeData` | — |
+| `.dFab(context)` | `FloatingActionButtonThemeData` | — |
+| `.dIcon(context)` | `IconThemeData` | — |
+| `.dShape(context)` | `ShapeDecoration` | — |
 
 ## Supported classes
 

@@ -13,6 +13,7 @@ _BState _state(String input, BuildContext context) {
   final base = parsed.resolve(brightness: brightness, screenWidth: screenWidth);
   base.resolveThemeColors(context);
   final variants = <String, DacsStyle>{};
+  final compoundVariants = <DacsStateRule>[];
   if (parsed.variants != null) {
     for (final k in parsed.variants!.keys) {
       final v = parsed.variants![k]!;
@@ -22,6 +23,7 @@ _BState _state(String input, BuildContext context) {
           v,
           base,
           variants,
+          compoundVariants,
           brightness,
           screenWidth,
           context,
@@ -34,7 +36,13 @@ _BState _state(String input, BuildContext context) {
       }
     }
   }
-  return _BState(base, variants);
+  return _BState(base, variants, compoundVariants);
+}
+
+class DacsStateRule {
+  final Set<WidgetState> requiredStates;
+  final DacsStyle style;
+  const DacsStateRule(this.requiredStates, this.style);
 }
 
 void _addCompoundVariant(
@@ -42,6 +50,7 @@ void _addCompoundVariant(
   DacsStyle v,
   DacsStyle base,
   Map<String, DacsStyle> variants,
+  List<DacsStateRule> compoundVariants,
   Brightness brightness,
   double screenWidth,
   BuildContext context,
@@ -75,16 +84,32 @@ void _addCompoundVariant(
     if (v.gradientViaThemeColor != null) merged.gradientViaColor = null;
     if (v.gradientToThemeColor != null) merged.gradientToColor = null;
     merged.resolveThemeColors(context);
-    for (final sp in stateParts) {
-      variants[sp] = merged;
+    if (stateParts.length == 1) {
+      variants[stateParts.first] = merged;
+    } else {
+      final states = stateParts.map(_widgetState).toSet();
+      compoundVariants.add(DacsStateRule(states, merged));
     }
   }
 }
 
+WidgetState _widgetState(String name) => switch (name) {
+      'hover' => WidgetState.hovered,
+      'focus' => WidgetState.focused,
+      'active' || 'pressed' => WidgetState.pressed,
+      'disabled' => WidgetState.disabled,
+      'selected' => WidgetState.selected,
+      'error' => WidgetState.error,
+      'dragged' => WidgetState.dragged,
+      'scrolledUnder' => WidgetState.scrolledUnder,
+      _ => WidgetState.hovered,
+    };
+
 class _BState {
   final DacsStyle base;
   final Map<String, DacsStyle> variants;
-  const _BState(this.base, this.variants);
+  final List<DacsStateRule> compoundVariants;
+  const _BState(this.base, this.variants, this.compoundVariants);
 }
 
 BorderSide? _side(DacsStyle s) => s.borderColor != null || s.borderWidth != null
@@ -100,13 +125,13 @@ OutlinedBorder? _shape(DacsStyle s) => s.borderRadius != null
 
 OutlineInputBorder? _outline(DacsStyle s) =>
     s.borderColor != null || s.borderWidth != null
-    ? OutlineInputBorder(
-        borderSide: _side(s) ?? BorderSide.none,
-        borderRadius: s.borderRadius is BorderRadius
-            ? (s.borderRadius as BorderRadius)
-            : BorderRadius.zero,
-      )
-    : null;
+        ? OutlineInputBorder(
+            borderSide: _side(s) ?? BorderSide.none,
+            borderRadius: s.borderRadius is BorderRadius
+                ? (s.borderRadius as BorderRadius)
+                : BorderRadius.zero,
+          )
+        : null;
 
 WidgetStateProperty<T> _stateProp<T>(
   _BState st,
@@ -129,22 +154,51 @@ WidgetStateProperty<T> _stateProp<T>(
       return extra?.call(v);
     }
 
-    final r1 = pick('disabled', disabledExtra);
-    if (r1 != null) return r1;
-    final r2 = pick('active', activeExtra) ?? pick('pressed', activeExtra);
-    if (r2 != null) return r2;
-    final r3 = pick('hover', hoverExtra);
-    if (r3 != null) return r3;
-    final r4 = pick('focus', focusExtra);
-    if (r4 != null) return r4;
-    final r5 = pick('selected', selectedExtra);
-    if (r5 != null) return r5;
-    final r6 = pick('error', errorExtra);
-    if (r6 != null) return r6;
-    final r7 = pick('dragged', draggedExtra);
-    if (r7 != null) return r7;
-    final r8 = pick('scrolledUnder', scrolledUnderExtra);
-    if (r8 != null) return r8;
+    T? fromRule(DacsStateRule rule, T Function(DacsStyle)? extra) {
+      final r = fallback(rule.style);
+      if (r != null) return r;
+      return extra?.call(rule.style);
+    }
+
+    for (final rule in st.compoundVariants) {
+      if (rule.requiredStates.every(states.contains)) {
+        final r = fromRule(rule, null);
+        if (r != null) return r;
+      }
+    }
+
+    if (states.contains(WidgetState.disabled)) {
+      final r = pick('disabled', disabledExtra);
+      if (r != null) return r;
+    }
+    if (states.contains(WidgetState.selected)) {
+      final r = pick('selected', selectedExtra);
+      if (r != null) return r;
+    }
+    if (states.contains(WidgetState.error)) {
+      final r = pick('error', errorExtra);
+      if (r != null) return r;
+    }
+    if (states.contains(WidgetState.pressed)) {
+      final r = pick('pressed', activeExtra) ?? pick('active', activeExtra);
+      if (r != null) return r;
+    }
+    if (states.contains(WidgetState.dragged)) {
+      final r = pick('dragged', draggedExtra);
+      if (r != null) return r;
+    }
+    if (states.contains(WidgetState.hovered)) {
+      final r = pick('hover', hoverExtra);
+      if (r != null) return r;
+    }
+    if (states.contains(WidgetState.focused)) {
+      final r = pick('focus', focusExtra);
+      if (r != null) return r;
+    }
+    if (states.contains(WidgetState.scrolledUnder)) {
+      final r = pick('scrolledUnder', scrolledUnderExtra);
+      if (r != null) return r;
+    }
 
     return fallback(st.base);
   });
@@ -163,7 +217,9 @@ extension DacsWidgetExtensions on String {
   /// Supports all variant types including WidgetState conditions
   /// (hover, focus, active/disabled, pressed) and chained compound
   /// variants. Uses [WidgetStateProperty] for interactive properties
-  /// (backgroundColor, foregroundColor, overlayColor, etc.).
+  /// (backgroundColor, foregroundColor, overlayColor, surfaceTintColor,
+  /// iconColor, iconSize, shadowColor, minimumSize, fixedSize, maximumSize,
+  /// padding, side, shape, elevation, mouseCursor).
   ButtonStyle dButton(BuildContext context) {
     final st = _state(this, context);
     return ButtonStyle(
@@ -182,18 +238,36 @@ extension DacsWidgetExtensions on String {
         (_) => null,
         hoverExtra: (s) => s.boxShadow?.firstOrNull?.color,
       ),
+      surfaceTintColor: _stateProp<Color?>(st, (s) => s.backgroundColor),
+      iconColor: _stateProp<Color?>(st, (s) => s.color),
+      iconSize: _stateProp<double?>(st, (s) => s.fontSize),
       padding: _stateProp<EdgeInsets?>(st, (s) => s.padding),
+      minimumSize: _stateProp<Size?>(
+        st,
+        (s) => s.width != null || s.height != null
+            ? Size(s.width ?? 0, s.height ?? 0)
+            : null,
+      ),
+      fixedSize: _stateProp<Size?>(
+        st,
+        (s) => s.width != null || s.height != null
+            ? Size(s.width ?? 0, s.height ?? 0)
+            : null,
+      ),
+      maximumSize: _stateProp<Size?>(
+        st,
+        (s) => s.width != null || s.height != null
+            ? Size(s.width ?? double.infinity, s.height ?? double.infinity)
+            : null,
+      ),
       side: _stateProp<BorderSide?>(st, (s) => _side(s)),
-      shape: st.base.borderRadius != null
-          ? WidgetStatePropertyAll(
-              RoundedRectangleBorder(borderRadius: st.base.borderRadius!),
-            )
-          : null,
+      shape: _stateProp<OutlinedBorder?>(st, (s) => _shape(s)),
       elevation: _stateProp<double?>(
         st,
         (_) => null,
         hoverExtra: (s) => s.boxShadow?.firstOrNull?.blurRadius,
       ),
+      mouseCursor: _stateProp<MouseCursor?>(st, (_) => null),
     );
   }
 
@@ -422,9 +496,8 @@ extension DacsWidgetExtensions on String {
       radius: s.borderRadius is BorderRadius
           ? Radius.circular((s.borderRadius as BorderRadius).topLeft.x)
           : null,
-      thickness: s.borderWidth != null
-          ? WidgetStatePropertyAll(s.borderWidth)
-          : null,
+      thickness:
+          s.borderWidth != null ? WidgetStatePropertyAll(s.borderWidth) : null,
     );
   }
 

@@ -18,11 +18,33 @@ class DacsExampleApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 2),
+  )..repeat(reverse: true);
+
+  final _cardGroup = DacsStyle.apply('rounded-xl shadow-md p-4 bg-white');
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final begin = DacsStyle()..opacity = 1;
+    final end = DacsStyle()..opacity = 0.3;
+    final animated = _controller.dAnimated(begin, end);
+
     return Scaffold(
       appBar: AppBar(title: const Text('DACS Example'), centerTitle: true),
       body: ListView(
@@ -66,6 +88,83 @@ class HomePage extends StatelessWidget {
             ),
           ),
 
+          SectionHeader(title: 'Apply (Reusable Groups)'),
+          Container(
+            padding: 'p-4'.dPads,
+            decoration: _cardGroup.toBoxDecoration(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Card style via apply()',
+                  style: 'text-lg font-bold'.dText,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'DacsStyle.apply("rounded-xl shadow-md p-4 bg-white")',
+                  style: 'text-sm text-gray-500'.dText,
+                ),
+              ],
+            ),
+          ),
+
+          SectionHeader(title: 'Gap & Flex Helpers'),
+          Container(
+            padding: 'p-4'.dPads,
+            decoration: 'bg-gray-50 dark:bg-gray-800 rounded-lg'.dBoxOf(
+              context,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Flex row with gap-3',
+                  style: 'text-sm font-medium text-gray-600 dark:text-gray-300'
+                      .dTextOf(context),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  spacing: DacsStyle.apply('gap-3').gap ?? 12,
+                  children: [1, 2, 3].map((i) {
+                    return Container(
+                      width: 60,
+                      height: 60,
+                      decoration: 'bg-primary rounded-lg'.dBoxOf(context),
+                      child: Center(
+                        child: Text(
+                          '$i',
+                          style: 'text-white font-bold text-xl'.dText,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'items-center + justify-between',
+                  style: 'text-sm font-medium text-gray-600 dark:text-gray-300'
+                      .dTextOf(context),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  padding: 'p-3'.dPads,
+                  decoration: 'bg-white dark:bg-gray-700 rounded-lg'.dBoxOf(
+                    context,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text('Left', style: 'font-medium'.dText),
+                      Text('Center', style: 'text-gray-500'.dText),
+                      Text('Right', style: 'font-medium'.dText),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           SectionHeader(title: 'Box Decoration'),
           Container(
             padding: 'p-4'.dPads,
@@ -93,6 +192,12 @@ class HomePage extends StatelessWidget {
             style: 'bg-primary text-white rounded-lg'.dButton(context),
             onPressed: () {},
             child: const Text('Styled Button'),
+          ),
+          const SizedBox(height: 8),
+          ElevatedButton(
+            onPressed: () {},
+            style: 'bg-primary text-white rounded-lg w-48'.dButton(context),
+            child: const Text('Fixed width via w-48'),
           ),
           const SizedBox(height: 8),
           CheckboxTheme(
@@ -134,16 +239,45 @@ class HomePage extends StatelessWidget {
 
           SectionHeader(title: 'WidgetState & Chained Variants'),
           ElevatedButton(
-            style: 'bg-primary hover:bg-primaryContainer disabled:bg-surface'
-                .dButton(context),
+            style:
+                ('bg-primary hover:bg-primaryContainer '
+                        'disabled:bg-surface '
+                        'rounded-lg hover:rounded-xl')
+                    .dButton(context),
             onPressed: () {},
-            child: const Text('Hover / Disabled States'),
+            child: const Text('Hover shape: rounded-xl'),
           ),
           const SizedBox(height: 8),
           ElevatedButton(
             style: 'bg-primary dark:hover:bg-error'.dButton(context),
             onPressed: () {},
             child: const Text('Dark + Hover (chained)'),
+          ),
+
+          SectionHeader(title: 'Important (!)'),
+          Text(
+            'This ignores dark mode override',
+            style: 'text-base text-red-500! dark:text-blue-300'.dTextOf(
+              context,
+            ),
+          ),
+
+          SectionHeader(title: 'Overflow'),
+          Container(
+            height: 60,
+            decoration: 'bg-gray-100 dark:bg-gray-800 rounded-lg'.dBoxOf(
+              context,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: 'bg-red-300 rounded'.dBox,
+                  child: const Center(child: Text('Overflow')),
+                ),
+              ],
+            ),
           ),
 
           SectionHeader(title: 'Responsive'),
@@ -175,6 +309,18 @@ class HomePage extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+
+          SectionHeader(title: 'RTL Border Radius'),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _radiusBox('rounded-ts-lg'),
+              _radiusBox('rounded-te-lg'),
+              _radiusBox('rounded-be-lg'),
+              _radiusBox('rounded-bs-lg'),
+            ],
           ),
 
           SectionHeader(title: 'Position (Stack)'),
@@ -224,6 +370,28 @@ class HomePage extends StatelessWidget {
             ),
           ),
 
+          SectionHeader(title: 'Animated (pulsing opacity)'),
+          AnimatedBuilder(
+            animation: animated,
+            builder: (context, child) {
+              final s = animated.value;
+              return Opacity(
+                opacity: s.opacity ?? 1,
+                child: Container(
+                  padding: 'px-4 py-2'.dPads,
+                  decoration: 'bg-purple-500 rounded-lg'.dBox,
+                  child: const Text(
+                    'Pulsing',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+
           SectionHeader(title: 'Shadows'),
           Wrap(
             spacing: 12,
@@ -242,6 +410,17 @@ class HomePage extends StatelessWidget {
 
           const SizedBox(height: 24),
         ],
+      ),
+    );
+  }
+
+  Widget _radiusBox(String cls) {
+    return Container(
+      width: 80,
+      height: 60,
+      decoration: 'bg-teal-100 $cls border border-teal-300'.dBox,
+      child: Center(
+        child: Text(cls, style: 'text-[10px] text-teal-800 font-medium'.dText),
       ),
     );
   }

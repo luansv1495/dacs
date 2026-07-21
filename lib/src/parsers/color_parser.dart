@@ -73,86 +73,86 @@ class ColorParser extends DacsParser {
   }
 
   bool _tryText(String token, DacsStyle style) => _tryPrefix(
-    'text',
-    token,
-    style,
-    (v) {
-      style.textThemeColor = v;
-    },
-    (c) {
-      style.color = c;
-    },
-  );
+        'text',
+        token,
+        style,
+        (v) {
+          style.textThemeColor = v;
+        },
+        (c) {
+          style.color = c;
+        },
+      );
 
   bool _tryBg(String token, DacsStyle style) => _tryPrefix(
-    'bg',
-    token,
-    style,
-    (v) {
-      style.bgThemeColor = v;
-    },
-    (c) {
-      style.backgroundColor = c;
-    },
-  );
+        'bg',
+        token,
+        style,
+        (v) {
+          style.bgThemeColor = v;
+        },
+        (c) {
+          style.backgroundColor = c;
+        },
+      );
 
   bool _tryBorder(String token, DacsStyle style) => _tryPrefix(
-    'border',
-    token,
-    style,
-    (v) {
-      style.borderThemeColor = v;
-    },
-    (c) {
-      style.borderColor = c;
-    },
-  );
+        'border',
+        token,
+        style,
+        (v) {
+          style.borderThemeColor = v;
+        },
+        (c) {
+          style.borderColor = c;
+        },
+      );
 
   bool _tryDecoration(String token, DacsStyle style) => _tryPrefix(
-    'decoration',
-    token,
-    style,
-    (v) {
-      style.decorationThemeColor = v;
-    },
-    (c) {
-      style.textDecorationColor = c;
-    },
-  );
+        'decoration',
+        token,
+        style,
+        (v) {
+          style.decorationThemeColor = v;
+        },
+        (c) {
+          style.textDecorationColor = c;
+        },
+      );
 
   bool _tryFrom(String token, DacsStyle style) => _tryPrefix(
-    'from',
-    token,
-    style,
-    (v) {
-      style.gradientFromThemeColor = v;
-    },
-    (c) {
-      style.gradientFromColor = c;
-    },
-  );
+        'from',
+        token,
+        style,
+        (v) {
+          style.gradientFromThemeColor = v;
+        },
+        (c) {
+          style.gradientFromColor = c;
+        },
+      );
 
   bool _tryVia(String token, DacsStyle style) => _tryPrefix(
-    'via',
-    token,
-    style,
-    (v) {
-      style.gradientViaThemeColor = v;
-    },
-    (c) {
-      style.gradientViaColor = c;
-    },
-  );
+        'via',
+        token,
+        style,
+        (v) {
+          style.gradientViaThemeColor = v;
+        },
+        (c) {
+          style.gradientViaColor = c;
+        },
+      );
 
   bool _tryTo(String token, DacsStyle style) => _tryPrefix(
-    'to',
-    token,
-    style,
-    (v) {
-      style.gradientToThemeColor = v;
-    },
-    (c) {
-      style.gradientToColor = c;
-    },
-  );
+        'to',
+        token,
+        style,
+        (v) {
+          style.gradientToThemeColor = v;
+        },
+        (c) {
+          style.gradientToColor = c;
+        },
+      );
 }

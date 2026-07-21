@@ -1,3 +1,9 @@
+## 0.4.0
+
+- **dButton expansion**: `surfaceTintColor`, `iconColor`, `minimumSize`, `fixedSize`, `maximumSize` now use `_stateProp` for dynamic WidgetState resolution
+- **dButton shape fix**: `shape` now uses `_stateProp<OutlinedBorder?>` instead of `WidgetStatePropertyAll` — variants like `hover:rounded-xl`, `pressed:rounded-sm` resolve dynamically
+- **dButton new fields**: `surfaceTintColor`, `iconColor`, `iconSize`, `minimumSize`, `fixedSize`, `maximumSize`, `mouseCursor` — all using `_stateProp` for WidgetState variant resolution
+
 ## 0.3.0
 
 - **Theme colors**: use `ColorScheme` keys directly — `text-primary`, `bg-surface`, `border-error`, `from-tertiary`, etc.

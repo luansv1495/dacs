@@ -25,7 +25,8 @@ Widget _buildApp(Widget body) {
         onErrorContainer: Color(0xFF3700B3),
         surface: Color(0xFFFFFBFE),
         onSurface: Color(0xFF1C1B1F),
-        surfaceContainerHighest: Color(0xFFE6E1E5),
+        // ignore: deprecated_member_use
+        surfaceVariant: Color(0xFFE6E1E5),
         onSurfaceVariant: Color(0xFF49454F),
         outline: Color(0xFF79747E),
         outlineVariant: Color(0xFFC4C4C4),
@@ -142,7 +143,8 @@ void main() {
             onErrorContainer: Color(0xFF3700B3),
             surface: Color(0xFF1C1B1F),
             onSurface: Color(0xFFE6E1E5),
-            surfaceContainerHighest: Color(0xFF49454F),
+            // ignore: deprecated_member_use
+            surfaceVariant: Color(0xFF49454F),
             onSurfaceVariant: Color(0xFFCAC4D0),
             outline: Color(0xFF938F99),
             outlineVariant: Color(0xFF49454F),
@@ -198,6 +200,40 @@ void main() {
       expect(style.foregroundColor, isNotNull);
       expect(style.padding, isNotNull);
       expect(style.shape, isNotNull);
+    });
+
+    testWidgets('dButton expands to new ButtonStyle fields', (t) async {
+      final style = await t.run(
+        (ctx) => 'bg-primary text-onPrimary w-32 h-48 rounded-lg'.dButton(ctx),
+      );
+      expect(style.surfaceTintColor, isA<WidgetStateProperty<Color?>>());
+      expect(style.iconColor, isA<WidgetStateProperty<Color?>>());
+      expect(style.iconSize, isA<WidgetStateProperty<double?>>());
+      expect(style.minimumSize, isA<WidgetStateProperty<Size?>>());
+      expect(style.fixedSize, isA<WidgetStateProperty<Size?>>());
+      expect(style.maximumSize, isA<WidgetStateProperty<Size?>>());
+      expect(style.mouseCursor, isA<WidgetStateProperty<MouseCursor?>>());
+    });
+
+    testWidgets('dButton iconSize maps from fontSize', (t) async {
+      final style = await t.run(
+        (ctx) => 'text-xl'.dButton(ctx),
+      );
+      final iconSize = style.iconSize?.resolve(<WidgetState>{});
+      expect(iconSize, closeTo(20.0, 0.01));
+    });
+
+    testWidgets('dButton shape resolves dynamically via _stateProp', (t) async {
+      final style = await t.run(
+        (ctx) => 'rounded-lg hover:rounded-xl'.dButton(ctx),
+      );
+      expect(style.shape, isA<WidgetStateProperty<OutlinedBorder?>>());
+      final resolved = style.shape!.resolve({WidgetState.hovered});
+      expect(resolved, isA<RoundedRectangleBorder>());
+      expect(
+        (resolved as RoundedRectangleBorder).borderRadius,
+        isA<BorderRadius>(),
+      );
     });
 
     testWidgets('dCheckbox resolves CheckboxThemeData', (t) async {
@@ -584,7 +620,8 @@ void main() {
             onErrorContainer: Color(0xFF3700B3),
             surface: Color(0xFF1C1B1F),
             onSurface: Color(0xFFE6E1E5),
-            surfaceContainerHighest: Color(0xFF49454F),
+            // ignore: deprecated_member_use
+            surfaceVariant: Color(0xFF49454F),
             onSurfaceVariant: Color(0xFFCAC4D0),
             outline: Color(0xFF938F99),
             outlineVariant: Color(0xFF49454F),

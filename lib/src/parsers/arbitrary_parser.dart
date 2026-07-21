@@ -72,9 +72,12 @@ class ArbitraryParser extends DacsParser {
       case 'opacity':
         style.opacity = (value / 100).clamp(0.0, 1.0);
         return true;
+      case 'gap':
+        style.gap = value;
+        return true;
       case 'inset':
-        style.insetTop = style.insetRight = style.insetBottom =
-            style.insetLeft = value / 100;
+        style.insetTop = style.insetRight =
+            style.insetBottom = style.insetLeft = value / 100;
         return true;
       case 'inset-x':
         style.insetLeft = style.insetRight = value / 100;
@@ -265,14 +268,86 @@ class ArbitraryParser extends DacsParser {
           (r) => r.copyWith(bottomRight: Radius.circular(value)),
         );
         return true;
+      case 'rounded-ts':
+        style.borderRadius = _addBorderRadius(
+          style.borderRadius,
+          (r) => r.copyWith(topLeft: Radius.circular(value)),
+        );
+        return true;
+      case 'rounded-te':
+        style.borderRadius = _addBorderRadius(
+          style.borderRadius,
+          (r) => r.copyWith(topRight: Radius.circular(value)),
+        );
+        return true;
+      case 'rounded-bs':
+        style.borderRadius = _addBorderRadius(
+          style.borderRadius,
+          (r) => r.copyWith(bottomLeft: Radius.circular(value)),
+        );
+        return true;
+      case 'rounded-be':
+        style.borderRadius = _addBorderRadius(
+          style.borderRadius,
+          (r) => r.copyWith(bottomRight: Radius.circular(value)),
+        );
+        return true;
+      case 'rounded-ss':
+        style.borderRadius = _addBorderRadius(
+          style.borderRadius,
+          (r) => BorderRadiusDirectional.only(
+            topStart: Radius.circular(value),
+            topEnd: r.topRight,
+            bottomStart: r.bottomLeft,
+            bottomEnd: r.bottomRight,
+          ),
+        );
+        return true;
+      case 'rounded-se':
+        style.borderRadius = _addBorderRadius(
+          style.borderRadius,
+          (r) => BorderRadiusDirectional.only(
+            topStart: r.topLeft,
+            topEnd: Radius.circular(value),
+            bottomStart: r.bottomLeft,
+            bottomEnd: r.bottomRight,
+          ),
+        );
+        return true;
+      case 'rounded-es':
+        style.borderRadius = _addBorderRadius(
+          style.borderRadius,
+          (r) => BorderRadiusDirectional.only(
+            topStart: r.topLeft,
+            topEnd: r.topRight,
+            bottomStart: Radius.circular(value),
+            bottomEnd: r.bottomRight,
+          ),
+        );
+        return true;
+      case 'rounded-ee':
+        style.borderRadius = _addBorderRadius(
+          style.borderRadius,
+          (r) => BorderRadiusDirectional.only(
+            topStart: r.topLeft,
+            topEnd: r.topRight,
+            bottomStart: r.bottomLeft,
+            bottomEnd: Radius.circular(value),
+          ),
+        );
+        return true;
       case 'border':
         style.borderWidth = value;
         return true;
       case 'gap':
-        return false;
+        style.gap = value;
+        return true;
+      case 'flex':
+        style.flex = value.toInt();
+        return true;
       case 'inset':
-        style.insetTop = style.insetRight = style.insetBottom =
-            style.insetLeft = value;
+        style.insetTop =
+            style.insetRight = style.insetBottom = style.insetLeft = value;
         return true;
       case 'inset-x':
         style.insetLeft = style.insetRight = value;
