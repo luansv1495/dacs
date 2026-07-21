@@ -1,12 +1,12 @@
 import '../dacs_style.dart';
 import '../tokens/spacing.dart';
+import '../tokens/shadows.dart';
 import 'parser.dart';
 
 class LayoutParser extends DacsParser {
   @override
   bool parse(String token, DacsStyle style) {
     if (token == 'flex') return true;
-
     if (token == 'flex-row') return true;
     if (token == 'flex-col') return true;
     if (token == 'flex-wrap') return true;
@@ -30,6 +30,22 @@ class LayoutParser extends DacsParser {
         return true;
       }
       return false;
+    }
+
+    final shadowMatch = RegExp(r'^shadow-(.+)$').firstMatch(token);
+    if (shadowMatch != null) {
+      final key = shadowMatch.group(1)!;
+      if (key == 'none') return true;
+      if (dacsShadows.containsKey(key)) {
+        style.boxShadow = dacsShadows[key];
+        return true;
+      }
+      return false;
+    }
+
+    if (token == 'shadow') {
+      style.boxShadow = dacsShadows['DEFAULT'];
+      return true;
     }
 
     return false;

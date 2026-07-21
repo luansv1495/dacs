@@ -4,6 +4,7 @@ import 'package:flutter/painting.dart';
 class DacsColor {
   /// Map of shade (50, 100, 200, ..., 950) to [Color].
   final Map<int, Color> shades;
+  /// Creates a color palette with the given [shades] map.
   const DacsColor(this.shades);
 
   /// Returns the color for [shade], or null if not found.
@@ -20,6 +21,7 @@ class DacsColor {
 class DacsColors {
   DacsColors._();
 
+  /// Slate gray tones.
   static const slate = DacsColor({
     50: Color(0xFFF8FAFC),
     100: Color(0xFFF1F5F9),
@@ -34,6 +36,7 @@ class DacsColors {
     950: Color(0xFF020617),
   });
 
+  /// Cool gray tones.
   static const gray = DacsColor({
     50: Color(0xFFF9FAFB),
     100: Color(0xFFF3F4F6),
@@ -48,6 +51,7 @@ class DacsColors {
     950: Color(0xFF030712),
   });
 
+  /// Zinc gray tones.
   static const zinc = DacsColor({
     50: Color(0xFFFAFAFA),
     100: Color(0xFFF4F4F5),
@@ -62,6 +66,7 @@ class DacsColors {
     950: Color(0xFF09090B),
   });
 
+  /// Neutral gray tones.
   static const neutral = DacsColor({
     50: Color(0xFFFAFAFA),
     100: Color(0xFFF5F5F5),
@@ -76,6 +81,7 @@ class DacsColors {
     950: Color(0xFF0A0A0A),
   });
 
+  /// Stone brown-gray tones.
   static const stone = DacsColor({
     50: Color(0xFFFAFAF9),
     100: Color(0xFFF5F5F4),
@@ -90,6 +96,7 @@ class DacsColors {
     950: Color(0xFF0C0A09),
   });
 
+  /// Red tones.
   static const red = DacsColor({
     50: Color(0xFFFEF2F2),
     100: Color(0xFFFEE2E2),
@@ -104,6 +111,7 @@ class DacsColors {
     950: Color(0xFF450A0A),
   });
 
+  /// Orange tones.
   static const orange = DacsColor({
     50: Color(0xFFFFF7ED),
     100: Color(0xFFFFEDD5),
@@ -118,6 +126,7 @@ class DacsColors {
     950: Color(0xFF431407),
   });
 
+  /// Amber yellow tones.
   static const amber = DacsColor({
     50: Color(0xFFFFFBEB),
     100: Color(0xFFFEF3C7),
@@ -132,6 +141,7 @@ class DacsColors {
     950: Color(0xFF451A03),
   });
 
+  /// Yellow tones.
   static const yellow = DacsColor({
     50: Color(0xFFFEFCE8),
     100: Color(0xFFFEF9C3),
@@ -146,6 +156,7 @@ class DacsColors {
     950: Color(0xFF422006),
   });
 
+  /// Lime green tones.
   static const lime = DacsColor({
     50: Color(0xFFF7FEE7),
     100: Color(0xFFECFCCB),
@@ -160,6 +171,7 @@ class DacsColors {
     950: Color(0xFF1A2E05),
   });
 
+  /// Green tones.
   static const green = DacsColor({
     50: Color(0xFFF0FDF4),
     100: Color(0xFFDCFCE7),
@@ -174,6 +186,7 @@ class DacsColors {
     950: Color(0xFF052E16),
   });
 
+  /// Emerald tones.
   static const emerald = DacsColor({
     50: Color(0xFFECFDF5),
     100: Color(0xFFD1FAE5),
@@ -188,6 +201,7 @@ class DacsColors {
     950: Color(0xFF022C22),
   });
 
+  /// Teal tones.
   static const teal = DacsColor({
     50: Color(0xFFF0FDFA),
     100: Color(0xFFCCFBF1),
@@ -202,6 +216,7 @@ class DacsColors {
     950: Color(0xFF042F2E),
   });
 
+  /// Cyan tones.
   static const cyan = DacsColor({
     50: Color(0xFFECFEFF),
     100: Color(0xFFCFFAFE),
@@ -216,6 +231,7 @@ class DacsColors {
     950: Color(0xFF083344),
   });
 
+  /// Sky blue tones.
   static const sky = DacsColor({
     50: Color(0xFFF0F9FF),
     100: Color(0xFFE0F2FE),
@@ -230,6 +246,7 @@ class DacsColors {
     950: Color(0xFF082F49),
   });
 
+  /// Blue tones.
   static const blue = DacsColor({
     50: Color(0xFFEFF6FF),
     100: Color(0xFFDBEAFE),
@@ -244,6 +261,7 @@ class DacsColors {
     950: Color(0xFF172554),
   });
 
+  /// Indigo tones.
   static const indigo = DacsColor({
     50: Color(0xFFEEF2FF),
     100: Color(0xFFE0E7FF),
@@ -258,6 +276,7 @@ class DacsColors {
     950: Color(0xFF1E1B4B),
   });
 
+  /// Violet tones.
   static const violet = DacsColor({
     50: Color(0xFFF5F3FF),
     100: Color(0xFFEDE9FE),
@@ -272,6 +291,7 @@ class DacsColors {
     950: Color(0xFF2E1065),
   });
 
+  /// Purple tones.
   static const purple = DacsColor({
     50: Color(0xFFFAF5FF),
     100: Color(0xFFF3E8FF),
@@ -286,6 +306,7 @@ class DacsColors {
     950: Color(0xFF3B0764),
   });
 
+  /// Fuchsia pink tones.
   static const fuchsia = DacsColor({
     50: Color(0xFFFDF4FF),
     100: Color(0xFFFAE8FF),
@@ -300,6 +321,7 @@ class DacsColors {
     950: Color(0xFF4A044E),
   });
 
+  /// Pink tones.
   static const pink = DacsColor({
     50: Color(0xFFFDF2F8),
     100: Color(0xFFFCE7F3),
@@ -314,6 +336,7 @@ class DacsColors {
     950: Color(0xFF500724),
   });
 
+  /// Rose pink tones.
   static const rose = DacsColor({
     50: Color(0xFFFFF1F2),
     100: Color(0xFFFFE4E6),
@@ -353,4 +376,22 @@ class DacsColors {
     'pink': pink,
     'rose': rose,
   };
+}
+
+/// Parses a color token (e.g. "sky-500", "black", "white", "transparent").
+Color? parseDacsColor(String token) {
+  if (token == 'black') return const Color(0xFF000000);
+  if (token == 'white') return const Color(0xFFFFFFFF);
+  if (token == 'transparent') return const Color(0x00000000);
+
+  final match = RegExp(r'^([a-z]+)-(\d+)$').firstMatch(token);
+  if (match != null) {
+    final colorName = match.group(1)!;
+    final shade = int.parse(match.group(2)!);
+    final color = DacsColors.all[colorName];
+    if (color != null) {
+      return color[shade];
+    }
+  }
+  return null;
 }

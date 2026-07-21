@@ -51,7 +51,9 @@ class TypographyParser extends DacsParser {
     if (leadingMatch != null) {
       final key = leadingMatch.group(1)!;
       if (dacsLineHeights.containsKey(key)) {
-        style.lineHeight = dacsLineHeights[key]! / style.fontSize!;
+        if (style.fontSize != null) {
+          style.lineHeight = dacsLineHeights[key]! / style.fontSize!;
+        }
         return true;
       }
       if (dacsLineHeightRelative.containsKey(key)) {
@@ -71,6 +73,45 @@ class TypographyParser extends DacsParser {
       return false;
     }
 
+    final decorationStyleMatch = RegExp(
+      r'^decoration-(solid|double|dotted|dashed|wavy)$',
+    ).firstMatch(token);
+    if (decorationStyleMatch != null) {
+      style.textDecorationStyle = _parseDecorationStyle(
+        decorationStyleMatch.group(1)!,
+      );
+      return true;
+    }
+
+    final decorationThicknessMatch = RegExp(
+      r'^decoration-(\d+(?:\.\d+)?)$',
+    ).firstMatch(token);
+    if (decorationThicknessMatch != null) {
+      final thickness = double.tryParse(decorationThicknessMatch.group(1)!);
+      if (thickness != null && thickness > 0) {
+        style.textDecorationThickness = thickness;
+        return true;
+      }
+      return false;
+    }
+
     return false;
+  }
+
+  TextDecorationStyle _parseDecorationStyle(String value) {
+    switch (value) {
+      case 'solid':
+        return TextDecorationStyle.solid;
+      case 'double':
+        return TextDecorationStyle.double;
+      case 'dotted':
+        return TextDecorationStyle.dotted;
+      case 'dashed':
+        return TextDecorationStyle.dashed;
+      case 'wavy':
+        return TextDecorationStyle.wavy;
+      default:
+        return TextDecorationStyle.solid;
+    }
   }
 }

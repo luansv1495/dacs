@@ -13,8 +13,8 @@ class SpacingParser extends DacsParser {
       final size = dacsSpacing(sizeKey);
       if (size == null) return false;
 
-      style.padding = _mergeEdgeInsets(
-        style.padding,
+      style.edgeInsets = _mergeEdgeInsets(
+        style.edgeInsets,
         _edgeInsets(direction, size),
       );
       return true;
@@ -25,16 +25,13 @@ class SpacingParser extends DacsParser {
       final direction = marginMatch.group(1);
       final sizeKey = marginMatch.group(2)!;
 
-      if (sizeKey == 'auto') {
-        // margin auto is not directly translatable to EdgeInsets
-        return false;
-      }
+      if (sizeKey == 'auto') return false;
 
       final size = dacsSpacing(sizeKey);
       if (size == null) return false;
 
-      style.margin = _mergeEdgeInsets(
-        style.margin,
+      style.edgeInsets = _mergeEdgeInsets(
+        style.edgeInsets,
         _edgeInsets(direction, size),
       );
       return true;

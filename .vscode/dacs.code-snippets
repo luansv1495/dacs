@@ -1,0 +1,47 @@
+{
+  "DACS Text Style": {
+    "prefix": "dt",
+    "body": "'${1:text-lg font-medium text-gray-900}'.dText",
+    "description": "DACS text style"
+  },
+  "DACS Box Decoration": {
+    "prefix": "db",
+    "body": "'${1:bg-white rounded-lg shadow-md}'.dBox",
+    "description": "DACS box decoration"
+  },
+  "DACS Padding": {
+    "prefix": "dp",
+    "body": "'${1:px-4 py-2}'.dPads",
+    "description": "DACS padding / margin"
+  },
+  "DACS Shadow": {
+    "prefix": "ds",
+    "body": "'${1:shadow-lg}'.dShadow",
+    "description": "DACS shadow"
+  },
+  "DACS Size": {
+    "prefix": "dw",
+    "body": "final (w, h) = '${1:w-64 h-48}'.dSize;",
+    "description": "DACS width/height"
+  },
+  "DACS Position": {
+    "prefix": "dpos",
+    "body": "final (t, r, b, l) = '${1:inset-0}'.dPosition;",
+    "description": "DACS position"
+  },
+  "DACS Style Raw": {
+    "prefix": "dsr",
+    "body": "final style = '${1:text-lg font-bold}'.dStyle;",
+    "description": "DACS raw style"
+  },
+  "DACS Transform": {
+    "prefix": "dtf",
+    "body": "final matrix = '${1:scale-125 rotate-45}'.dTransform;",
+    "description": "DACS transform matrix"
+  },
+  "DACS Gradient": {
+    "prefix": "dg",
+    "body": "'${1:bg-gradient-to-r from-blue-500 to-purple-600}'.dGradient",
+    "description": "DACS linear gradient"
+  }
+}
