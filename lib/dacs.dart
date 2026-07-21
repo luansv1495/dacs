@@ -8,7 +8,11 @@
 /// ```
 library;
 
+export 'src/dacs_compiler.dart';
+export 'src/dacs_config.dart';
 export 'src/dacs_style.dart';
+export 'src/dacs_style_sheet.dart';
+export 'src/dacs_layout_style.dart';
 export 'src/extensions/string_ext.dart';
 export 'src/extensions/material_ext.dart';
 export 'src/tokens/colors.dart';

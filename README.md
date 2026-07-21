@@ -31,10 +31,32 @@ Text('Hello, World!', style: 'text-2xl font-medium text-sky-500'.dText)
 
 ```yaml
 dependencies:
-  dacs: ^0.3.0
+  dacs: ^0.4.0
 ```
 
 ## Usage
+
+### Configuration and compilation
+
+DACS works without configuration, but you can enable diagnostics for unknown
+utilities and tune the parser cache:
+
+```dart
+Dacs.configure(
+  strictMode: false,
+  cacheSize: 500,
+  onUnknownUtility: (utility) {
+    debugPrint('Unknown DACS utility: $utility');
+  },
+);
+
+final sheet = DacsCompiler.compile('text-sm dark:md:hover:bg-red-500');
+```
+
+Compilation is context-free: `DacsCompiler.compile` only parses the string into
+a `DacsStyleSheet`. Runtime values such as `BuildContext`, theme colors,
+brightness, breakpoints, and widget states are applied later by methods such as
+`.dTextOf(context)`, `.dBoxOf(context)`, and `.dButton(context)`.
 
 ### Text styles
 
@@ -189,7 +211,29 @@ CardTheme(
 )
 ```
 
-All 26 Material widgets are supported: `dButton`, `dCheckbox`, `dSwitch`, `dRadio`, `dChip`, `dAppBar`, `dCard`, `dListTile`, `dTabBar`, `dBottomNav`, `dInput`, `dProgress`, `dTooltip`, `dDivider`, `dScrollbar`, `dSnackBar`, `dDialog`, `dBottomSheet`, `dExpansionTile`, `dNavBar`, `dFab`, `dDataTable`, `dSearchBar`, `dMenu`, `dIcon`, `dShape`.
+All 27 Material widgets are supported: `dButton`, `dCheckbox`, `dSwitch`, `dRadio`, `dChip`, `dAppBar`, `dCard`, `dListTile`, `dTabBar`, `dBottomNav`, `dInput`, `dProgress`, `dTooltip`, `dDivider`, `dScrollbar`, `dSnackBar`, `dDialog`, `dBottomSheet`, `dExpansionTile`, `dNavBar`, `dFab`, `dDataTable`, `dSearchBar`, `dMenu`, `dSlider`, `dIcon`, `dShape`.
+
+For the detailed per-widget property matrix, see
+[`doc/widget-support.md`](doc/widget-support.md).
+
+### TextField inputs
+
+`TextField.style` and `TextField.decoration` are different Flutter APIs.
+Use `.dTextOf(context)` for the typed text and `.dInputOf(context)` for the
+input chrome: label, hint, helper, error, prefix/suffix, fill, density, padding,
+and borders.
+
+```dart
+const classes = 'text-onSurface label-[Email] hint-[you@example.com] '
+    'helper-[Use your work email] filled dense bg-surface '
+    'border-outline focus:border-primary error:border-error '
+    'focus:error:border-primaryContainer rounded-lg p-4';
+
+TextField(
+  style: classes.dTextOf(context),
+  decoration: classes.dInputOf(context),
+)
+```
 
 ### WidgetState variants
 
@@ -224,13 +268,17 @@ Container(
 )
 ```
 
-### Raw style access
+### Parsed style access
 
 ```dart
-final style = 'text-lg font-bold text-red-600'.dStyle;
-print(style.fontSize);   // 18
-print(style.fontWeight); // FontWeight.w700
-print(style.color);      // Color(0xFFDC2626)
+final sheet = 'text-lg font-bold text-red-600 dark:text-white'.dStyle;
+final base = sheet.base;
+
+print(base.fontSize);   // 18
+print(base.fontWeight); // FontWeight.w700
+print(base.color);      // Color(0xFFDC2626)
+
+final resolved = sheet.resolveFor(context);
 ```
 
 ## Extension methods
@@ -244,12 +292,21 @@ These parse classes and convert immediately. Useful when you don't need variant 
 | `.dText` | `TextStyle` |
 | `.dPads` | `EdgeInsets` |
 | `.dBox` | `BoxDecoration` |
-| `.dStyle` | `DacsStyle` |
+| `.dStyle` | `DacsStyleSheet` |
+| `.dBase` | `DacsStyle` |
 | `.dShadow` | `List<BoxShadow>` |
 | `.dSize` | `(double?, double?)` |
+| `.dFixedSize` | `Size?` |
+| `.dLayout` | `DacsLayoutStyle` |
 | `.dPosition` | `(double?, double?, double?, double?)` |
 | `.dTransform` | `Matrix4` |
 | `.dGradient` | `LinearGradient?` |
+| `.dBorder` | `BoxBorder?` |
+| `.dBorderSide` | `BorderSide?` |
+| `.dRadius` | `BorderRadiusGeometry?` |
+| `.dConstraints` | `BoxConstraints?` |
+| `.dAlignment` | `AlignmentGeometry?` |
+| `.dShapeBorder` | `ShapeBorder?` |
 
 ### Context-aware methods (resolve variants)
 
@@ -264,14 +321,23 @@ These accept a `BuildContext` to resolve dark/light mode, responsive breakpoints
 | `.dStyleOf(context)` | `DacsStyle` |
 | `.dShadowOf(context)` | `List<BoxShadow>` |
 | `.dSizeOf(context)` | `(double?, double?)` |
+| `.dFixedSizeOf(context)` | `Size?` |
+| `.dLayoutOf(context)` | `DacsLayoutStyle` |
 | `.dPositionOf(context)` | `(double?, double?, double?, double?)` |
 | `.dTransformOf(context)` | `Matrix4` |
 | `.dGradientOf(context)` | `LinearGradient?` |
+| `.dBorderOf(context)` | `BoxBorder?` |
+| `.dBorderSideOf(context)` | `BorderSide?` |
+| `.dRadiusOf(context)` | `BorderRadiusGeometry?` |
+| `.dConstraintsOf(context)` | `BoxConstraints?` |
+| `.dAlignmentOf(context)` | `AlignmentGeometry?` |
+| `.dShapeBorderOf(context)` | `ShapeBorder?` |
 
 ### Material widget extensions
 
 These accept a `BuildContext` and return Material theme data with variant resolution.
 WidgetState support is marked per method.
+For property-level support, see `doc/widget-support.md`.
 
 | Method | Returns | WidgetState |
 |---|---|---|
@@ -285,12 +351,13 @@ WidgetState support is marked per method.
 | `.dDataTable(context)` | `DataTableThemeData` | partial |
 | `.dSearchBar(context)` | `SearchBarThemeData` | partial |
 | `.dMenu(context)` | `MenuStyle` | partial |
+| `.dSlider(context)` | `SliderThemeData` | partial |
 | `.dAppBar(context)` | `AppBarTheme` | — |
 | `.dCard(context)` | `CardTheme` | — |
 | `.dListTile(context)` | `ListTileThemeData` | — |
 | `.dTabBar(context)` | `TabBarTheme` | — |
 | `.dBottomNav(context)` | `BottomNavigationBarThemeData` | — |
-| `.dInput(context)` | `InputDecoration` | — |
+| `.dInput(context)` / `.dInputOf(context)` | `InputDecoration` | focus, disabled, error, focus:error border mappings |
 | `.dProgress(context)` | `ProgressIndicatorThemeData` | — |
 | `.dTooltip(context)` | `TooltipThemeData` | — |
 | `.dDivider(context)` | `DividerThemeData` | — |

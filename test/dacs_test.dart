@@ -2,8 +2,16 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vector_math/vector_math_64.dart' as vmath;
 import 'package:dacs/dacs.dart';
+import 'package:dacs/src/dacs_condition.dart';
+import 'package:dacs/src/dacs_conditional_rule.dart';
+import 'package:dacs/src/dacs_resolve_context.dart';
 
 void main() {
+  tearDown(() {
+    Dacs.configure();
+    DacsCompiler.clearCache();
+  });
+
   group('DacsStyle parsing', () {
     test('parses text size', () {
       final style = 'text-2xl'.dStyle;
@@ -663,6 +671,80 @@ void main() {
       final a = 'text-lg font-bold'.dStyle;
       final b = 'text-xl font-medium'.dStyle;
       expect(identical(a, b), isFalse);
+    });
+  });
+
+  group('DacsCompiler', () {
+    test('compile parses without BuildContext', () {
+      final sheet = DacsCompiler.compile('text-lg dark:md:hover:bg-red-500');
+
+      expect(sheet.base.fontSize, 18);
+      expect(sheet.ruleVariants.keys, contains('dark:md:hover'));
+    });
+
+    test('uses configured cache size', () {
+      Dacs.configure(cacheSize: 1);
+
+      final first = DacsCompiler.compile('text-sm');
+      final second = DacsCompiler.compile('text-lg');
+      final third = DacsCompiler.compile('text-sm');
+
+      expect(identical(first, second), isFalse);
+      expect(identical(first, third), isFalse);
+      expect(third.fontSize, 14);
+    });
+
+    test('cache can be disabled', () {
+      Dacs.configure(cacheSize: 0);
+
+      final a = DacsCompiler.compile('text-sm');
+      final b = DacsCompiler.compile('text-sm');
+
+      expect(identical(a, b), isFalse);
+    });
+
+    test('reports unknown utilities through callback', () {
+      final unknown = <String>[];
+      Dacs.configure(onUnknownUtility: unknown.add);
+
+      final sheet = DacsCompiler.compile('text-sm bg-missing-950');
+
+      expect(sheet.fontSize, 14);
+      expect(sheet.unknownUtilities, ['bg-missing-950']);
+      expect(unknown, ['bg-missing-950']);
+    });
+
+    test('reports unknown utilities from cache hits', () {
+      final first = <String>[];
+      final second = <String>[];
+
+      Dacs.configure(onUnknownUtility: first.add);
+      DacsCompiler.compile('text-sm bg-missing-950');
+      Dacs.configure(onUnknownUtility: second.add);
+      DacsCompiler.compile('text-sm bg-missing-950');
+
+      expect(first, ['bg-missing-950']);
+      expect(second, ['bg-missing-950']);
+    });
+
+    test('strict mode throws on unknown utility', () {
+      Dacs.configure(strictMode: true);
+
+      expect(
+        () => DacsCompiler.compile('text-sm bg-missing-950'),
+        throwsA(isA<DacsUnknownUtilityException>()),
+      );
+    });
+
+    test('unknown conditional utilities include their prefixes', () {
+      final unknown = <String>[];
+      Dacs.configure(onUnknownUtility: unknown.add);
+
+      final sheet = DacsCompiler.compile('hover:bg-missing-950');
+
+      expect(sheet.unknownUtilities, ['hover:bg-missing-950']);
+      expect(unknown, ['hover:bg-missing-950']);
+      expect(sheet.ruleVariants, isEmpty);
     });
   });
 
@@ -1380,6 +1462,93 @@ void main() {
       final style = 'gap-[10]'.dStyle;
       expect(style.gap, 10);
     });
+
+    test('parses arbitrary percentage layout and position values', () {
+      final style =
+          'h-[25%] opacity-[125%] gap-[12%] inset-[50%] inset-x-[20%] '
+                  'inset-y-[30%] top-[10%] right-[15%] bottom-[25%] '
+                  'left-[35%] border-[3%]'
+              .dStyle;
+
+      expect(style.height, 25);
+      expect(style.opacity, 1);
+      expect(style.gap, 12);
+      expect(style.insetTop, 0.1);
+      expect(style.insetRight, 0.15);
+      expect(style.insetBottom, 0.25);
+      expect(style.insetLeft, 0.35);
+      expect(style.borderWidth, 3);
+    });
+
+    test('parses arbitrary remaining padding and margin sides', () {
+      final style = 'pr-[3] pl-[4] m-[5] mr-[6] ml-[7]'.dStyle;
+
+      expect(style.padding?.right, 3);
+      expect(style.padding?.left, 4);
+      expect(style.margin?.top, 5);
+      expect(style.margin?.bottom, 5);
+      expect(style.margin?.right, 11);
+      expect(style.margin?.left, 12);
+    });
+
+    test('parses arbitrary directional radius corners', () {
+      final style = 'rounded-b-[1] rounded-l-[2] rounded-r-[3] '
+              'rounded-tl-[4] rounded-tr-[5] rounded-bl-[6] rounded-br-[7]'
+          .dStyle;
+      final br = style.borderRadius as BorderRadius;
+
+      expect(br.topLeft.x, 4);
+      expect(br.topRight.x, 5);
+      expect(br.bottomLeft.x, 6);
+      expect(br.bottomRight.x, 7);
+    });
+
+    test('parses arbitrary logical directional radius corners', () {
+      final directional =
+          'rounded-ss-[1] rounded-se-[2] rounded-es-[3] rounded-ee-[4]'
+              .dStyle
+              .borderRadius;
+
+      expect(directional, isA<BorderRadiusDirectional>());
+    });
+
+    test('parses arbitrary numeric layout, transform, and typography values',
+        () {
+      final style = 'flex-[2] inset-x-[8] inset-y-[9] top-[1] right-[2] '
+              'bottom-[3] left-[4] scale-x-[150] scale-y-[75] '
+              'translate-x-[11] translate-y-[12] skew-y-[13] '
+              'leading-[1.5] tracking-[0.2]'
+          .dStyle;
+
+      expect(style.flex, 2);
+      expect(style.insetTop, 1);
+      expect(style.insetRight, 2);
+      expect(style.insetBottom, 3);
+      expect(style.insetLeft, 4);
+      expect(style.scaleX, 1.5);
+      expect(style.scaleY, 0.75);
+      expect(style.translateX, 11);
+      expect(style.translateY, 12);
+      expect(style.skewY, 13);
+      expect(style.lineHeight, 1.5);
+      expect(style.letterSpacing, 0.2);
+    });
+
+    test('reports malformed arbitrary values as unknown utilities', () {
+      final unknown = <String>[];
+      Dacs.configure(onUnknownUtility: unknown.add);
+
+      final style = 'text-[#ff] bg-[hsl(0,100%,50%)] w-[oops]'.dStyle;
+
+      expect(style.color, isNull);
+      expect(style.backgroundColor, isNull);
+      expect(style.width, isNull);
+      expect(unknown, [
+        'text-[#ff]',
+        'bg-[hsl(0,100%,50%)]',
+        'w-[oops]',
+      ]);
+    });
   });
 
   group('Min/Max constraints', () {
@@ -1572,6 +1741,35 @@ void main() {
     test('toShapeBorder returns null without borderRadius', () {
       expect(DacsStyle().toShapeBorder(), isNull);
     });
+
+    test('toFixedSize returns Size from width and height', () {
+      final s = DacsStyle()
+        ..width = 100
+        ..height = 200;
+      expect(s.toFixedSize(), const Size(100, 200));
+    });
+
+    test('toFixedSize returns null without width or height', () {
+      expect(DacsStyle().toFixedSize(), isNull);
+    });
+
+    test('toLayoutStyle groups reusable layout fields', () {
+      final s = DacsStyle()
+        ..width = 100
+        ..height = 200
+        ..aspectRatio = 16 / 9
+        ..boxFit = BoxFit.cover
+        ..overflow = Clip.hardEdge
+        ..alignment = Alignment.center;
+      final layout = s.toLayoutStyle();
+      expect(layout.fixedSize, const Size(100, 200));
+      expect(layout.constraints, isA<BoxConstraints>());
+      expect(layout.aspectRatio, closeTo(16 / 9, 1e-10));
+      expect(layout.boxFit, BoxFit.cover);
+      expect(layout.overflow, Clip.hardEdge);
+      expect(layout.alignment, Alignment.center);
+      expect(layout.hasLayout, isTrue);
+    });
   });
 
   group('Extension getters (Phase 2)', () {
@@ -1624,6 +1822,502 @@ void main() {
 
     test('.dShapeBorder returns null without rounded', () {
       expect('text-lg'.dShapeBorder, isNull);
+    });
+
+    test('.dFixedSize returns Size', () {
+      expect('w-32 h-48'.dFixedSize, const Size(128, 192));
+    });
+
+    test('.dLayout returns DacsLayoutStyle', () {
+      final layout =
+          'w-32 h-48 min-w-12 max-w-64 aspect-video object-cover overflow-hidden align-center'
+              .dLayout;
+      expect(layout.fixedSize, const Size(128, 192));
+      expect(layout.constraints, isA<BoxConstraints>());
+      expect(layout.constraints!.minWidth, 48);
+      expect(layout.constraints!.maxWidth, 256);
+      expect(layout.aspectRatio, closeTo(16 / 9, 1e-10));
+      expect(layout.boxFit, BoxFit.cover);
+      expect(layout.overflow, Clip.hardEdge);
+      expect(layout.alignment, Alignment.center);
+    });
+  });
+
+  group('DacsStyleSheet', () {
+    test('.dStyle returns a stylesheet and .dBase returns only base values',
+        () {
+      final sheet = 'text-sm dark:text-white hover:bg-red-500'.dStyle;
+      final base = 'text-sm dark:text-white hover:bg-red-500'.dBase;
+
+      expect(sheet, isA<DacsStyleSheet>());
+      expect(sheet.base.fontSize, 14);
+      expect(sheet.variants, isNotNull);
+      expect(sheet.variants!.keys, containsAll(['dark', 'hover']));
+      expect(base.fontSize, 14);
+      expect(base.variants, isNull);
+    });
+
+    test('ruleVariants exposes backward-compatible variant map', () {
+      final variants =
+          'dark:text-white md:hover:bg-blue-500'.dStyle.ruleVariants;
+
+      expect(variants.keys, containsAll(['dark', 'md:hover']));
+      expect(variants['dark']!.color, const Color(0xFFFFFFFF));
+      expect(variants['md:hover']!.backgroundColor, const Color(0xFF3B82F6));
+    });
+
+    test('resolve preserves unmatched compound variants', () {
+      final resolved = 'bg-white dark:hover:bg-red-500'.dStyle.resolve(
+            brightness: Brightness.light,
+            screenWidth: 1200,
+          );
+
+      expect(resolved.backgroundColor, const Color(0xFFFFFFFF));
+      expect(resolved.variants, isNotNull);
+      expect(resolved.variants!.keys, contains('dark:hover'));
+    });
+
+    test('resolve remaps matched compound state variants', () {
+      final resolved = 'bg-white dark:md:hover:bg-red-500'.dStyle.resolve(
+            brightness: Brightness.dark,
+            screenWidth: 900,
+          );
+
+      expect(resolved.backgroundColor, const Color(0xFFFFFFFF));
+      expect(resolved.variants, isNotNull);
+      expect(resolved.variants!.keys, contains('hover'));
+      expect(resolved.variants!['hover']!.backgroundColor,
+          const Color(0xFFEF4444));
+    });
+
+    test('resolve returns a clone when there are no conditional rules', () {
+      final base = DacsStyle()..color = const Color(0xFF111111);
+      final resolved = DacsStyleSheet(base).resolve();
+
+      expect(resolved.color, const Color(0xFF111111));
+      expect(identical(resolved, base), isFalse);
+    });
+
+    test('resolve applies matching non-state rules by source order', () {
+      final sheet = DacsStyleSheet(
+        DacsStyle()..backgroundColor = const Color(0xFFFFFFFF),
+        [
+          DacsConditionalRule(
+            condition: DacsCondition.fromPrefix('md'),
+            style: DacsStyle()..backgroundColor = const Color(0xFF111111),
+            sourceOrder: 2,
+          ),
+          DacsConditionalRule(
+            condition: DacsCondition.fromPrefix('dark'),
+            style: DacsStyle()..backgroundColor = const Color(0xFF222222),
+            sourceOrder: 1,
+          ),
+        ],
+      );
+
+      final resolved =
+          sheet.resolve(brightness: Brightness.dark, screenWidth: 900);
+
+      expect(resolved.backgroundColor, const Color(0xFF111111));
+    });
+
+    test('resolve does not merge matching rules over an important base', () {
+      final sheet = DacsStyleSheet(
+        DacsStyle()
+          ..backgroundColor = const Color(0xFFFFFFFF)
+          ..isImportant = true,
+        [
+          DacsConditionalRule(
+            condition: DacsCondition.fromPrefix('dark'),
+            style: DacsStyle()..backgroundColor = const Color(0xFF111111),
+            sourceOrder: 1,
+          ),
+        ],
+      );
+
+      final resolved = sheet.resolve(brightness: Brightness.dark);
+
+      expect(resolved.backgroundColor, const Color(0xFFFFFFFF));
+    });
+
+    test('resolve merges multiple matched compound state rules', () {
+      final sheet = DacsStyleSheet(
+        DacsStyle(),
+        [
+          DacsConditionalRule(
+            condition: DacsCondition.fromPrefixes(['dark', 'hover', 'focus']),
+            style: DacsStyle()..backgroundColor = const Color(0xFF111111),
+            sourceOrder: 1,
+          ),
+          DacsConditionalRule(
+            condition: DacsCondition.fromPrefixes(['dark', 'hover', 'focus']),
+            style: DacsStyle()..color = const Color(0xFF222222),
+            sourceOrder: 2,
+          ),
+        ],
+      );
+
+      final resolved = sheet.resolve(brightness: Brightness.dark);
+
+      expect(resolved.variants!['hover:focus']!.backgroundColor,
+          const Color(0xFF111111));
+      expect(resolved.variants!['hover:focus']!.color, const Color(0xFF222222));
+    });
+
+    test('resolve preserves last class wins across matching conditions', () {
+      final resolved = 'dark:text-red-500 md:text-blue-500 dark:text-green-500'
+          .dStyle
+          .resolve(brightness: Brightness.dark, screenWidth: 900);
+
+      expect(resolved.color, const Color(0xFF22C55E));
+    });
+
+    test('forwarded setters mutate only the base style', () {
+      final sheet = DacsStyleSheet(DacsStyle());
+
+      sheet.fontSize = 18;
+      sheet.padding = const EdgeInsets.all(12);
+      sheet.inputDense = true;
+
+      expect(sheet.base.fontSize, 18);
+      expect(sheet.base.padding, const EdgeInsets.all(12));
+      expect(sheet.base.inputDense, isTrue);
+    });
+
+    test('all forwarded properties read and write the base style', () {
+      final sheet = DacsStyleSheet(DacsStyle());
+      final shadow = [
+        const BoxShadow(color: Color(0xFF111111), blurRadius: 4),
+      ];
+
+      sheet
+        ..fontWeight = FontWeight.w700
+        ..color = const Color(0xFF010101)
+        ..backgroundColor = const Color(0xFF020202)
+        ..borderColor = const Color(0xFF030303)
+        ..borderWidth = 2
+        ..margin = const EdgeInsets.all(3)
+        ..borderRadius = BorderRadius.circular(4)
+        ..width = 5
+        ..height = 6
+        ..opacity = 0.7
+        ..fontStyle = FontStyle.italic
+        ..textDecoration = TextDecoration.underline
+        ..textDecorationColor = const Color(0xFF040404)
+        ..textDecorationStyle = TextDecorationStyle.dashed
+        ..textDecorationThickness = 8
+        ..letterSpacing = 9
+        ..lineHeight = 1.5
+        ..boxShadow = shadow
+        ..insetTop = 10
+        ..insetRight = 11
+        ..insetBottom = 12
+        ..insetLeft = 13
+        ..scaleX = 1.1
+        ..scaleY = 1.2
+        ..rotateDegrees = 14
+        ..translateX = 15
+        ..translateY = 16
+        ..skewX = 17
+        ..skewY = 18
+        ..gradientDirection = DacsGradientDirection.toBR
+        ..gradientFromColor = const Color(0xFF050505)
+        ..gradientViaColor = const Color(0xFF060606)
+        ..gradientToColor = const Color(0xFF070707)
+        ..textThemeColor = 'primary'
+        ..bgThemeColor = 'surface'
+        ..borderThemeColor = 'outline'
+        ..decorationThemeColor = 'error'
+        ..gradientFromThemeColor = 'secondary'
+        ..gradientViaThemeColor = 'tertiary'
+        ..gradientToThemeColor = 'inversePrimary'
+        ..gap = 19
+        ..flex = 2
+        ..flexDirection = Axis.vertical
+        ..flexWrap = true
+        ..alignItems = CrossAxisAlignment.end
+        ..justifyContent = MainAxisAlignment.spaceBetween
+        ..minWidth = 20
+        ..maxWidth = 21
+        ..minHeight = 22
+        ..maxHeight = 23
+        ..aspectRatio = 1.6
+        ..boxFit = BoxFit.cover
+        ..alignment = Alignment.bottomRight
+        ..overflow = Clip.hardEdge
+        ..inputLabelText = 'Label'
+        ..inputHintText = 'Hint'
+        ..inputHelperText = 'Helper'
+        ..inputErrorText = 'Error'
+        ..inputPrefixText = 'Prefix'
+        ..inputSuffixText = 'Suffix'
+        ..inputFilled = true
+        ..isImportant = true;
+
+      expect(sheet.fontWeight, FontWeight.w700);
+      expect(sheet.color, const Color(0xFF010101));
+      expect(sheet.backgroundColor, const Color(0xFF020202));
+      expect(sheet.borderColor, const Color(0xFF030303));
+      expect(sheet.borderWidth, 2);
+      expect(sheet.margin, const EdgeInsets.all(3));
+      expect(sheet.borderRadius, BorderRadius.circular(4));
+      expect(sheet.width, 5);
+      expect(sheet.height, 6);
+      expect(sheet.opacity, 0.7);
+      expect(sheet.fontStyle, FontStyle.italic);
+      expect(sheet.textDecoration, TextDecoration.underline);
+      expect(sheet.textDecorationColor, const Color(0xFF040404));
+      expect(sheet.textDecorationStyle, TextDecorationStyle.dashed);
+      expect(sheet.textDecorationThickness, 8);
+      expect(sheet.letterSpacing, 9);
+      expect(sheet.lineHeight, 1.5);
+      expect(sheet.boxShadow, shadow);
+      expect(sheet.insetTop, 10);
+      expect(sheet.insetRight, 11);
+      expect(sheet.insetBottom, 12);
+      expect(sheet.insetLeft, 13);
+      expect(sheet.scaleX, 1.1);
+      expect(sheet.scaleY, 1.2);
+      expect(sheet.rotateDegrees, 14);
+      expect(sheet.translateX, 15);
+      expect(sheet.translateY, 16);
+      expect(sheet.skewX, 17);
+      expect(sheet.skewY, 18);
+      expect(sheet.gradientDirection, DacsGradientDirection.toBR);
+      expect(sheet.gradientFromColor, const Color(0xFF050505));
+      expect(sheet.gradientViaColor, const Color(0xFF060606));
+      expect(sheet.gradientToColor, const Color(0xFF070707));
+      expect(sheet.textThemeColor, 'primary');
+      expect(sheet.bgThemeColor, 'surface');
+      expect(sheet.borderThemeColor, 'outline');
+      expect(sheet.decorationThemeColor, 'error');
+      expect(sheet.gradientFromThemeColor, 'secondary');
+      expect(sheet.gradientViaThemeColor, 'tertiary');
+      expect(sheet.gradientToThemeColor, 'inversePrimary');
+      expect(sheet.gap, 19);
+      expect(sheet.flex, 2);
+      expect(sheet.flexDirection, Axis.vertical);
+      expect(sheet.flexWrap, isTrue);
+      expect(sheet.alignItems, CrossAxisAlignment.end);
+      expect(sheet.justifyContent, MainAxisAlignment.spaceBetween);
+      expect(sheet.minWidth, 20);
+      expect(sheet.maxWidth, 21);
+      expect(sheet.minHeight, 22);
+      expect(sheet.maxHeight, 23);
+      expect(sheet.aspectRatio, 1.6);
+      expect(sheet.boxFit, BoxFit.cover);
+      expect(sheet.alignment, Alignment.bottomRight);
+      expect(sheet.overflow, Clip.hardEdge);
+      expect(sheet.inputLabelText, 'Label');
+      expect(sheet.inputHintText, 'Hint');
+      expect(sheet.inputHelperText, 'Helper');
+      expect(sheet.inputErrorText, 'Error');
+      expect(sheet.inputPrefixText, 'Prefix');
+      expect(sheet.inputSuffixText, 'Suffix');
+      expect(sheet.inputFilled, isTrue);
+      expect(sheet.isImportant, isTrue);
+    });
+
+    test('forwarded methods delegate to the base style', () {
+      final sheet = DacsStyleSheet(
+        DacsStyle()
+          ..fontSize = 16
+          ..color = const Color(0xFF111111)
+          ..padding = const EdgeInsets.all(4)
+          ..margin = const EdgeInsets.all(5)
+          ..borderWidth = 1
+          ..borderColor = const Color(0xFF222222)
+          ..borderRadius = BorderRadius.circular(6)
+          ..width = 40
+          ..height = 30
+          ..alignment = Alignment.center
+          ..gradientDirection = DacsGradientDirection.toR
+          ..gradientFromColor = const Color(0xFF333333)
+          ..gradientToColor = const Color(0xFF444444)
+          ..translateX = 7,
+      );
+
+      final clone = sheet.clone();
+      final copied = sheet.copyWith(DacsStyle()..fontWeight = FontWeight.w700);
+      sheet.mergeFrom(DacsStyle()..lineHeight = 1.4);
+
+      expect(clone.fontSize, 16);
+      expect(copied.fontWeight, FontWeight.w700);
+      expect(sheet.lineHeight, 1.4);
+      expect(sheet.toMatrix4().storage, isNotEmpty);
+      expect(sheet.toTextStyle().fontSize, 16);
+      expect(sheet.toPadding(), const EdgeInsets.all(4));
+      expect(sheet.toMargin(), const EdgeInsets.all(5));
+      expect(sheet.toGradient(), isA<LinearGradient>());
+      expect(sheet.toBoxDecoration(), isA<BoxDecoration>());
+      expect(sheet.toBorder(), isA<BoxBorder>());
+      expect(sheet.toBorderSide(), isA<BorderSide>());
+      expect(sheet.toRadius(), BorderRadius.circular(6));
+      expect(sheet.toConstraints(), isA<BoxConstraints>());
+      expect(sheet.toAlignment(), Alignment.center);
+      expect(sheet.toShapeBorder(), isA<ShapeBorder>());
+      expect(sheet.toFixedSize(), const Size(40, 30));
+      expect(sheet.toLayoutStyle().alignment, Alignment.center);
+    });
+
+    test('splitVariantKey preserves condition order', () {
+      expect(splitVariantKey('dark:md:hover'), ['dark', 'md', 'hover']);
+    });
+  });
+
+  group('DacsCondition', () {
+    test('maps brightness, breakpoint, and widget state prefixes', () {
+      final dark = DacsCondition.fromPrefix('dark');
+      final md = DacsCondition.fromPrefix('md');
+      final hover = DacsCondition.fromPrefix('hover');
+
+      expect(dark.isBrightnessCondition, isTrue);
+      expect(dark.matches(brightness: Brightness.dark), isTrue);
+      expect(dark.matches(brightness: Brightness.light), isFalse);
+      expect(md.isResponsive, isTrue);
+      expect(md.matches(screenWidth: 768), isTrue);
+      expect(md.matches(screenWidth: 767), isFalse);
+      expect(hover.isWidgetState, isTrue);
+      expect(hover.requiredStates, {WidgetState.hovered});
+    });
+
+    test('compound conditions keep max breakpoint and all widget states', () {
+      final condition = DacsCondition.fromPrefixes(
+        ['sm', 'lg', 'dark', 'hover', 'focus'],
+      );
+
+      expect(condition.name, 'sm:lg:dark:hover:focus');
+      expect(condition.minWidth, 1024);
+      expect(condition.brightness, Brightness.dark);
+      expect(
+          condition.requiredStates, {WidgetState.hovered, WidgetState.focused});
+      expect(condition.atomicConditions.map((c) => c.name),
+          ['sm', 'lg', 'dark', 'hover', 'focus']);
+    });
+
+    test('environment requires width when breakpoint is present', () {
+      final condition = DacsCondition.fromPrefix('md');
+
+      expect(condition.matchesEnvironment(), isFalse);
+      expect(condition.matchesEnvironment(screenWidth: 900), isTrue);
+    });
+
+    test('equality and hash code are based on condition name', () {
+      final a = DacsCondition.fromPrefixes(['dark', 'hover']);
+      final b = DacsCondition.fromPrefixes(['dark', 'hover']);
+      final c = DacsCondition.fromPrefixes(['hover', 'dark']);
+
+      expect(a, b);
+      expect(a.hashCode, b.hashCode);
+      expect(a == c, isFalse);
+    });
+  });
+
+  group('DacsConditionalRule', () {
+    test('exposes condition groups and important metadata', () {
+      final rule = DacsConditionalRule(
+        condition: DacsCondition.fromPrefixes(['dark', 'hover']),
+        style: DacsStyle()..color = const Color(0xFF111111),
+        sourceOrder: 7,
+        importantFields: {'color'},
+      );
+
+      expect(rule.conditions.map((c) => c.name), ['dark', 'hover']);
+      expect(rule.nonWidgetStateConditions.map((c) => c.name), ['dark']);
+      expect(rule.widgetStateConditions.map((c) => c.name), ['hover']);
+      expect(rule.allWidgetState, isFalse);
+      expect(rule.isImportant, isTrue);
+      expect(rule.matches(brightness: Brightness.dark), isTrue);
+      expect(rule.toString(), 'DacsConditionalRule(dark:hover)');
+    });
+
+    test('detects rules made only of widget state conditions', () {
+      final rule = DacsConditionalRule(
+        condition: DacsCondition.fromPrefixes(['hover', 'focus']),
+        style: DacsStyle(),
+        sourceOrder: 1,
+      );
+
+      expect(rule.allWidgetState, isTrue);
+      expect(rule.nonWidgetStateConditions, isEmpty);
+      expect(rule.isImportant, isFalse);
+    });
+  });
+
+  group('DacsResolveContext', () {
+    test('withStates preserves environment and replaces states', () {
+      const context = DacsResolveContext(
+        brightness: Brightness.dark,
+        screenWidth: 1200,
+        states: {WidgetState.hovered},
+      );
+
+      final next = context.withStates({WidgetState.pressed});
+
+      expect(next.brightness, Brightness.dark);
+      expect(next.screenWidth, 1200);
+      expect(next.states, {WidgetState.pressed});
+    });
+  });
+
+  group('DacsLayoutStyle', () {
+    test('fixedSize uses zero for unspecified dimensions', () {
+      const widthOnly = DacsLayoutStyle(width: 64);
+      const heightOnly = DacsLayoutStyle(height: 32);
+
+      expect(widthOnly.fixedSize, const Size(64, 0));
+      expect(heightOnly.fixedSize, const Size(0, 32));
+    });
+
+    test('hasLayout reflects any layout-related value', () {
+      expect(const DacsLayoutStyle().hasLayout, isFalse);
+      expect(const DacsLayoutStyle(aspectRatio: 16 / 9).hasLayout, isTrue);
+      expect(const DacsLayoutStyle(boxFit: BoxFit.cover).hasLayout, isTrue);
+      expect(const DacsLayoutStyle(overflow: Clip.hardEdge).hasLayout, isTrue);
+      expect(
+          const DacsLayoutStyle(alignment: Alignment.center).hasLayout, isTrue);
+    });
+  });
+
+  group('Input utility parsing', () {
+    test('parses text slots with spaces inside brackets', () {
+      final style =
+          'label-[Email address] helper-[Use your work email] suffix-[per month]'
+              .dBase;
+
+      expect(style.inputLabelText, 'Email address');
+      expect(style.inputHelperText, 'Use your work email');
+      expect(style.inputSuffixText, 'per month');
+    });
+
+    test('parses escaped bracket and colon characters in input text', () {
+      final style = r'label-[Amount \[USD\]] helper-[Format\: 10.00]'.dBase;
+
+      expect(style.inputLabelText, 'Amount [USD]');
+      expect(style.inputHelperText, 'Format: 10.00');
+    });
+
+    test('parses filled and dense flags including explicit false values', () {
+      final style = 'filled dense not-filled not-dense'.dBase;
+
+      expect(style.inputFilled, isFalse);
+      expect(style.inputDense, isFalse);
+    });
+
+    test('input fields clone and merge correctly', () {
+      final base = DacsStyle()
+        ..inputLabelText = 'Name'
+        ..inputFilled = true;
+      final override = DacsStyle()
+        ..inputHintText = 'Full name'
+        ..inputDense = true;
+
+      final merged = base.copyWith(override);
+
+      expect(merged.inputLabelText, 'Name');
+      expect(merged.inputHintText, 'Full name');
+      expect(merged.inputFilled, isTrue);
+      expect(merged.inputDense, isTrue);
     });
   });
 }

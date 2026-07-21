@@ -205,6 +205,30 @@ class _HomePageState extends State<HomePage>
             child: Checkbox(value: true, onChanged: (_) {}),
           ),
 
+          SectionHeader(title: 'TextField InputDecoration'),
+          TextField(
+            style: 'text-onSurface'.dTextOf(context),
+            decoration:
+                ('label-[Email] hint-[you@example.com] '
+                        'helper-[TextField.style handles typed text; '
+                        'dInputOf handles decoration.] '
+                        'filled dense bg-surface border-outline '
+                        'focus:border-primary disabled:border-outlineVariant '
+                        'error:border-error focus:error:border-primaryContainer '
+                        'rounded-lg p-4')
+                    .dInputOf(context),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            enabled: false,
+            style: 'text-onSurfaceVariant'.dTextOf(context),
+            decoration:
+                'label-[Disabled] hint-[Native disabledBorder] filled dense '
+                        'bg-surfaceVariant border-outline disabled:border-error '
+                        'rounded-lg p-4'
+                    .dInputOf(context),
+          ),
+
           SectionHeader(title: 'Dark / Light Mode'),
           Container(
             padding: 'p-4'.dPads,

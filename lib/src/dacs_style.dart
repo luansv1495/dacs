@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' as vmath;
+import 'dacs_layout_style.dart';
 import 'parsers/class_parser.dart';
-import 'tokens/variants.dart';
 
 /// Direction for a linear gradient.
 ///
@@ -237,6 +237,30 @@ class DacsStyle {
   /// Overflow behavior (e.g. `overflow-hidden` → [Clip.hardEdge]).
   Clip? overflow;
 
+  /// Label text for [InputDecoration].
+  String? inputLabelText;
+
+  /// Hint text for [InputDecoration].
+  String? inputHintText;
+
+  /// Helper text for [InputDecoration].
+  String? inputHelperText;
+
+  /// Error text for [InputDecoration].
+  String? inputErrorText;
+
+  /// Prefix text for [InputDecoration].
+  String? inputPrefixText;
+
+  /// Suffix text for [InputDecoration].
+  String? inputSuffixText;
+
+  /// Whether [InputDecoration.filled] should be enabled.
+  bool? inputFilled;
+
+  /// Whether [InputDecoration.isDense] should be enabled.
+  bool? inputDense;
+
   /// When `true`, variant overrides are ignored for this style group
   /// (triggered by `!important` suffix).
   bool isImportant = false;
@@ -247,10 +271,13 @@ class DacsStyle {
   /// Parses [classes] into a [DacsStyle], providing a convenient way to
   /// define reusable style groups.
   ///
+  /// Returns only the base style (variant conditions are stripped). Use
+  /// [DacsStyleSheet.resolve] if variant resolution is needed.
+  ///
   /// ```dart
   /// final cardStyle = DacsStyle.apply('bg-white rounded-lg shadow-md p-4');
   /// ```
-  factory DacsStyle.apply(String classes) => ClassParser().parse(classes);
+  factory DacsStyle.apply(String classes) => ClassParser().parse(classes).base;
 
   /// Converts transform properties (scale, rotate, translate, skew)
   /// into a single [Matrix4] for use with [Transform.transform].
@@ -383,6 +410,25 @@ class DacsStyle {
     );
   }
 
+  /// Builds a fixed [Size] from [width] and [height], or `null` if both are unset.
+  Size? toFixedSize() {
+    if (width == null && height == null) return null;
+    return Size(width ?? 0, height ?? 0);
+  }
+
+  /// Groups layout-only fields into a [DacsLayoutStyle].
+  DacsLayoutStyle toLayoutStyle() {
+    return DacsLayoutStyle(
+      width: width,
+      height: height,
+      constraints: toConstraints(),
+      aspectRatio: aspectRatio,
+      boxFit: boxFit,
+      overflow: overflow,
+      alignment: alignment,
+    );
+  }
+
   /// Returns [alignment] directly, or `null`.
   AlignmentGeometry? toAlignment() => alignment;
 
@@ -440,86 +486,6 @@ class DacsStyle {
       'scrim' => s.scrim,
       _ => null,
     };
-  }
-
-  /// Resolves variants using [MediaQuery] from [context], then resolves
-  /// theme colors via [resolveThemeColors].
-  ///
-  /// This is the main entry point for context-aware resolution.
-  DacsStyle resolveFor(BuildContext context) {
-    final brightness = MediaQuery.of(context).platformBrightness;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final result = resolve(brightness: brightness, screenWidth: screenWidth);
-    result.resolveThemeColors(context);
-    return result;
-  }
-
-  /// Resolves variants against the given [brightness] and [screenWidth].
-  ///
-  /// Simple variant keys (`"dark"`, `"md"`, etc.) are merged directly into
-  /// the result when their conditions match. Compound keys (joined with `:`)
-  /// are decomposed: if all conditions match and only WidgetState conditions
-  /// remain, the variant is re-mapped under the remaining simple key.
-  DacsStyle resolve({Brightness? brightness, double? screenWidth}) {
-    if (variants == null || variants!.isEmpty) return this;
-    final result = clone();
-
-    for (final entry in variants!.entries.toList()) {
-      final key = entry.key;
-      final variant = entry.value;
-
-      if (key.contains(':')) {
-        final conditions = splitVariantKey(key);
-        bool allMatch = true;
-        final remaining = <String>[];
-
-        for (final c in conditions) {
-          if (dacsBreakpoints.containsKey(c)) {
-            if (screenWidth == null ||
-                screenWidth < (dacsBreakpoints[c] ?? double.infinity)) {
-              allMatch = false;
-            }
-          } else if (c == 'dark') {
-            if (brightness != Brightness.dark) allMatch = false;
-          } else if (c == 'light') {
-            if (brightness != Brightness.light) allMatch = false;
-          } else {
-            remaining.add(c);
-          }
-        }
-
-        if (allMatch) {
-          if (remaining.isEmpty) {
-            result._mergeVariant(variant);
-          } else {
-            final newKey = remaining.join(':');
-            result.variants ??= {};
-            result.variants![newKey] = variant;
-          }
-        }
-      } else {
-        if (screenWidth != null && dacsBreakpoints.containsKey(key)) {
-          final minWidth = dacsBreakpoints[key] ?? double.infinity;
-          if (screenWidth >= minWidth) {
-            result._mergeVariant(variant);
-          }
-        } else if (brightness != null && (key == 'dark' || key == 'light')) {
-          final expected = key == 'dark' ? Brightness.dark : Brightness.light;
-          if (brightness == expected) {
-            result._mergeVariant(variant);
-          }
-        }
-      }
-    }
-
-    return result;
-  }
-
-  /// Merges a variant into this style, respecting [isImportant].
-  /// When [isImportant] is true, the variant does not override base values.
-  void _mergeVariant(DacsStyle variant) {
-    if (isImportant) return;
-    mergeFrom(variant);
   }
 
   /// Returns a deep copy of this [DacsStyle] including all fields and variants.
@@ -586,7 +552,22 @@ class DacsStyle {
     flexWrap = source.flexWrap ?? flexWrap;
     alignItems = source.alignItems ?? alignItems;
     justifyContent = source.justifyContent ?? justifyContent;
+    minWidth = source.minWidth ?? minWidth;
+    maxWidth = source.maxWidth ?? maxWidth;
+    minHeight = source.minHeight ?? minHeight;
+    maxHeight = source.maxHeight ?? maxHeight;
+    aspectRatio = source.aspectRatio ?? aspectRatio;
+    boxFit = source.boxFit ?? boxFit;
+    alignment = source.alignment ?? alignment;
     overflow = source.overflow ?? overflow;
+    inputLabelText = source.inputLabelText ?? inputLabelText;
+    inputHintText = source.inputHintText ?? inputHintText;
+    inputHelperText = source.inputHelperText ?? inputHelperText;
+    inputErrorText = source.inputErrorText ?? inputErrorText;
+    inputPrefixText = source.inputPrefixText ?? inputPrefixText;
+    inputSuffixText = source.inputSuffixText ?? inputSuffixText;
+    inputFilled = source.inputFilled ?? inputFilled;
+    inputDense = source.inputDense ?? inputDense;
     if (source.isImportant) isImportant = true;
     if (source.variants != null) {
       variants ??= {};
@@ -603,7 +584,3 @@ class DacsStyle {
     return result;
   }
 }
-
-/// Splits a compound variant key into individual conditions.
-/// For example, `"dark:md:hover"` returns `["dark", "md", "hover"]`.
-List<String> splitVariantKey(String key) => key.split(':');

@@ -1,17 +1,20 @@
 import 'package:flutter/widgets.dart';
 import 'package:vector_math/vector_math_64.dart' as vmath;
+import '../dacs_compiler.dart';
+import '../dacs_layout_style.dart';
 import '../dacs_style.dart';
-import '../parsers/class_parser.dart';
+import '../dacs_style_sheet.dart';
 
 /// Extension providing simple getters on [String] that parse DACS classes
 /// and return Flutter style objects directly (no context required, no
 /// variant resolution).
 extension DacsStringExtension on String {
-  /// Parses this string into a raw [DacsStyle] without variant resolution.
-  DacsStyle get dStyle {
-    final parser = ClassParser();
-    return parser.parse(this);
-  }
+  /// Parses this string into a [DacsStyleSheet] containing the base style and
+  /// all conditional rules.
+  DacsStyleSheet get dStyle => DacsCompiler.compile(this);
+
+  /// Parses this string into a [DacsStyle] (base values only, no variants).
+  DacsStyle get dBase => dStyle.base;
 
   /// Parses this string into a [TextStyle].
   TextStyle get dText => dStyle.toTextStyle();
@@ -31,6 +34,12 @@ extension DacsStringExtension on String {
 
   /// Parses width and height classes into a `(width, height)` tuple.
   (double?, double?) get dSize => (dStyle.width, dStyle.height);
+
+  /// Parses width and height classes into a [Size], or `null`.
+  Size? get dFixedSize => dStyle.toFixedSize();
+
+  /// Parses layout-related classes into a [DacsLayoutStyle].
+  DacsLayoutStyle get dLayout => dStyle.toLayoutStyle();
 
   /// Parses inset classes into a `(top, right, bottom, left)` tuple for use
   /// with [Positioned].
@@ -74,73 +83,81 @@ extension DacsContextExtension on String {
   /// Parses this string into a [DacsStyle] with variants and theme colors
   /// resolved from [context].
   DacsStyle dStyleOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context);
+      DacsCompiler.compile(this).resolveFor(context);
 
   /// Parses this string into a [TextStyle] with variant and theme resolution.
   TextStyle dTextOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).toTextStyle();
+      DacsCompiler.compile(this).resolveFor(context).toTextStyle();
 
   /// Parses padding classes into [EdgeInsets] with variant resolution.
   EdgeInsets dPadsOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).toPadding();
+      DacsCompiler.compile(this).resolveFor(context).toPadding();
 
   /// Parses margin classes into [EdgeInsets] with variant resolution.
   EdgeInsets dMarginOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).toMargin();
+      DacsCompiler.compile(this).resolveFor(context).toMargin();
 
   /// Parses decoration classes into a [BoxDecoration] with variant resolution.
   BoxDecoration dBoxOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).toBoxDecoration();
+      DacsCompiler.compile(this).resolveFor(context).toBoxDecoration();
 
   /// Parses shadow classes into a list of [BoxShadow] with variant resolution.
   List<BoxShadow> dShadowOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).boxShadow ?? [];
+      DacsCompiler.compile(this).resolveFor(context).boxShadow ?? [];
 
   /// Parses width/height classes into a `(width, height)` tuple with variant
   /// resolution.
   (double?, double?) dSizeOf(BuildContext context) {
-    final s = ClassParser().parse(this).resolveFor(context);
+    final s = DacsCompiler.compile(this).resolveFor(context);
     return (s.width, s.height);
   }
+
+  /// Parses width/height classes into a [Size] with variant resolution.
+  Size? dFixedSizeOf(BuildContext context) =>
+      DacsCompiler.compile(this).resolveFor(context).toFixedSize();
+
+  /// Parses layout classes into a [DacsLayoutStyle] with variant resolution.
+  DacsLayoutStyle dLayoutOf(BuildContext context) =>
+      DacsCompiler.compile(this).resolveFor(context).toLayoutStyle();
 
   /// Parses inset classes into a `(top, right, bottom, left)` tuple with
   /// variant resolution.
   (double?, double?, double?, double?) dPositionOf(BuildContext context) {
-    final s = ClassParser().parse(this).resolveFor(context);
+    final s = DacsCompiler.compile(this).resolveFor(context);
     return (s.insetTop, s.insetRight, s.insetBottom, s.insetLeft);
   }
 
   /// Parses transform classes into a [Matrix4] with variant resolution.
   vmath.Matrix4 dTransformOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).toMatrix4();
+      DacsCompiler.compile(this).resolveFor(context).toMatrix4();
 
   /// Parses gradient classes into a [LinearGradient] with variant resolution.
   LinearGradient? dGradientOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).toGradient();
+      DacsCompiler.compile(this).resolveFor(context).toGradient();
 
   /// Parses border classes into a [BoxBorder] with variant resolution.
   BoxBorder? dBorderOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).toBorder();
+      DacsCompiler.compile(this).resolveFor(context).toBorder();
 
   /// Parses border classes into a [BorderSide] with variant resolution.
   BorderSide? dBorderSideOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).toBorderSide();
+      DacsCompiler.compile(this).resolveFor(context).toBorderSide();
 
   /// Parses rounded classes into a [BorderRadiusGeometry] with variant resolution.
   BorderRadiusGeometry? dRadiusOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).toRadius();
+      DacsCompiler.compile(this).resolveFor(context).toRadius();
 
   /// Parses constraint classes into [BoxConstraints] with variant resolution.
   BoxConstraints? dConstraintsOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).toConstraints();
+      DacsCompiler.compile(this).resolveFor(context).toConstraints();
 
   /// Parses alignment classes into [AlignmentGeometry] with variant resolution.
   AlignmentGeometry? dAlignmentOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).toAlignment();
+      DacsCompiler.compile(this).resolveFor(context).toAlignment();
 
   /// Parses rounded classes into a [ShapeBorder] with variant resolution.
   ShapeBorder? dShapeBorderOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).toShapeBorder();
+      DacsCompiler.compile(this).resolveFor(context).toShapeBorder();
 }
 
 /// A [Tween] subclass that interpolates between two [DacsStyle] values.
@@ -149,6 +166,7 @@ extension DacsContextExtension on String {
 /// interpolated. Non-numeric fields (color, fontWeight, padding, etc.) use
 /// step interpolation at `t = 0.5`.
 class DacsStyleTween extends Tween<DacsStyle> {
+  /// Creates a tween between two [DacsStyle] values.
   DacsStyleTween({super.begin, super.end});
 
   @override
@@ -193,6 +211,8 @@ class DacsStyleTween extends Tween<DacsStyle> {
     result.flexWrap = t < 0.5 ? b.flexWrap : e.flexWrap;
     result.alignItems = t < 0.5 ? b.alignItems : e.alignItems;
     result.justifyContent = t < 0.5 ? b.justifyContent : e.justifyContent;
+    result.boxFit = t < 0.5 ? b.boxFit : e.boxFit;
+    result.alignment = t < 0.5 ? b.alignment : e.alignment;
     result.overflow = t < 0.5 ? b.overflow : e.overflow;
     return result;
   }

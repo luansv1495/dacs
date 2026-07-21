@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:dacs/dacs.dart';
+import 'package:dacs/src/adapters/material_state.dart';
+import 'package:dacs/src/dacs_resolve_context.dart';
 
 Widget _buildApp(Widget body) {
   return MaterialApp(
@@ -99,6 +101,23 @@ void main() {
       final size = await t.run((ctx) => 'w-64 h-32'.dSizeOf(ctx));
       expect(size.$1, 256);
       expect(size.$2, 128);
+    });
+
+    testWidgets('dFixedSizeOf returns Size', (t) async {
+      final size = await t.run((ctx) => 'w-64 h-32'.dFixedSizeOf(ctx));
+      expect(size, const Size(256, 128));
+    });
+
+    testWidgets('dLayoutOf resolves layout variants', (t) async {
+      final layout = await t.run(
+        (ctx) =>
+            'w-32 h-32 md:w-64 aspect-square object-contain overflow-hidden'
+                .dLayoutOf(ctx),
+      );
+      expect(layout.fixedSize, const Size(256, 128));
+      expect(layout.aspectRatio, 1);
+      expect(layout.boxFit, BoxFit.contain);
+      expect(layout.overflow, Clip.hardEdge);
     });
 
     testWidgets('dPositionOf returns insets', (t) async {
@@ -215,6 +234,35 @@ void main() {
       expect(style.mouseCursor, isA<WidgetStateProperty<MouseCursor?>>());
     });
 
+    testWidgets('dButton resolves overlay, shadow, size, and cursor states', (
+      t,
+    ) async {
+      final style = await t.run(
+        (ctx) =>
+            'hover:bg-primary active:bg-error hover:shadow-lg w-64 h-12 p-4'
+                .dButton(ctx),
+      );
+
+      expect(
+        style.overlayColor!.resolve({WidgetState.hovered}),
+        const Color(0xFF6200EE).withAlpha(26),
+      );
+      expect(
+        style.overlayColor!.resolve({WidgetState.pressed}),
+        const Color(0xFFB00020).withAlpha(52),
+      );
+      expect(style.shadowColor!.resolve({WidgetState.hovered}), isNotNull);
+      expect(style.elevation!.resolve({WidgetState.hovered}), isNotNull);
+      expect(style.minimumSize!.resolve({}), const Size(256, 48));
+      expect(style.fixedSize!.resolve({}), const Size(256, 48));
+      expect(style.maximumSize!.resolve({}), const Size(256, 48));
+      expect(
+        style.mouseCursor!.resolve({WidgetState.disabled}),
+        SystemMouseCursors.forbidden,
+      );
+      expect(style.mouseCursor!.resolve({}), SystemMouseCursors.click);
+    });
+
     testWidgets('dButton iconSize maps from fontSize', (t) async {
       final style = await t.run(
         (ctx) => 'text-xl'.dButton(ctx),
@@ -244,6 +292,22 @@ void main() {
       expect(data.checkColor, isNotNull);
     });
 
+    testWidgets('dCheckbox resolves hover and base colors', (t) async {
+      final data = await t.run(
+        (ctx) => 'bg-primary hover:bg-error text-onPrimary'.dCheckbox(ctx),
+      );
+
+      expect(data.fillColor!.resolve(<WidgetState>{}), const Color(0xFF6200EE));
+      expect(
+        data.fillColor!.resolve({WidgetState.hovered}),
+        const Color(0xFFB00020),
+      );
+      expect(
+        data.checkColor!.resolve(<WidgetState>{}),
+        const Color(0xFFFFFFFF),
+      );
+    });
+
     testWidgets('dSwitch resolves SwitchThemeData', (t) async {
       final data = await t.run(
         (ctx) => 'bg-primary text-onPrimary'.dSwitch(ctx),
@@ -252,11 +316,48 @@ void main() {
       expect(data.trackColor, isNotNull);
     });
 
+    testWidgets('dSwitch resolves pressed thumb and outline states', (t) async {
+      final data = await t.run(
+        (ctx) =>
+            'pressed:text-secondary border-outline hover:bg-error'.dSwitch(ctx),
+      );
+
+      expect(data.thumbColor!.resolve(<WidgetState>{}), isNull);
+      expect(
+        data.thumbColor!.resolve({WidgetState.pressed}),
+        const Color(0xFF03DAC6),
+      );
+      expect(
+        data.trackOutlineColor!.resolve(<WidgetState>{}),
+        const Color(0xFF79747E),
+      );
+      expect(
+        data.overlayColor!.resolve({WidgetState.hovered}),
+        const Color(0xFFB00020).withAlpha(26),
+      );
+    });
+
     testWidgets('dRadio resolves RadioThemeData', (t) async {
       final data = await t.run(
         (ctx) => 'bg-primary text-onPrimary'.dRadio(ctx),
       );
       expect(data.fillColor, isNotNull);
+    });
+
+    testWidgets('dRadio resolves pressed and hover colors', (t) async {
+      final data = await t.run(
+        (ctx) => 'pressed:text-error hover:text-secondary'.dRadio(ctx),
+      );
+
+      expect(data.fillColor!.resolve(<WidgetState>{}), isNull);
+      expect(
+        data.fillColor!.resolve({WidgetState.pressed}),
+        const Color(0xFFB00020),
+      );
+      expect(
+        data.overlayColor!.resolve({WidgetState.hovered}),
+        const Color(0xFF03DAC6).withAlpha(26),
+      );
     });
 
     testWidgets('dChip resolves ChipThemeData', (t) async {
@@ -314,6 +415,92 @@ void main() {
       expect(data.contentPadding, isNotNull);
     });
 
+    testWidgets('dInput resolves text slots and layout flags', (t) async {
+      final data = await t.run(
+        (ctx) => 'label-[Email] hint-[you@example.com] '
+                'helper-[Use your work email] error-[Required field] '
+                'prefix-[USD] suffix-[per month] filled dense bg-surface'
+            .dInputOf(ctx),
+      );
+      expect(data.labelText, 'Email');
+      expect(data.hintText, 'you@example.com');
+      expect(data.helperText, 'Use your work email');
+      expect(data.errorText, 'Required field');
+      expect(data.prefixText, 'USD');
+      expect(data.suffixText, 'per month');
+      expect(data.filled, isTrue);
+      expect(data.isDense, isTrue);
+      expect(data.fillColor, const Color(0xFFFFFBFE));
+    });
+
+    testWidgets('dInput maps native border states', (t) async {
+      final data = await t.run(
+        (ctx) => 'border-outline rounded-lg focus:border-primary '
+                'disabled:border-outlineVariant error:border-error '
+                'focus:error:border-primaryContainer'
+            .dInput(ctx),
+      );
+
+      Color? sideColor(InputBorder? border) =>
+          border is OutlineInputBorder ? border.borderSide.color : null;
+
+      expect(sideColor(data.border), const Color(0xFF79747E));
+      expect(sideColor(data.enabledBorder), const Color(0xFF79747E));
+      expect(sideColor(data.focusedBorder), const Color(0xFF6200EE));
+      expect(sideColor(data.disabledBorder), const Color(0xFFC4C4C4));
+      expect(sideColor(data.errorBorder), const Color(0xFFB00020));
+      expect(sideColor(data.focusedErrorBorder), const Color(0xFFBB86FC));
+    });
+
+    testWidgets('dInput respects explicit false flags', (t) async {
+      final data = await t.run(
+        (ctx) => 'bg-surface not-filled not-dense'.dInput(ctx),
+      );
+
+      expect(data.filled, isFalse);
+      expect(data.isDense, isFalse);
+      expect(data.fillColor, const Color(0xFFFFFBFE));
+    });
+
+    testWidgets('dInput maps error text style from error:text-*', (t) async {
+      final data = await t.run(
+        (ctx) => 'text-onSurface error:text-error error-[Required]'.dInput(ctx),
+      );
+
+      expect(data.errorText, 'Required');
+      expect(data.errorStyle!.color, const Color(0xFFB00020));
+      expect(data.labelStyle!.color, const Color(0xFF1C1B1F));
+    });
+
+    testWidgets('dInput focusedErrorBorder can override radius and width', (
+      t,
+    ) async {
+      final data = await t.run(
+        (ctx) => 'border-outline rounded-sm '
+                'focus:error:border-error focus:error:border-2 focus:error:rounded-xl'
+            .dInput(ctx),
+      );
+
+      final border = data.focusedErrorBorder as OutlineInputBorder;
+      expect(border.borderSide.color, const Color(0xFFB00020));
+      expect(border.borderSide.width, 8);
+      expect(border.borderRadius, BorderRadius.circular(12));
+    });
+
+    testWidgets('TextField style and decoration stay separate', (t) async {
+      final result = await t.run((ctx) {
+        const classes = 'text-primary label-[Email] hint-[you@example.com]';
+        return (
+          textStyle: classes.dTextOf(ctx),
+          decoration: classes.dInputOf(ctx),
+        );
+      });
+
+      expect(result.textStyle.color, const Color(0xFF6200EE));
+      expect(result.decoration.labelText, 'Email');
+      expect(result.decoration.hintText, 'you@example.com');
+    });
+
     testWidgets('dProgress resolves ProgressIndicatorThemeData', (t) async {
       final data = await t.run(
         (ctx) => 'text-primary bg-surface'.dProgress(ctx),
@@ -347,6 +534,38 @@ void main() {
       expect(data.thumbColor, isNotNull);
       expect(data.radius, isNotNull);
       expect(data.thickness, isNotNull);
+    });
+
+    testWidgets('dScrollbar resolves native state properties', (t) async {
+      final data = await t.run(
+        (ctx) =>
+            'bg-primary hover:bg-error active:bg-secondary disabled:bg-outline border-outline m-4 min-h-12'
+                .dScrollbar(ctx),
+      );
+      expect(
+        data.thumbColor!.resolve({WidgetState.hovered}),
+        const Color(0xFFB00020),
+      );
+      expect(
+        data.thumbColor!.resolve({WidgetState.pressed}),
+        const Color(0xFF03DAC6),
+      );
+      expect(
+        data.thumbColor!.resolve({WidgetState.disabled}),
+        const Color(0xFF79747E),
+      );
+      expect(
+        data.trackColor!.resolve({WidgetState.hovered}),
+        const Color(0xFFB00020).withAlpha(51),
+      );
+      expect(
+        data.trackColor!.resolve({WidgetState.pressed}),
+        const Color(0xFF03DAC6).withAlpha(77),
+      );
+      expect(data.trackBorderColor!.resolve({}), const Color(0xFF79747E));
+      expect(data.minThumbLength, 48);
+      expect(data.crossAxisMargin, 16);
+      expect(data.mainAxisMargin, 16);
     });
 
     testWidgets('dSnackBar resolves SnackBarThemeData', (t) async {
@@ -408,6 +627,35 @@ void main() {
       expect(data.horizontalMargin, 16);
     });
 
+    testWidgets('dDataTable resolves text and decoration fields', (t) async {
+      final data = await t.run(
+        (ctx) => 'bg-primary text-onPrimary border-2'.dDataTable(ctx),
+      );
+      expect(data.headingTextStyle?.color, const Color(0xFFFFFFFF));
+      expect(data.dataTextStyle?.color, const Color(0xFFFFFFFF));
+      expect(data.dividerThickness, 8);
+      expect(data.decoration, isA<BoxDecoration>());
+    });
+
+    testWidgets('dDataTable resolves hover row colors and column spacing', (
+      t,
+    ) async {
+      final data = await t.run(
+        (ctx) => 'hover:bg-primary px-4 py-2'.dDataTable(ctx),
+      );
+
+      expect(
+        data.headingRowColor!.resolve({WidgetState.hovered}),
+        const Color(0xFF6200EE).withAlpha(26),
+      );
+      expect(
+        data.dataRowColor!.resolve({WidgetState.hovered}),
+        const Color(0xFF6200EE).withAlpha(13),
+      );
+      expect(data.horizontalMargin, 16);
+      expect(data.columnSpacing, 16);
+    });
+
     testWidgets('dSearchBar resolves SearchBarThemeData', (t) async {
       final data = await t.run(
         (ctx) => 'bg-primary rounded-lg'.dSearchBar(ctx),
@@ -416,11 +664,88 @@ void main() {
       expect(data.shape, isNotNull);
     });
 
+    testWidgets('dSearchBar resolves native state properties', (t) async {
+      final data = await t.run(
+        (ctx) =>
+            'bg-primary text-onPrimary hover:bg-error focus:bg-secondary disabled:bg-outline focus:border-secondary border-2 rounded-lg p-4 min-w-64 max-w-96'
+                .dSearchBar(ctx),
+      );
+      expect(
+        data.backgroundColor!.resolve({WidgetState.hovered}),
+        const Color(0xFFB00020),
+      );
+      expect(
+        data.backgroundColor!.resolve({WidgetState.focused}),
+        const Color(0xFF03DAC6),
+      );
+      expect(
+        data.backgroundColor!.resolve({WidgetState.disabled}),
+        const Color(0xFF79747E),
+      );
+      expect(
+        data.side!.resolve({WidgetState.focused})?.color,
+        const Color(0xFF03DAC6),
+      );
+      expect(
+        data.overlayColor!.resolve({WidgetState.hovered}),
+        const Color(0xFFB00020).withAlpha(26),
+      );
+      expect(
+        data.overlayColor!.resolve({WidgetState.focused}),
+        const Color(0xFF03DAC6).withAlpha(26),
+      );
+      expect(data.padding!.resolve({}), isA<EdgeInsetsGeometry>());
+      expect(data.textStyle!.resolve({})?.color, const Color(0xFFFFFFFF));
+      expect(data.hintStyle!.resolve({})?.color, const Color(0xFFFFFFFF));
+      expect(data.constraints?.minWidth, 256);
+      expect(data.constraints?.maxWidth, 384);
+    });
+
+    testWidgets('dSearchBar resolves hover shadow and elevation', (t) async {
+      final data = await t.run(
+        (ctx) => 'hover:shadow-lg focus:shadow-md'.dSearchBar(ctx),
+      );
+
+      expect(data.elevation!.resolve({WidgetState.hovered}), isNotNull);
+      expect(data.elevation!.resolve({WidgetState.focused}), isNotNull);
+      expect(data.shadowColor!.resolve({WidgetState.hovered}), isNotNull);
+      expect(data.shadowColor!.resolve({WidgetState.focused}), isNotNull);
+    });
+
     testWidgets('dMenu resolves MenuStyle', (t) async {
       final data = await t.run((ctx) => 'bg-primary rounded-lg p-4'.dMenu(ctx));
       expect(data.backgroundColor, isNotNull);
       expect(data.shape, isNotNull);
       expect(data.padding, isNotNull);
+    });
+
+    testWidgets('dMenu resolves shape and side as state properties', (t) async {
+      final data = await t.run(
+        (ctx) =>
+            'bg-primary border-2 hover:rounded-xl hover:border-error hover:shadow-lg'
+                .dMenu(ctx),
+      );
+      expect(data.shape, isA<WidgetStateProperty<OutlinedBorder?>>());
+      expect(data.side, isA<WidgetStateProperty<BorderSide?>>());
+      expect(
+        data.side!.resolve({WidgetState.hovered})?.color,
+        const Color(0xFFB00020),
+      );
+      expect(data.shadowColor!.resolve({WidgetState.hovered}), isNotNull);
+      expect(data.elevation!.resolve({WidgetState.hovered}), isNotNull);
+    });
+
+    testWidgets('dSlider resolves SliderThemeData', (t) async {
+      final data = await t.run(
+        (ctx) =>
+            'bg-primary text-onPrimary border-secondary h-2 disabled:bg-error'
+                .dSlider(ctx),
+      );
+      expect(data.activeTrackColor, const Color(0xFF6200EE));
+      expect(data.inactiveTrackColor, const Color(0xFF03DAC6));
+      expect(data.thumbColor, const Color(0xFFFFFFFF));
+      expect(data.disabledActiveTrackColor, const Color(0xFFB00020));
+      expect(data.trackHeight, 8);
     });
 
     testWidgets('dIcon resolves IconThemeData', (t) async {
@@ -504,6 +829,96 @@ void main() {
                 .dButton(ctx),
       );
       expect(style.backgroundColor, isA<WidgetStateProperty<Color?>>());
+    });
+
+    testWidgets('materialStateFor resolves theme color variant overrides', (
+      t,
+    ) async {
+      final state = await t.run(
+        (ctx) => materialStateFor(
+          'decoration-red-500 from-red-500 via-red-500 to-red-500 '
+                  'hover:decoration-primary hover:from-secondaryContainer '
+                  'hover:via-tertiary hover:to-inversePrimary'
+              .dStyle,
+          DacsResolveContext.fromBuildContext(ctx),
+        ),
+      );
+
+      final hover = state.variants['hover']!;
+      expect(hover.textDecorationColor, const Color(0xFF6200EE));
+      expect(hover.gradientFromColor, const Color(0xFFCE93D8));
+      expect(hover.gradientViaColor, const Color(0xFFE91E63));
+      expect(hover.gradientToColor, const Color(0xFFBB86FC));
+    });
+
+    test('widgetStateForName falls back to hovered for unknown names', () {
+      expect(widgetStateForName('unknown'), WidgetState.hovered);
+    });
+
+    test('dacsSide, dacsShape, and dacsOutline handle fallbacks', () {
+      expect(dacsSide(DacsStyle()), isNull);
+      expect(dacsShape(DacsStyle()), isNull);
+      expect(dacsOutline(DacsStyle()), isNull);
+
+      final side = dacsSide(DacsStyle()..borderWidth = 3);
+      expect(side?.color, const Color(0xFF000000));
+      expect(side?.width, 3);
+
+      final outline = dacsOutline(
+        DacsStyle()
+          ..borderWidth = 2
+          ..borderRadius = BorderRadiusDirectional.circular(8),
+      );
+      expect(outline, isA<OutlineInputBorder>());
+      expect(outline!.borderRadius, BorderRadius.zero);
+    });
+
+    test('dacsStateProp resolves selected/error/dragged/scrolledUnder extras',
+        () {
+      final state = DacsMaterialState(
+        DacsStyle(),
+        {
+          'selected': DacsStyle()..fontSize = 1,
+          'error': DacsStyle()..fontSize = 2,
+          'dragged': DacsStyle()..fontSize = 3,
+          'scrolledUnder': DacsStyle()..fontSize = 4,
+        },
+        const [],
+      );
+      final prop = dacsStateProp<double?>(
+        state,
+        (_) => null,
+        selectedExtra: (s) => s.fontSize,
+        errorExtra: (s) => s.fontSize,
+        draggedExtra: (s) => s.fontSize,
+        scrolledUnderExtra: (s) => s.fontSize,
+      );
+
+      expect(prop.resolve({WidgetState.selected}), 1);
+      expect(prop.resolve({WidgetState.error}), 2);
+      expect(prop.resolve({WidgetState.dragged}), 3);
+      expect(prop.resolve({WidgetState.scrolledUnder}), 4);
+    });
+
+    test('dacsStateProp returns null when compound fallback and extra miss',
+        () {
+      final state = DacsMaterialState(
+        DacsStyle(),
+        const {},
+        [
+          DacsStateRule(
+            {WidgetState.hovered, WidgetState.focused},
+            DacsStyle()..fontSize = 9,
+          ),
+        ],
+      );
+      final prop = dacsStateProp<double?>(
+        state,
+        (_) => null,
+        hoverExtra: (s) => s.fontSize,
+      );
+
+      expect(prop.resolve({WidgetState.hovered, WidgetState.focused}), isNull);
     });
   });
 

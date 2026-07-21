@@ -1,3 +1,5 @@
+// ignore_for_file: public_member_api_docs
+
 import '../dacs_style.dart';
 
 /// Parses a single utility class token into a [DacsStyle].
