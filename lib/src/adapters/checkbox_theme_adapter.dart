@@ -13,21 +13,17 @@ class DacsCheckboxThemeAdapter implements DacsAdapter<CheckboxThemeData> {
   CheckboxThemeData build(DacsStyleSheet sheet, DacsResolveContext context) {
     final st = materialStateFor(sheet, context);
     return CheckboxThemeData(
-      fillColor: dacsStateProp<Color?>(
-        st,
-        (s) => s.backgroundColor,
-        hoverExtra: (s) => s.backgroundColor?.withAlpha(26),
-        focusExtra: (s) => s.backgroundColor?.withAlpha(26),
-        activeExtra: (s) => s.backgroundColor?.withAlpha(52),
-      ),
+      fillColor: dacsStateProp<Color?>(st, (s) => s.backgroundColor),
       checkColor: dacsStateProp<Color?>(st, (s) => s.color),
-      overlayColor: dacsStateProp<Color?>(
-        st,
-        (_) => null,
-        hoverExtra: (s) => s.color?.withAlpha(26),
-      ),
+      overlayColor:
+          dacsStateOverrideOrBaseProp<Color>(st, (s) => s.overlayColor),
+      mouseCursor:
+          dacsStateOverrideOrBaseProp<MouseCursor>(st, (s) => s.mouseCursor),
       side: dacsSide(st.base),
       shape: dacsShape(st.base),
+      splashRadius: st.base.splashRadius,
+      visualDensity: st.base.visualDensity,
+      materialTapTargetSize: st.base.materialTapTargetSize,
     );
   }
 }
@@ -39,16 +35,17 @@ class DacsRadioThemeAdapter implements DacsAdapter<RadioThemeData> {
   RadioThemeData build(DacsStyleSheet sheet, DacsResolveContext context) {
     final st = materialStateFor(sheet, context);
     return RadioThemeData(
-      fillColor: dacsStateProp<Color?>(
-        st,
-        (s) => s.backgroundColor,
-        activeExtra: (s) => s.color,
-      ),
-      overlayColor: dacsStateProp<Color?>(
-        st,
-        (_) => null,
-        hoverExtra: (s) => s.color?.withAlpha(26),
-      ),
+      fillColor: dacsStateProp<Color?>(st, (s) => s.backgroundColor),
+      overlayColor:
+          dacsStateOverrideOrBaseProp<Color>(st, (s) => s.overlayColor),
+      mouseCursor:
+          dacsStateOverrideOrBaseProp<MouseCursor>(st, (s) => s.mouseCursor),
+      backgroundColor: dacsStateProp<Color?>(st, (s) => s.backgroundColor),
+      side: dacsSide(st.base),
+      splashRadius: st.base.splashRadius,
+      visualDensity: st.base.visualDensity,
+      materialTapTargetSize: st.base.materialTapTargetSize,
+      innerRadius: dacsStateProp<double?>(st, (s) => s.width ?? s.height),
     );
   }
 }

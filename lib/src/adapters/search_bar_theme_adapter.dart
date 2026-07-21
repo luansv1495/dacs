@@ -17,35 +17,25 @@ class DacsSearchBarThemeAdapter implements DacsAdapter<SearchBarThemeData> {
       backgroundColor: dacsStateProp<Color?>(
         st,
         (s) => s.backgroundColor,
-        hoverExtra: (s) => s.backgroundColor,
-        focusExtra: (s) => s.backgroundColor,
-        disabledExtra: (s) => s.backgroundColor?.withAlpha(97),
       ),
       elevation: dacsStateProp<double?>(
         st,
-        (_) => null,
-        hoverExtra: (s) => s.boxShadow?.firstOrNull?.blurRadius,
-        focusExtra: (s) => s.boxShadow?.firstOrNull?.blurRadius,
+        (s) => s.boxShadow?.firstOrNull?.blurRadius,
       ),
       shadowColor: dacsStateProp<Color?>(
         st,
-        (_) => null,
-        hoverExtra: (s) => s.boxShadow?.firstOrNull?.color,
-        focusExtra: (s) => s.boxShadow?.firstOrNull?.color,
+        (s) => s.boxShadow?.firstOrNull?.color,
       ),
       surfaceTintColor: dacsStateProp<Color?>(st, (s) => s.backgroundColor),
-      overlayColor: dacsStateProp<Color?>(
-        st,
-        (_) => null,
-        hoverExtra: (s) => s.backgroundColor?.withAlpha(26),
-        focusExtra: (s) => s.backgroundColor?.withAlpha(26),
-      ),
+      overlayColor:
+          dacsStateOverrideOrBaseProp<Color>(st, (s) => s.overlayColor),
       side: dacsStateProp<BorderSide?>(st, dacsSide),
       shape: dacsStateProp<OutlinedBorder?>(st, dacsShape),
       padding: dacsStateProp<EdgeInsetsGeometry?>(st, (s) => s.padding),
       textStyle: dacsStateProp<TextStyle?>(st, (s) => s.toTextStyle()),
       hintStyle: dacsStateProp<TextStyle?>(st, (s) => s.toTextStyle()),
       constraints: s.toConstraints(),
+      textCapitalization: s.textCapitalization,
     );
   }
 }

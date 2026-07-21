@@ -213,32 +213,67 @@ void main() {
   group('Material extensions', () {
     testWidgets('dAppBar resolves AppBarTheme', (t) async {
       final data = await t.run(
-        (ctx) => 'bg-primary text-onPrimary'.dAppBar(ctx),
+        (ctx) =>
+            'bg-primary text-onPrimary rounded-lg w-6 h-16 p-2 m-4 shadow-lg'
+                .dAppBar(ctx),
       );
       expect(data.backgroundColor, const Color(0xFF6200EE));
       expect(data.foregroundColor, const Color(0xFFFFFFFF));
+      expect(data.shape, isNotNull);
+      expect(data.iconTheme?.size, 24);
+      expect(data.actionsIconTheme?.color, const Color(0xFFFFFFFF));
+      expect(data.leadingWidth, 24);
+      expect(data.toolbarHeight, 64);
+      expect(data.actionsPadding, isNotNull);
     });
 
     testWidgets('dCard resolves CardTheme', (t) async {
-      final data = await t.run((ctx) => 'bg-primary rounded-lg m-4'.dCard(ctx));
+      final data = await t.run(
+        (ctx) => 'bg-primary rounded-lg m-4 overflow-hidden'.dCard(ctx),
+      );
       expect(data.color, const Color(0xFF6200EE));
+      expect(data.surfaceTintColor, const Color(0xFF6200EE));
       expect(data.shape, isNotNull);
       expect(data.margin, isNotNull);
+      expect(data.clipBehavior, Clip.hardEdge);
     });
 
     testWidgets('dListTile resolves ListTileThemeData', (t) async {
       final data = await t.run(
-        (ctx) => 'bg-primary text-onPrimary p-4'.dListTile(ctx),
+        (ctx) =>
+            'bg-primary selected:bg-secondary text-onPrimary p-4 min-w-10 min-h-12 gap-2 dense'
+                .dListTile(ctx),
       );
       expect(data.tileColor, const Color(0xFF6200EE));
+      expect(data.selectedTileColor, const Color(0xFF03DAC6));
       expect(data.textColor, const Color(0xFFFFFFFF));
       expect(data.contentPadding, isNotNull);
+      expect(data.titleTextStyle?.color, const Color(0xFFFFFFFF));
+      expect(data.dense, isTrue);
+      expect(data.horizontalTitleGap, 8);
+      expect(data.minLeadingWidth, 40);
+      expect(data.minTileHeight, 48);
     });
 
     testWidgets('dTabBar resolves TabBarTheme', (t) async {
-      final data = await t.run((ctx) => 'text-primary font-bold'.dTabBar(ctx));
+      final data = await t.run(
+        (ctx) =>
+            'text-primary unselected-secondary bg-surface hover:overlay-secondary font-bold border-outline border p-2 tab-indicator-label splash-none'
+                .dTabBar(ctx),
+      );
       expect(data.labelColor, const Color(0xFF6200EE));
+      expect(data.unselectedLabelColor, const Color(0xFF03DAC6));
       expect(data.labelStyle, isNotNull);
+      expect(data.indicator, isA<ShapeDecoration>());
+      expect(data.dividerColor, const Color(0xFF79747E));
+      expect(data.dividerHeight, 1);
+      expect(data.indicatorSize, TabBarIndicatorSize.label);
+      expect(data.labelPadding, isNotNull);
+      expect(
+        data.overlayColor!.resolve({WidgetState.hovered}),
+        const Color(0xFF03DAC6),
+      );
+      expect(data.splashFactory, NoSplash.splashFactory);
     });
 
     testWidgets('dProgress resolves ProgressIndicatorThemeData', (t) async {
@@ -247,16 +282,25 @@ void main() {
       );
       expect(data.color, const Color(0xFF6200EE));
       expect(data.linearTrackColor, const Color(0xFFFFFBFE));
+      expect(data.circularTrackColor, const Color(0xFFFFFBFE));
     });
 
     testWidgets('dTooltip resolves TooltipThemeData', (t) async {
       final data = await t.run(
-        (ctx) => 'bg-primary text-onPrimary rounded-lg p-2 m-1'.dTooltip(ctx),
+        (ctx) =>
+            'bg-primary text-onPrimary rounded-lg p-2 m-1 tooltip-above no-feedback tooltip-wait-500 tooltip-show-1500 tooltip-exit-100'
+                .dTooltip(ctx),
       );
       expect(data.decoration, isNotNull);
       expect(data.textStyle, isNotNull);
       expect(data.padding, isNotNull);
       expect(data.margin, isNotNull);
+      expect(data.constraints, isNull);
+      expect(data.preferBelow, isFalse);
+      expect(data.enableFeedback, isFalse);
+      expect(data.waitDuration, const Duration(milliseconds: 500));
+      expect(data.showDuration, const Duration(milliseconds: 1500));
+      expect(data.exitDuration, const Duration(milliseconds: 100));
     });
 
     testWidgets('dDivider resolves DividerThemeData', (t) async {
@@ -269,28 +313,43 @@ void main() {
 
     testWidgets('dSnackBar resolves SnackBarThemeData', (t) async {
       final data = await t.run(
-        (ctx) => 'bg-primary text-onPrimary rounded-lg'.dSnackBar(ctx),
+        (ctx) =>
+            'bg-primary text-onPrimary disabled-action-error rounded-lg show-close snackbar-fixed'
+                .dSnackBar(ctx),
       );
       expect(data.backgroundColor, const Color(0xFF6200EE));
       expect(data.contentTextStyle, isNotNull);
       expect(data.shape, isNotNull);
+      expect(data.actionTextColor, const Color(0xFFFFFFFF));
+      expect(data.disabledActionTextColor, const Color(0xFFB00020));
+      expect(data.closeIconColor, const Color(0xFFFFFFFF));
+      expect(data.showCloseIcon, isTrue);
+      expect(data.behavior, SnackBarBehavior.fixed);
     });
 
     testWidgets('dDialog resolves DialogTheme', (t) async {
       final data = await t.run(
-        (ctx) => 'bg-primary rounded-lg shadow-lg'.dDialog(ctx),
+        (ctx) => 'bg-primary barrier-scrim rounded-lg shadow-lg'.dDialog(ctx),
       );
       expect(data.backgroundColor, const Color(0xFF6200EE));
       expect(data.shape, isNotNull);
       expect(data.elevation, isNotNull);
+      expect(data.shadowColor, isNotNull);
+      expect(data.surfaceTintColor, const Color(0xFF6200EE));
+      expect(data.barrierColor, const Color(0xFF000000));
     });
 
     testWidgets('dBottomSheet resolves BottomSheetThemeData', (t) async {
       final data = await t.run(
-        (ctx) => 'bg-primary rounded-lg shadow-lg'.dBottomSheet(ctx),
+        (ctx) =>
+            'bg-primary barrier-scrim rounded-lg shadow-lg show-drag-handle'
+                .dBottomSheet(ctx),
       );
       expect(data.backgroundColor, const Color(0xFF6200EE));
+      expect(data.modalBackgroundColor, const Color(0xFF6200EE));
+      expect(data.modalBarrierColor, const Color(0xFF000000));
       expect(data.shape, isNotNull);
+      expect(data.showDragHandle, isTrue);
     });
 
     testWidgets('dExpansionTile resolves ExpansionTileThemeData', (t) async {
@@ -301,33 +360,55 @@ void main() {
       expect(data.textColor, const Color(0xFFFFFFFF));
       expect(data.iconColor, const Color(0xFFFFFFFF));
       expect(data.shape, isNotNull);
+      expect(data.collapsedIconColor, isNull);
     });
 
     testWidgets('dFab resolves FloatingActionButtonThemeData', (t) async {
       final data = await t.run(
-        (ctx) => 'bg-primary text-onPrimary rounded-full shadow-lg'.dFab(ctx),
+        (ctx) =>
+            'bg-primary text-onPrimary rounded-full shadow-lg active:bg-error hover:bg-secondary hover:shadow-sm disabled:shadow-sm small:w-10 small:h-10 large:w-16 large:h-16 extended:w-32 extended:h-12'
+                .dFab(ctx),
       );
       expect(data.backgroundColor, const Color(0xFF6200EE));
       expect(data.foregroundColor, const Color(0xFFFFFFFF));
       expect(data.shape, isNotNull);
+      expect(data.extendedTextStyle?.color, const Color(0xFFFFFFFF));
+      expect(data.splashColor, const Color(0xFFB00020));
+      expect(data.hoverColor, const Color(0xFF03DAC6));
+      expect(data.hoverElevation, isNot(data.elevation));
+      expect(data.disabledElevation, isNotNull);
+      expect(data.smallSizeConstraints?.minWidth, 40);
+      expect(data.largeSizeConstraints?.minWidth, 64);
+      expect(data.extendedSizeConstraints?.minWidth, 128);
     });
 
     testWidgets('dIcon resolves IconThemeData', (t) async {
       final data = await t.run(
-        (ctx) => 'text-primary w-64 opacity-50'.dIcon(ctx),
+        (ctx) =>
+            'text-primary w-64 opacity-50 icon-fill icon-weight-600 icon-grade--25 icon-optical-48'
+                .dIcon(ctx),
       );
       expect(data.color, const Color(0xFF6200EE));
       expect(data.size, 256);
       expect(data.opacity, 0.5);
+      expect(data.shadows, isNull);
+      expect(data.fill, 1);
+      expect(data.weight, 600);
+      expect(data.grade, -25);
+      expect(data.opticalSize, 48);
     });
 
     testWidgets('dShape resolves ShapeDecoration', (t) async {
       final data = await t.run(
-        (ctx) => 'bg-primary rounded-lg shadow-lg'.dShape(ctx),
+        (ctx) =>
+            'bg-primary rounded-lg shadow-lg object-cover image-asset-[assets/card.png]'
+                .dShape(ctx),
       );
       expect(data.color, const Color(0xFF6200EE));
       expect(data.shape, isA<RoundedRectangleBorder>());
       expect(data.shadows, isNotNull);
+      expect(data.image, isNotNull);
+      expect(data.image!.fit, BoxFit.cover);
     });
   });
 }

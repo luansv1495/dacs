@@ -19,9 +19,32 @@ class DacsChipThemeAdapter implements DacsAdapter<ChipThemeData> {
             ? WidgetStateColor.resolveWith((_) => s.backgroundColor!)
             : null,
       ),
+      backgroundColor: st.base.backgroundColor,
+      disabledColor: st.variantOverrides['disabled']?.backgroundColor,
+      selectedColor: st.variantOverrides['selected']?.backgroundColor,
+      shadowColor: st.base.boxShadow?.firstOrNull?.color,
+      surfaceTintColor: st.base.backgroundColor,
+      selectedShadowColor:
+          st.variantOverrides['selected']?.boxShadow?.firstOrNull?.color,
+      checkmarkColor: st.base.color,
       shape: dacsShape(st.base),
       side: dacsSide(st.base),
       padding: st.base.padding,
+      labelPadding: st.base.margin,
+      labelStyle: st.base.toTextStyle(),
+      secondaryLabelStyle: st.variantOverrides['selected']?.toTextStyle(),
+      brightness: st.base.chipBrightness,
+      showCheckmark: st.base.chipShowCheckmark,
+      elevation: st.base.boxShadow?.firstOrNull?.blurRadius,
+      pressElevation:
+          st.variantOverrides['pressed']?.boxShadow?.firstOrNull?.blurRadius ??
+              st.variantOverrides['active']?.boxShadow?.firstOrNull?.blurRadius,
+      iconTheme: st.base.color != null || st.base.width != null
+          ? IconThemeData(color: st.base.color, size: st.base.width)
+          : null,
+      avatarBoxConstraints: st.base.toConstraints(),
+      deleteIconBoxConstraints:
+          st.variantOverrides['disabled']?.toConstraints(),
     );
   }
 }

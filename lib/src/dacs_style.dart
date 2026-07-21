@@ -194,6 +194,66 @@ class DacsStyle {
   /// Theme color key for gradient end color.
   String? gradientToThemeColor;
 
+  /// Explicit overlay color for state layers.
+  Color? overlayColor;
+
+  /// Theme color key for [overlayColor].
+  String? overlayThemeColor;
+
+  /// Explicit indicator color for widgets with selected indicators.
+  Color? indicatorColor;
+
+  /// Theme color key for [indicatorColor].
+  String? indicatorThemeColor;
+
+  /// Explicit modal barrier color.
+  Color? barrierColor;
+
+  /// Theme color key for [barrierColor].
+  String? barrierThemeColor;
+
+  /// Explicit unselected item or label color.
+  Color? unselectedColor;
+
+  /// Theme color key for [unselectedColor].
+  String? unselectedThemeColor;
+
+  /// Explicit disabled action color.
+  Color? disabledActionColor;
+
+  /// Theme color key for [disabledActionColor].
+  String? disabledActionThemeColor;
+
+  /// Mouse cursor for interactive Material components.
+  MouseCursor? mouseCursor;
+
+  /// Splash radius for controls that expose a splash radius.
+  double? splashRadius;
+
+  /// Visual density for Material components.
+  VisualDensity? visualDensity;
+
+  /// Material tap target size.
+  MaterialTapTargetSize? materialTapTargetSize;
+
+  /// Whether Material feedback should be enabled.
+  bool? enableFeedback;
+
+  /// Animation duration for components that expose one.
+  Duration? animationDuration;
+
+  /// Ink splash factory for Material interaction effects.
+  InteractiveInkFeatureFactory? splashFactory;
+
+  /// Whether button styles should build a DACS background layer.
+  bool? buttonBackgroundLayer;
+
+  /// Whether button styles should build a DACS foreground layer.
+  bool? buttonForegroundLayer;
+
+  /// Icon alignment for button styles.
+  IconAlignment? iconAlignment;
+
   /// Gap/spacing between flex/grid children (e.g. `gap-4` → 16.0).
   double? gap;
 
@@ -260,6 +320,93 @@ class DacsStyle {
 
   /// Whether [InputDecoration.isDense] should be enabled.
   bool? inputDense;
+
+  /// Whether [InputDecoration.alignLabelWithHint] should be enabled.
+  bool? inputAlignLabelWithHint;
+
+  /// Floating label behavior for [InputDecoration].
+  FloatingLabelBehavior? inputFloatingLabelBehavior;
+
+  /// Brightness hint for chip themes.
+  Brightness? chipBrightness;
+
+  /// Whether chip themes should show the checkmark.
+  bool? chipShowCheckmark;
+
+  /// Indicator size for tab bars.
+  TabBarIndicatorSize? tabIndicatorSize;
+
+  /// Whether bottom navigation bars should show selected labels.
+  bool? bottomNavShowSelectedLabels;
+
+  /// Whether bottom navigation bars should show unselected labels.
+  bool? bottomNavShowUnselectedLabels;
+
+  /// Bottom navigation bar type.
+  BottomNavigationBarType? bottomNavType;
+
+  /// Bottom navigation bar landscape layout.
+  BottomNavigationBarLandscapeLayout? bottomNavLandscapeLayout;
+
+  /// Text capitalization for search bars.
+  TextCapitalization? textCapitalization;
+
+  /// Label behavior for navigation bars.
+  NavigationDestinationLabelBehavior? navigationLabelBehavior;
+
+  /// Whether tooltips prefer rendering below their child.
+  bool? tooltipPreferBelow;
+
+  /// Whether snack bars should show a close icon.
+  bool? snackShowCloseIcon;
+
+  /// Whether bottom sheets should show the drag handle.
+  bool? bottomSheetShowDragHandle;
+
+  /// Value indicator visibility mode for slider themes.
+  ShowValueIndicator? sliderShowValueIndicator;
+
+  /// Thumb icon data for switch themes.
+  IconData? switchThumbIcon;
+
+  /// Track shape preset for slider themes.
+  SliderTrackShape? sliderTrackShape;
+
+  /// Thumb shape preset for slider themes.
+  SliderComponentShape? sliderThumbShape;
+
+  /// Overlay shape preset for slider themes.
+  SliderComponentShape? sliderOverlayShape;
+
+  /// Value indicator shape preset for slider themes.
+  SliderComponentShape? sliderValueIndicatorShape;
+
+  /// Material Symbols fill axis value for icon themes.
+  double? iconFill;
+
+  /// Material Symbols weight axis value for icon themes.
+  double? iconWeight;
+
+  /// Material Symbols grade axis value for icon themes.
+  double? iconGrade;
+
+  /// Material Symbols optical size axis value for icon themes.
+  double? iconOpticalSize;
+
+  /// Decoration image for shape-based decorations.
+  DecorationImage? decorationImage;
+
+  /// Wait duration for tooltip themes.
+  Duration? tooltipWaitDuration;
+
+  /// Show duration for tooltip themes.
+  Duration? tooltipShowDuration;
+
+  /// Exit duration for tooltip themes.
+  Duration? tooltipExitDuration;
+
+  /// Snack bar positioning behavior.
+  SnackBarBehavior? snackBehavior;
 
   /// When `true`, variant overrides are ignored for this style group
   /// (triggered by `!important` suffix).
@@ -361,6 +508,7 @@ class DacsStyle {
     return BoxDecoration(
       color: backgroundColor,
       gradient: toGradient(),
+      image: decorationImage,
       borderRadius: borderRadius,
       border: border,
       boxShadow: boxShadow,
@@ -451,6 +599,11 @@ class DacsStyle {
     gradientFromColor ??= _themeColor(scheme, gradientFromThemeColor);
     gradientViaColor ??= _themeColor(scheme, gradientViaThemeColor);
     gradientToColor ??= _themeColor(scheme, gradientToThemeColor);
+    overlayColor ??= _themeColor(scheme, overlayThemeColor);
+    indicatorColor ??= _themeColor(scheme, indicatorThemeColor);
+    barrierColor ??= _themeColor(scheme, barrierThemeColor);
+    unselectedColor ??= _themeColor(scheme, unselectedThemeColor);
+    disabledActionColor ??= _themeColor(scheme, disabledActionThemeColor);
   }
 
   Color? _themeColor(ColorScheme s, String? key) {
@@ -546,6 +699,30 @@ class DacsStyle {
     gradientViaThemeColor =
         source.gradientViaThemeColor ?? gradientViaThemeColor;
     gradientToThemeColor = source.gradientToThemeColor ?? gradientToThemeColor;
+    overlayColor = source.overlayColor ?? overlayColor;
+    overlayThemeColor = source.overlayThemeColor ?? overlayThemeColor;
+    indicatorColor = source.indicatorColor ?? indicatorColor;
+    indicatorThemeColor = source.indicatorThemeColor ?? indicatorThemeColor;
+    barrierColor = source.barrierColor ?? barrierColor;
+    barrierThemeColor = source.barrierThemeColor ?? barrierThemeColor;
+    unselectedColor = source.unselectedColor ?? unselectedColor;
+    unselectedThemeColor = source.unselectedThemeColor ?? unselectedThemeColor;
+    disabledActionColor = source.disabledActionColor ?? disabledActionColor;
+    disabledActionThemeColor =
+        source.disabledActionThemeColor ?? disabledActionThemeColor;
+    mouseCursor = source.mouseCursor ?? mouseCursor;
+    splashRadius = source.splashRadius ?? splashRadius;
+    visualDensity = source.visualDensity ?? visualDensity;
+    materialTapTargetSize =
+        source.materialTapTargetSize ?? materialTapTargetSize;
+    enableFeedback = source.enableFeedback ?? enableFeedback;
+    animationDuration = source.animationDuration ?? animationDuration;
+    splashFactory = source.splashFactory ?? splashFactory;
+    buttonBackgroundLayer =
+        source.buttonBackgroundLayer ?? buttonBackgroundLayer;
+    buttonForegroundLayer =
+        source.buttonForegroundLayer ?? buttonForegroundLayer;
+    iconAlignment = source.iconAlignment ?? iconAlignment;
     gap = source.gap ?? gap;
     flex = source.flex ?? flex;
     flexDirection = source.flexDirection ?? flexDirection;
@@ -568,6 +745,44 @@ class DacsStyle {
     inputSuffixText = source.inputSuffixText ?? inputSuffixText;
     inputFilled = source.inputFilled ?? inputFilled;
     inputDense = source.inputDense ?? inputDense;
+    inputAlignLabelWithHint =
+        source.inputAlignLabelWithHint ?? inputAlignLabelWithHint;
+    inputFloatingLabelBehavior =
+        source.inputFloatingLabelBehavior ?? inputFloatingLabelBehavior;
+    chipBrightness = source.chipBrightness ?? chipBrightness;
+    chipShowCheckmark = source.chipShowCheckmark ?? chipShowCheckmark;
+    tabIndicatorSize = source.tabIndicatorSize ?? tabIndicatorSize;
+    bottomNavShowSelectedLabels =
+        source.bottomNavShowSelectedLabels ?? bottomNavShowSelectedLabels;
+    bottomNavShowUnselectedLabels =
+        source.bottomNavShowUnselectedLabels ?? bottomNavShowUnselectedLabels;
+    bottomNavType = source.bottomNavType ?? bottomNavType;
+    bottomNavLandscapeLayout =
+        source.bottomNavLandscapeLayout ?? bottomNavLandscapeLayout;
+    textCapitalization = source.textCapitalization ?? textCapitalization;
+    navigationLabelBehavior =
+        source.navigationLabelBehavior ?? navigationLabelBehavior;
+    tooltipPreferBelow = source.tooltipPreferBelow ?? tooltipPreferBelow;
+    snackShowCloseIcon = source.snackShowCloseIcon ?? snackShowCloseIcon;
+    bottomSheetShowDragHandle =
+        source.bottomSheetShowDragHandle ?? bottomSheetShowDragHandle;
+    sliderShowValueIndicator =
+        source.sliderShowValueIndicator ?? sliderShowValueIndicator;
+    switchThumbIcon = source.switchThumbIcon ?? switchThumbIcon;
+    sliderTrackShape = source.sliderTrackShape ?? sliderTrackShape;
+    sliderThumbShape = source.sliderThumbShape ?? sliderThumbShape;
+    sliderOverlayShape = source.sliderOverlayShape ?? sliderOverlayShape;
+    sliderValueIndicatorShape =
+        source.sliderValueIndicatorShape ?? sliderValueIndicatorShape;
+    iconFill = source.iconFill ?? iconFill;
+    iconWeight = source.iconWeight ?? iconWeight;
+    iconGrade = source.iconGrade ?? iconGrade;
+    iconOpticalSize = source.iconOpticalSize ?? iconOpticalSize;
+    decorationImage = source.decorationImage ?? decorationImage;
+    tooltipWaitDuration = source.tooltipWaitDuration ?? tooltipWaitDuration;
+    tooltipShowDuration = source.tooltipShowDuration ?? tooltipShowDuration;
+    tooltipExitDuration = source.tooltipExitDuration ?? tooltipExitDuration;
+    snackBehavior = source.snackBehavior ?? snackBehavior;
     if (source.isImportant) isImportant = true;
     if (source.variants != null) {
       variants ??= {};

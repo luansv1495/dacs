@@ -11,10 +11,19 @@ void main() {
 
   group('menu style adapter', () {
     testWidgets('dMenu resolves MenuStyle', (t) async {
-      final data = await t.run((ctx) => 'bg-primary rounded-lg p-4'.dMenu(ctx));
+      final data = await t.run(
+        (ctx) =>
+            'bg-primary rounded-lg p-4 w-64 h-12 min-w-32 max-w-96 align-center density-compact'
+                .dMenu(ctx),
+      );
       expect(data.backgroundColor, isNotNull);
       expect(data.shape, isNotNull);
       expect(data.padding, isNotNull);
+      expect(data.alignment, Alignment.center);
+      expect(data.fixedSize!.resolve({}), const Size(256, 48));
+      expect(data.minimumSize!.resolve({}), const Size(128, 0));
+      expect(data.maximumSize!.resolve({}), const Size(384, double.infinity));
+      expect(data.visualDensity, VisualDensity.compact);
     });
 
     testWidgets('dMenu resolves shape and side as state properties', (t) async {

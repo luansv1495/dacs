@@ -13,20 +13,17 @@ class DacsScrollbarThemeAdapter implements DacsAdapter<ScrollbarThemeData> {
   ScrollbarThemeData build(DacsStyleSheet sheet, DacsResolveContext context) {
     final s = sheet.resolveWith(context);
     final st = materialStateFor(sheet, context);
+    final visible = s.opacity == null ? null : s.opacity! > 0;
     return ScrollbarThemeData(
+      thumbVisibility:
+          visible == null ? null : WidgetStatePropertyAll<bool?>(visible),
       thumbColor: dacsStateProp<Color?>(
         st,
         (s) => s.backgroundColor,
-        hoverExtra: (s) => s.backgroundColor,
-        activeExtra: (s) => s.color,
-        disabledExtra: (s) => s.backgroundColor?.withAlpha(97),
       ),
-      trackColor: dacsStateProp<Color?>(
-        st,
-        (_) => null,
-        hoverExtra: (s) => s.backgroundColor?.withAlpha(51),
-        activeExtra: (s) => s.backgroundColor?.withAlpha(77),
-      ),
+      trackColor: dacsStateOverrideProp<Color>(st, (s) => s.borderColor),
+      trackVisibility:
+          visible == null ? null : WidgetStatePropertyAll<bool?>(visible),
       trackBorderColor: dacsStateProp<Color?>(st, (s) => s.borderColor),
       radius: s.borderRadius is BorderRadius
           ? Radius.circular((s.borderRadius as BorderRadius).topLeft.x)
@@ -36,6 +33,7 @@ class DacsScrollbarThemeAdapter implements DacsAdapter<ScrollbarThemeData> {
       minThumbLength: s.minHeight,
       crossAxisMargin: s.margin?.left,
       mainAxisMargin: s.margin?.top,
+      interactive: visible == false ? false : null,
     );
   }
 }

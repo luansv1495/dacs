@@ -116,7 +116,7 @@ void main() {
       expect(outline!.borderRadius, BorderRadius.zero);
     });
 
-    test('dacsStateProp resolves selected/error/dragged/scrolledUnder extras',
+    test('dacsStateProp resolves selected/error/dragged/scrolledUnder states',
         () {
       final state = DacsMaterialState(
         DacsStyle(),
@@ -126,15 +126,13 @@ void main() {
           'dragged': DacsStyle()..fontSize = 3,
           'scrolledUnder': DacsStyle()..fontSize = 4,
         },
+        const {},
+        const [],
         const [],
       );
       final prop = dacsStateProp<double?>(
         state,
-        (_) => null,
-        selectedExtra: (s) => s.fontSize,
-        errorExtra: (s) => s.fontSize,
-        draggedExtra: (s) => s.fontSize,
-        scrolledUnderExtra: (s) => s.fontSize,
+        (s) => s.fontSize,
       );
 
       expect(prop.resolve({WidgetState.selected}), 1);
@@ -143,25 +141,47 @@ void main() {
       expect(prop.resolve({WidgetState.scrolledUnder}), 4);
     });
 
-    test('dacsStateProp returns null when compound fallback and extra miss',
-        () {
+    test('dacsStateOverrideProp uses only explicit override styles', () {
       final state = DacsMaterialState(
-        DacsStyle(),
-        const {},
+        DacsStyle()..fontSize = 3,
+        {
+          'hover': DacsStyle()
+            ..fontSize = 3
+            ..backgroundColor = Colors.red,
+        },
+        {
+          'hover': DacsStyle()..backgroundColor = Colors.red,
+        },
         [
           DacsStateRule(
             {WidgetState.hovered, WidgetState.focused},
-            DacsStyle()..fontSize = 9,
+            DacsStyle()
+              ..fontSize = 3
+              ..backgroundColor = Colors.blue,
+          ),
+        ],
+        [
+          DacsStateRule(
+            {WidgetState.hovered, WidgetState.focused},
+            DacsStyle()..backgroundColor = Colors.blue,
           ),
         ],
       );
-      final prop = dacsStateProp<double?>(
+      final overrideColor = dacsStateOverrideProp<Color>(
         state,
-        (_) => null,
-        hoverExtra: (s) => s.fontSize,
+        (s) => s.backgroundColor,
+      );
+      final overrideFontSize = dacsStateOverrideProp<double>(
+        state,
+        (s) => s.fontSize,
       );
 
-      expect(prop.resolve({WidgetState.hovered, WidgetState.focused}), isNull);
+      expect(
+        overrideColor.resolve({WidgetState.hovered, WidgetState.focused}),
+        Colors.blue,
+      );
+      expect(overrideColor.resolve({WidgetState.hovered}), Colors.red);
+      expect(overrideFontSize.resolve({WidgetState.hovered}), isNull);
     });
   });
 

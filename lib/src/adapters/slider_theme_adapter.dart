@@ -12,39 +12,37 @@ class DacsSliderThemeAdapter implements DacsAdapter<SliderThemeData> {
   @override
   SliderThemeData build(DacsStyleSheet sheet, DacsResolveContext context) {
     final s = sheet.resolveWith(context);
-    final disabled = _stateStyle(sheet, context, 'disabled');
-    final active = _stateStyle(sheet, context, 'active') ??
-        _stateStyle(sheet, context, 'pressed');
-    final hover = _stateStyle(sheet, context, 'hover');
-    final overlayColor =
-        active?.backgroundColor ?? hover?.backgroundColor ?? s.backgroundColor;
+    final st = materialStateFor(sheet, context);
+    final disabled = st.variantOverrides['disabled'];
 
     return SliderThemeData(
       activeTrackColor: s.backgroundColor,
-      inactiveTrackColor: s.borderColor ?? s.backgroundColor?.withAlpha(77),
+      inactiveTrackColor: s.borderColor,
       secondaryActiveTrackColor: s.color,
-      disabledActiveTrackColor:
-          disabled?.backgroundColor ?? s.backgroundColor?.withAlpha(97),
-      disabledInactiveTrackColor:
-          disabled?.borderColor ?? s.borderColor?.withAlpha(97),
+      disabledActiveTrackColor: disabled?.backgroundColor,
+      disabledInactiveTrackColor: disabled?.borderColor,
       thumbColor: s.color ?? s.backgroundColor,
-      disabledThumbColor: disabled?.color ?? s.color?.withAlpha(97),
-      overlayColor: overlayColor?.withAlpha(31),
+      disabledThumbColor: disabled?.color,
+      overlayColor: s.overlayColor,
       valueIndicatorColor: s.backgroundColor,
       activeTickMarkColor: s.color,
       inactiveTickMarkColor: s.borderColor,
       disabledActiveTickMarkColor: disabled?.color,
       disabledInactiveTickMarkColor: disabled?.borderColor,
       trackHeight: s.height ?? s.borderWidth,
+      valueIndicatorTextStyle: s.toTextStyle(),
+      mouseCursor:
+          dacsStateOverrideOrBaseProp<MouseCursor>(st, (s) => s.mouseCursor),
+      padding: s.padding,
+      thumbSize: s.toFixedSize() == null
+          ? null
+          : WidgetStatePropertyAll<Size?>(s.toFixedSize()),
+      trackGap: s.gap,
+      trackShape: s.sliderTrackShape,
+      thumbShape: s.sliderThumbShape,
+      overlayShape: s.sliderOverlayShape,
+      valueIndicatorShape: s.sliderValueIndicatorShape,
+      showValueIndicator: s.sliderShowValueIndicator,
     );
-  }
-
-  dynamic _stateStyle(
-    DacsStyleSheet sheet,
-    DacsResolveContext context,
-    String key,
-  ) {
-    final st = materialStateFor(sheet, context);
-    return st.variants[key];
   }
 }

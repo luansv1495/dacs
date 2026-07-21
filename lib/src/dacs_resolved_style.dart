@@ -147,6 +147,67 @@ class DacsResolvedStyle {
   /// Theme color key for gradient end color.
   String? get gradientToThemeColor => _style.gradientToThemeColor;
 
+  /// Explicit overlay color.
+  Color? get overlayColor => _style.overlayColor;
+
+  /// Theme color key for overlay color.
+  String? get overlayThemeColor => _style.overlayThemeColor;
+
+  /// Explicit indicator color.
+  Color? get indicatorColor => _style.indicatorColor;
+
+  /// Theme color key for indicator color.
+  String? get indicatorThemeColor => _style.indicatorThemeColor;
+
+  /// Explicit modal barrier color.
+  Color? get barrierColor => _style.barrierColor;
+
+  /// Theme color key for barrier color.
+  String? get barrierThemeColor => _style.barrierThemeColor;
+
+  /// Explicit unselected item or label color.
+  Color? get unselectedColor => _style.unselectedColor;
+
+  /// Theme color key for unselected color.
+  String? get unselectedThemeColor => _style.unselectedThemeColor;
+
+  /// Explicit disabled action color.
+  Color? get disabledActionColor => _style.disabledActionColor;
+
+  /// Theme color key for disabled action color.
+  String? get disabledActionThemeColor => _style.disabledActionThemeColor;
+
+  /// Mouse cursor for interactive Material components.
+  MouseCursor? get mouseCursor => _style.mouseCursor;
+
+  /// Splash radius for controls that expose a splash radius.
+  double? get splashRadius => _style.splashRadius;
+
+  /// Visual density for Material components.
+  VisualDensity? get visualDensity => _style.visualDensity;
+
+  /// Material tap target size.
+  MaterialTapTargetSize? get materialTapTargetSize =>
+      _style.materialTapTargetSize;
+
+  /// Whether Material feedback should be enabled.
+  bool? get enableFeedback => _style.enableFeedback;
+
+  /// Animation duration for components that expose one.
+  Duration? get animationDuration => _style.animationDuration;
+
+  /// Ink splash factory for Material interaction effects.
+  InteractiveInkFeatureFactory? get splashFactory => _style.splashFactory;
+
+  /// Whether button styles should build a DACS background layer.
+  bool? get buttonBackgroundLayer => _style.buttonBackgroundLayer;
+
+  /// Whether button styles should build a DACS foreground layer.
+  bool? get buttonForegroundLayer => _style.buttonForegroundLayer;
+
+  /// Icon alignment for button styles.
+  IconAlignment? get iconAlignment => _style.iconAlignment;
+
   /// Gap value.
   double? get gap => _style.gap;
 
@@ -212,6 +273,99 @@ class DacsResolvedStyle {
 
   /// Whether input decoration should be dense.
   bool? get inputDense => _style.inputDense;
+
+  /// Whether input labels align with hints.
+  bool? get inputAlignLabelWithHint => _style.inputAlignLabelWithHint;
+
+  /// Floating label behavior for input decoration.
+  FloatingLabelBehavior? get inputFloatingLabelBehavior =>
+      _style.inputFloatingLabelBehavior;
+
+  /// Brightness hint for chip themes.
+  Brightness? get chipBrightness => _style.chipBrightness;
+
+  /// Whether chip themes should show the checkmark.
+  bool? get chipShowCheckmark => _style.chipShowCheckmark;
+
+  /// Indicator size for tab bars.
+  TabBarIndicatorSize? get tabIndicatorSize => _style.tabIndicatorSize;
+
+  /// Whether bottom navigation bars should show selected labels.
+  bool? get bottomNavShowSelectedLabels => _style.bottomNavShowSelectedLabels;
+
+  /// Whether bottom navigation bars should show unselected labels.
+  bool? get bottomNavShowUnselectedLabels =>
+      _style.bottomNavShowUnselectedLabels;
+
+  /// Bottom navigation bar type.
+  BottomNavigationBarType? get bottomNavType => _style.bottomNavType;
+
+  /// Bottom navigation bar landscape layout.
+  BottomNavigationBarLandscapeLayout? get bottomNavLandscapeLayout =>
+      _style.bottomNavLandscapeLayout;
+
+  /// Text capitalization for search bars.
+  TextCapitalization? get textCapitalization => _style.textCapitalization;
+
+  /// Label behavior for navigation bars.
+  NavigationDestinationLabelBehavior? get navigationLabelBehavior =>
+      _style.navigationLabelBehavior;
+
+  /// Whether tooltips prefer rendering below their child.
+  bool? get tooltipPreferBelow => _style.tooltipPreferBelow;
+
+  /// Whether snack bars should show a close icon.
+  bool? get snackShowCloseIcon => _style.snackShowCloseIcon;
+
+  /// Whether bottom sheets should show the drag handle.
+  bool? get bottomSheetShowDragHandle => _style.bottomSheetShowDragHandle;
+
+  /// Value indicator visibility mode for slider themes.
+  ShowValueIndicator? get sliderShowValueIndicator =>
+      _style.sliderShowValueIndicator;
+
+  /// Thumb icon data for switch themes.
+  IconData? get switchThumbIcon => _style.switchThumbIcon;
+
+  /// Track shape preset for slider themes.
+  SliderTrackShape? get sliderTrackShape => _style.sliderTrackShape;
+
+  /// Thumb shape preset for slider themes.
+  SliderComponentShape? get sliderThumbShape => _style.sliderThumbShape;
+
+  /// Overlay shape preset for slider themes.
+  SliderComponentShape? get sliderOverlayShape => _style.sliderOverlayShape;
+
+  /// Value indicator shape preset for slider themes.
+  SliderComponentShape? get sliderValueIndicatorShape =>
+      _style.sliderValueIndicatorShape;
+
+  /// Material Symbols fill axis value for icon themes.
+  double? get iconFill => _style.iconFill;
+
+  /// Material Symbols weight axis value for icon themes.
+  double? get iconWeight => _style.iconWeight;
+
+  /// Material Symbols grade axis value for icon themes.
+  double? get iconGrade => _style.iconGrade;
+
+  /// Material Symbols optical size axis value for icon themes.
+  double? get iconOpticalSize => _style.iconOpticalSize;
+
+  /// Decoration image for shape-based decorations.
+  DecorationImage? get decorationImage => _style.decorationImage;
+
+  /// Wait duration for tooltip themes.
+  Duration? get tooltipWaitDuration => _style.tooltipWaitDuration;
+
+  /// Show duration for tooltip themes.
+  Duration? get tooltipShowDuration => _style.tooltipShowDuration;
+
+  /// Exit duration for tooltip themes.
+  Duration? get tooltipExitDuration => _style.tooltipExitDuration;
+
+  /// Snack bar positioning behavior.
+  SnackBarBehavior? get snackBehavior => _style.snackBehavior;
 
   /// Whether this style blocks conditional overrides.
   bool get isImportant => _style.isImportant;

@@ -16,6 +16,10 @@ const Set<String> dacsVariantPrefixes = {
   'error',
   'dragged',
   'scrolledUnder',
+  'collapsed',
+  'small',
+  'large',
+  'extended',
 };
 
 /// Breakpoints for responsive variants mapped to min-width in pixels.

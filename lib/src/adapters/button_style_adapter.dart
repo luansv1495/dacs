@@ -16,18 +16,10 @@ class DacsButtonStyleAdapter implements DacsAdapter<ButtonStyle> {
       textStyle: dacsStateProp<TextStyle?>(st, (s) => s.toTextStyle()),
       backgroundColor: dacsStateProp<Color?>(st, (s) => s.backgroundColor),
       foregroundColor: dacsStateProp<Color?>(st, (s) => s.color),
-      overlayColor: dacsStateProp<Color?>(
-        st,
-        (_) => null,
-        hoverExtra: (s) => s.backgroundColor?.withAlpha(26),
-        focusExtra: (s) => s.backgroundColor?.withAlpha(26),
-        activeExtra: (s) => s.backgroundColor?.withAlpha(52),
-      ),
-      shadowColor: dacsStateProp<Color?>(
-        st,
-        (_) => null,
-        hoverExtra: (s) => s.boxShadow?.firstOrNull?.color,
-      ),
+      overlayColor:
+          dacsStateOverrideOrBaseProp<Color>(st, (s) => s.overlayColor),
+      shadowColor:
+          dacsStateProp<Color?>(st, (s) => s.boxShadow?.firstOrNull?.color),
       surfaceTintColor: dacsStateProp<Color?>(st, (s) => s.backgroundColor),
       iconColor: dacsStateProp<Color?>(st, (s) => s.color),
       iconSize: dacsStateProp<double?>(st, (s) => s.fontSize),
@@ -43,16 +35,22 @@ class DacsButtonStyleAdapter implements DacsAdapter<ButtonStyle> {
       side: dacsStateProp<BorderSide?>(st, dacsSide),
       shape: dacsStateProp<OutlinedBorder?>(st, dacsShape),
       elevation: dacsStateProp<double?>(
-        st,
-        (_) => null,
-        hoverExtra: (s) => s.boxShadow?.firstOrNull?.blurRadius,
-      ),
-      mouseCursor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.disabled)) {
-          return SystemMouseCursors.forbidden;
-        }
-        return SystemMouseCursors.click;
-      }),
+          st, (s) => s.boxShadow?.firstOrNull?.blurRadius),
+      alignment: st.base.alignment,
+      iconAlignment: st.base.iconAlignment,
+      visualDensity: st.base.visualDensity,
+      tapTargetSize: st.base.materialTapTargetSize,
+      mouseCursor:
+          dacsStateOverrideOrBaseProp<MouseCursor>(st, (s) => s.mouseCursor),
+      enableFeedback: st.base.enableFeedback,
+      animationDuration: st.base.animationDuration,
+      splashFactory: st.base.splashFactory,
+      backgroundBuilder: st.base.buttonBackgroundLayer == true
+          ? _backgroundLayerBuilder(st)
+          : null,
+      foregroundBuilder: st.base.buttonForegroundLayer == true
+          ? _foregroundLayerBuilder(st)
+          : null,
     );
   }
 
@@ -60,5 +58,28 @@ class DacsButtonStyleAdapter implements DacsAdapter<ButtonStyle> {
     return s.width != null || s.height != null
         ? Size(s.width ?? 0, s.height ?? 0)
         : null;
+  }
+
+  ButtonLayerBuilder _backgroundLayerBuilder(DacsMaterialState st) {
+    return (context, states, child) {
+      final style = dacsStyleForStates(st, states);
+      return DecoratedBox(
+        decoration: style.toBoxDecoration(),
+        child: child,
+      );
+    };
+  }
+
+  ButtonLayerBuilder _foregroundLayerBuilder(DacsMaterialState st) {
+    return (context, states, child) {
+      final source = dacsStyleForStates(st, states);
+      final style = source.clone()
+        ..backgroundColor = source.overlayColor
+        ..bgThemeColor = null;
+      return DecoratedBox(
+        decoration: style.toBoxDecoration(),
+        child: child,
+      );
+    };
   }
 }

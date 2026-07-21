@@ -14,22 +14,20 @@ class DacsDataTableAdapter implements DacsAdapter<DataTableThemeData> {
     final s = sheet.resolveWith(context);
     final st = materialStateFor(sheet, context);
     return DataTableThemeData(
-      headingRowColor: dacsStateProp<Color?>(
-        st,
-        (_) => null,
-        hoverExtra: (s2) => s2.backgroundColor?.withAlpha(26),
-      ),
-      dataRowColor: dacsStateProp<Color?>(
-        st,
-        (_) => null,
-        hoverExtra: (s2) => s2.backgroundColor?.withAlpha(13),
-      ),
+      headingRowColor:
+          dacsStateOverrideProp<Color>(st, (s) => s.backgroundColor),
+      dataRowColor: dacsStateOverrideProp<Color>(st, (s) => s.backgroundColor),
       headingTextStyle: s.toTextStyle(),
       dataTextStyle: s.toTextStyle(),
       dividerThickness: s.borderWidth,
       decoration: s.toBoxDecoration(),
       horizontalMargin: s.padding?.left,
       columnSpacing: s.padding?.right,
+      headingRowHeight: s.height,
+      dataRowMinHeight: s.minHeight,
+      dataRowMaxHeight: s.maxHeight,
+      checkboxHorizontalMargin: s.margin?.left,
+      headingRowAlignment: s.justifyContent,
     );
   }
 }

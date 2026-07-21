@@ -13,21 +13,31 @@ class DacsSwitchThemeAdapter implements DacsAdapter<SwitchThemeData> {
   SwitchThemeData build(DacsStyleSheet sheet, DacsResolveContext context) {
     final st = materialStateFor(sheet, context);
     return SwitchThemeData(
-      thumbColor: dacsStateProp<Color?>(
-        st,
-        (s) => s.backgroundColor,
-        activeExtra: (s) => s.color,
-      ),
-      trackColor: dacsStateProp<Color?>(
-        st,
-        (s) => s.backgroundColor?.withAlpha(128),
-      ),
+      thumbColor: dacsStateProp<Color?>(st, (s) => s.color),
+      trackColor: dacsStateProp<Color?>(st, (s) => s.backgroundColor),
       trackOutlineColor: dacsStateProp<Color?>(st, (s) => s.borderColor),
-      overlayColor: dacsStateProp<Color?>(
+      trackOutlineWidth: dacsStateProp<double?>(st, (s) => s.borderWidth),
+      thumbIcon: dacsStateOverrideOrBaseProp<Icon>(
         st,
-        (_) => null,
-        hoverExtra: (s) => s.backgroundColor?.withAlpha(26),
+        (s) => s.switchThumbIcon == null
+            ? null
+            : Icon(
+                s.switchThumbIcon,
+                color: s.color,
+                size: s.fontSize ?? s.width,
+                fill: s.iconFill,
+                weight: s.iconWeight,
+                grade: s.iconGrade,
+                opticalSize: s.iconOpticalSize,
+              ),
       ),
+      overlayColor:
+          dacsStateOverrideOrBaseProp<Color>(st, (s) => s.overlayColor),
+      mouseCursor:
+          dacsStateOverrideOrBaseProp<MouseCursor>(st, (s) => s.mouseCursor),
+      splashRadius: st.base.splashRadius,
+      materialTapTargetSize: st.base.materialTapTargetSize,
+      padding: st.base.padding,
     );
   }
 }

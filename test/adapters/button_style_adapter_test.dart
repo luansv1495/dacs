@@ -30,10 +30,12 @@ void main() {
       expect(style.minimumSize, isA<WidgetStateProperty<Size?>>());
       expect(style.fixedSize, isA<WidgetStateProperty<Size?>>());
       expect(style.maximumSize, isA<WidgetStateProperty<Size?>>());
-      expect(style.mouseCursor, isA<WidgetStateProperty<MouseCursor?>>());
+      expect(style.overlayColor, isNull);
+      expect(style.mouseCursor, isNull);
     });
 
-    testWidgets('dButton resolves overlay, shadow, size, and cursor states', (
+    testWidgets(
+        'dButton resolves shadow and size states without derived colors', (
       t,
     ) async {
       final style = await t.run(
@@ -42,24 +44,51 @@ void main() {
                 .dButton(ctx),
       );
 
-      expect(
-        style.overlayColor!.resolve({WidgetState.hovered}),
-        const Color(0xFF6200EE).withAlpha(26),
-      );
-      expect(
-        style.overlayColor!.resolve({WidgetState.pressed}),
-        const Color(0xFFB00020).withAlpha(52),
-      );
       expect(style.shadowColor!.resolve({WidgetState.hovered}), isNotNull);
       expect(style.elevation!.resolve({WidgetState.hovered}), isNotNull);
       expect(style.minimumSize!.resolve({}), const Size(256, 48));
       expect(style.fixedSize!.resolve({}), const Size(256, 48));
       expect(style.maximumSize!.resolve({}), const Size(256, 48));
-      expect(
-        style.mouseCursor!.resolve({WidgetState.disabled}),
-        SystemMouseCursors.forbidden,
+      expect(style.overlayColor, isNull);
+      expect(style.mouseCursor, isNull);
+    });
+
+    testWidgets('dButton maps child alignment', (t) async {
+      final style = await t.run(
+        (ctx) =>
+            'align-center icon-align-end density-compact tap-target-shrink feedback cursor-click overlay-primary hover:overlay-error'
+                .dButton(ctx),
       );
-      expect(style.mouseCursor!.resolve({}), SystemMouseCursors.click);
+
+      expect(style.alignment, Alignment.center);
+      expect(style.iconAlignment, IconAlignment.end);
+      expect(style.visualDensity, VisualDensity.compact);
+      expect(style.tapTargetSize, MaterialTapTargetSize.shrinkWrap);
+      expect(style.enableFeedback, isTrue);
+      expect(
+        style.mouseCursor!.resolve({WidgetState.hovered}),
+        SystemMouseCursors.click,
+      );
+      expect(style.overlayColor!.resolve({}), const Color(0xFF6200EE));
+      expect(
+        style.overlayColor!.resolve({WidgetState.hovered}),
+        const Color(0xFFB00020),
+      );
+    });
+
+    testWidgets('dButton maps duration, splash factory, and layer builders', (
+      t,
+    ) async {
+      final style = await t.run(
+        (ctx) =>
+            'duration-200 splash-none button-bg-layer button-fg-layer overlay-primary'
+                .dButton(ctx),
+      );
+
+      expect(style.animationDuration, const Duration(milliseconds: 200));
+      expect(style.splashFactory, NoSplash.splashFactory);
+      expect(style.backgroundBuilder, isNotNull);
+      expect(style.foregroundBuilder, isNotNull);
     });
 
     testWidgets('dButton iconSize maps from fontSize', (t) async {

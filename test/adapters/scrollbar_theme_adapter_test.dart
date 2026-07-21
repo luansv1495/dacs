@@ -22,7 +22,7 @@ void main() {
     testWidgets('dScrollbar resolves native state properties', (t) async {
       final data = await t.run(
         (ctx) =>
-            'bg-primary hover:bg-error active:bg-secondary disabled:bg-outline border-outline m-4 min-h-12'
+            'bg-primary hover:bg-error active:bg-secondary disabled:bg-outline border-outline hover:border-error active:border-secondary m-4 min-h-12'
                 .dScrollbar(ctx),
       );
       expect(
@@ -39,16 +39,28 @@ void main() {
       );
       expect(
         data.trackColor!.resolve({WidgetState.hovered}),
-        const Color(0xFFB00020).withAlpha(51),
+        const Color(0xFFB00020),
       );
       expect(
         data.trackColor!.resolve({WidgetState.pressed}),
-        const Color(0xFF03DAC6).withAlpha(77),
+        const Color(0xFF03DAC6),
       );
       expect(data.trackBorderColor!.resolve({}), const Color(0xFF79747E));
       expect(data.minThumbLength, 48);
       expect(data.crossAxisMargin, 16);
       expect(data.mainAxisMargin, 16);
+    });
+
+    testWidgets('dScrollbar maps opacity to visibility flags', (t) async {
+      final visible = await t.run((ctx) => 'opacity-100'.dScrollbar(ctx));
+      expect(visible.thumbVisibility!.resolve({}), isTrue);
+      expect(visible.trackVisibility!.resolve({}), isTrue);
+      expect(visible.interactive, isNull);
+
+      final hidden = await t.run((ctx) => 'opacity-0'.dScrollbar(ctx));
+      expect(hidden.thumbVisibility!.resolve({}), isFalse);
+      expect(hidden.trackVisibility!.resolve({}), isFalse);
+      expect(hidden.interactive, isFalse);
     });
   });
 }

@@ -11,9 +11,17 @@ void main() {
 
   group('data table adapter', () {
     testWidgets('dDataTable resolves DataTableThemeData', (t) async {
-      final data = await t.run((ctx) => 'bg-primary p-4'.dDataTable(ctx));
+      final data = await t.run(
+        (ctx) => 'bg-primary p-4 m-2 h-12 min-h-10 max-h-16 justify-center'
+            .dDataTable(ctx),
+      );
       expect(data.headingRowColor, isNotNull);
       expect(data.horizontalMargin, 16);
+      expect(data.headingRowHeight, 48);
+      expect(data.dataRowMinHeight, 40);
+      expect(data.dataRowMaxHeight, 64);
+      expect(data.checkboxHorizontalMargin, 8);
+      expect(data.headingRowAlignment, MainAxisAlignment.center);
     });
 
     testWidgets('dDataTable resolves text and decoration fields', (t) async {
@@ -35,11 +43,11 @@ void main() {
 
       expect(
         data.headingRowColor!.resolve({WidgetState.hovered}),
-        const Color(0xFF6200EE).withAlpha(26),
+        const Color(0xFF6200EE),
       );
       expect(
         data.dataRowColor!.resolve({WidgetState.hovered}),
-        const Color(0xFF6200EE).withAlpha(13),
+        const Color(0xFF6200EE),
       );
       expect(data.horizontalMargin, 16);
       expect(data.columnSpacing, 16);

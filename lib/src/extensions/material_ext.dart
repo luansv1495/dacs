@@ -55,6 +55,19 @@ extension DacsWidgetExtensions on String {
       elevation: s.boxShadow?.firstOrNull?.blurRadius,
       shadowColor: s.boxShadow?.firstOrNull?.color,
       surfaceTintColor: s.backgroundColor,
+      shape: dacsShape(s),
+      iconTheme: s.color != null || s.width != null
+          ? IconThemeData(color: s.color, size: s.width)
+          : null,
+      actionsIconTheme: s.color != null || s.width != null
+          ? IconThemeData(color: s.color, size: s.width)
+          : null,
+      titleSpacing: s.margin?.left,
+      leadingWidth: s.width,
+      toolbarHeight: s.height,
+      toolbarTextStyle: s.toTextStyle(),
+      titleTextStyle: s.toTextStyle(),
+      actionsPadding: s.padding,
     );
   }
 
@@ -64,34 +77,59 @@ extension DacsWidgetExtensions on String {
     return CardTheme(
       color: s.backgroundColor,
       shadowColor: s.boxShadow?.firstOrNull?.color,
+      surfaceTintColor: s.backgroundColor,
       elevation: s.boxShadow?.firstOrNull?.blurRadius,
       shape: dacsShape(s),
       margin: s.margin,
+      clipBehavior: s.overflow,
     );
   }
 
   /// Builds [ListTileThemeData] from this DACS class string.
   ListTileThemeData dListTile(BuildContext context) {
-    final s = _resolve(this, context);
+    final sheet = _sheet(this);
+    final ctx = _context(context);
+    final s = sheet.resolveWith(ctx);
+    final st = materialStateFor(sheet, ctx);
     return ListTileThemeData(
       tileColor: s.backgroundColor,
+      selectedTileColor: st.variantOverrides['selected']?.backgroundColor,
       textColor: s.color,
       iconColor: s.color,
       selectedColor: s.color,
       shape: dacsShape(s),
       contentPadding: s.padding,
+      titleTextStyle: s.toTextStyle(),
+      subtitleTextStyle: s.toTextStyle(),
+      leadingAndTrailingTextStyle: s.toTextStyle(),
+      dense: s.inputDense,
+      horizontalTitleGap: s.gap,
+      minVerticalPadding: s.padding?.top,
+      minLeadingWidth: s.minWidth,
+      minTileHeight: s.minHeight,
     );
   }
 
   /// Builds a [TabBarTheme] from this DACS class string.
   TabBarTheme dTabBar(BuildContext context) {
-    final s = _resolve(this, context);
+    final sheet = _sheet(this);
+    final ctx = _context(context);
+    final s = sheet.resolveWith(ctx);
+    final st = materialStateFor(sheet, ctx);
     return TabBarTheme(
       labelColor: s.color,
-      unselectedLabelColor: s.color?.withAlpha(128),
+      unselectedLabelColor: s.unselectedColor,
       indicatorColor: s.color,
+      indicator: _shapeDecoration(s),
       labelStyle: s.toTextStyle(),
       unselectedLabelStyle: s.toTextStyle(),
+      dividerColor: s.borderColor,
+      dividerHeight: s.borderWidth,
+      indicatorSize: s.tabIndicatorSize,
+      labelPadding: s.padding,
+      overlayColor:
+          dacsStateOverrideOrBaseProp<Color>(st, (s) => s.overlayColor),
+      splashFactory: s.splashFactory,
     );
   }
 
@@ -118,6 +156,10 @@ extension DacsWidgetExtensions on String {
       color: s.color,
       linearTrackColor: s.backgroundColor,
       circularTrackColor: s.backgroundColor,
+      linearMinHeight: s.height,
+      refreshBackgroundColor: s.backgroundColor,
+      stopIndicatorColor: s.borderColor,
+      stopIndicatorRadius: s.borderWidth,
     );
   }
 
@@ -129,6 +171,13 @@ extension DacsWidgetExtensions on String {
       textStyle: s.toTextStyle(),
       padding: s.padding,
       margin: s.margin,
+      constraints: s.toConstraints(),
+      preferBelow: s.tooltipPreferBelow,
+      verticalOffset: s.insetTop,
+      enableFeedback: s.enableFeedback,
+      waitDuration: s.tooltipWaitDuration,
+      showDuration: s.tooltipShowDuration,
+      exitDuration: s.tooltipExitDuration,
     );
   }
 
@@ -157,7 +206,13 @@ extension DacsWidgetExtensions on String {
       backgroundColor: s.backgroundColor,
       contentTextStyle: s.toTextStyle(),
       shape: dacsShape(s),
-      behavior: SnackBarBehavior.floating,
+      elevation: s.boxShadow?.firstOrNull?.blurRadius,
+      actionTextColor: s.color,
+      disabledActionTextColor: s.disabledActionColor,
+      closeIconColor: s.color,
+      insetPadding: s.margin,
+      behavior: s.snackBehavior,
+      showCloseIcon: s.snackShowCloseIcon,
     );
   }
 
@@ -167,7 +222,17 @@ extension DacsWidgetExtensions on String {
     return DialogTheme(
       backgroundColor: s.backgroundColor,
       elevation: s.boxShadow?.firstOrNull?.blurRadius,
+      shadowColor: s.boxShadow?.firstOrNull?.color,
+      surfaceTintColor: s.backgroundColor,
       shape: dacsShape(s),
+      alignment: s.alignment,
+      iconColor: s.color,
+      titleTextStyle: s.toTextStyle(),
+      contentTextStyle: s.toTextStyle(),
+      actionsPadding: s.padding,
+      barrierColor: s.barrierColor,
+      insetPadding: s.margin,
+      clipBehavior: s.overflow,
     );
   }
 
@@ -176,21 +241,41 @@ extension DacsWidgetExtensions on String {
     final s = _resolve(this, context);
     return BottomSheetThemeData(
       backgroundColor: s.backgroundColor,
+      modalBackgroundColor: s.backgroundColor,
+      modalBarrierColor: s.barrierColor,
       elevation: s.boxShadow?.firstOrNull?.blurRadius,
+      modalElevation: s.boxShadow?.firstOrNull?.blurRadius,
+      shadowColor: s.boxShadow?.firstOrNull?.color,
+      surfaceTintColor: s.backgroundColor,
       shape: dacsShape(s),
+      clipBehavior: s.overflow,
+      constraints: s.toConstraints(),
+      dragHandleColor: s.color,
+      dragHandleSize: s.toFixedSize(),
+      showDragHandle: s.bottomSheetShowDragHandle,
     );
   }
 
   /// Builds [ExpansionTileThemeData] from this DACS class string.
   ExpansionTileThemeData dExpansionTile(BuildContext context) {
-    final s = _resolve(this, context);
+    final sheet = _sheet(this);
+    final ctx = _context(context);
+    final s = sheet.resolveWith(ctx);
+    final st = materialStateFor(sheet, ctx);
     return ExpansionTileThemeData(
       backgroundColor: s.backgroundColor,
-      collapsedBackgroundColor: s.backgroundColor?.withAlpha(128),
+      collapsedBackgroundColor:
+          st.variantOverrides['collapsed']?.backgroundColor,
       iconColor: s.color,
       textColor: s.color,
       shape: dacsShape(s),
       collapsedShape: dacsShape(s),
+      tilePadding: s.padding,
+      childrenPadding: s.margin,
+      expandedAlignment: s.alignment,
+      collapsedIconColor: st.variantOverrides['collapsed']?.color,
+      collapsedTextColor: st.variantOverrides['collapsed']?.color,
+      clipBehavior: s.overflow,
     );
   }
 
@@ -200,12 +285,37 @@ extension DacsWidgetExtensions on String {
 
   /// Builds [FloatingActionButtonThemeData] from this DACS class string.
   FloatingActionButtonThemeData dFab(BuildContext context) {
-    final s = _resolve(this, context);
+    final sheet = _sheet(this);
+    final ctx = _context(context);
+    final s = sheet.resolveWith(ctx);
+    final st = materialStateFor(sheet, ctx);
     return FloatingActionButtonThemeData(
       backgroundColor: s.backgroundColor,
       foregroundColor: s.color,
       elevation: s.boxShadow?.firstOrNull?.blurRadius,
       shape: dacsShape(s),
+      focusColor: st.variantOverrides['focus']?.backgroundColor,
+      hoverColor: st.variantOverrides['hover']?.backgroundColor,
+      splashColor: st.variantOverrides['pressed']?.backgroundColor ??
+          st.variantOverrides['active']?.backgroundColor,
+      highlightElevation:
+          (st.variantOverrides['pressed'] ?? st.variantOverrides['active'])
+              ?.boxShadow
+              ?.firstOrNull
+              ?.blurRadius,
+      focusElevation:
+          st.variantOverrides['focus']?.boxShadow?.firstOrNull?.blurRadius,
+      hoverElevation:
+          st.variantOverrides['hover']?.boxShadow?.firstOrNull?.blurRadius,
+      disabledElevation:
+          st.variantOverrides['disabled']?.boxShadow?.firstOrNull?.blurRadius,
+      extendedPadding: s.padding,
+      extendedTextStyle: s.toTextStyle(),
+      sizeConstraints: s.toConstraints(),
+      smallSizeConstraints: st.variantOverrides['small']?.toConstraints(),
+      largeSizeConstraints: st.variantOverrides['large']?.toConstraints(),
+      extendedSizeConstraints: st.variantOverrides['extended']?.toConstraints(),
+      iconSize: s.fontSize ?? s.width,
     );
   }
 
@@ -234,6 +344,11 @@ extension DacsWidgetExtensions on String {
       color: s.color,
       size: s.width,
       opacity: s.opacity ?? 1.0,
+      shadows: s.boxShadow,
+      fill: s.iconFill,
+      weight: s.iconWeight,
+      grade: s.iconGrade,
+      opticalSize: s.iconOpticalSize,
     );
   }
 
@@ -242,9 +357,26 @@ extension DacsWidgetExtensions on String {
     final s = _resolve(this, context);
     return ShapeDecoration(
       color: s.backgroundColor,
+      image: s.decorationImage,
       gradient: s.toGradient(),
       shape: dacsShape(s) ?? RoundedRectangleBorder(),
       shadows: s.boxShadow,
     );
   }
+}
+
+Decoration? _shapeDecoration(DacsResolvedStyle style) {
+  if (style.backgroundColor == null &&
+      style.borderColor == null &&
+      style.borderWidth == null &&
+      style.borderRadius == null) {
+    return null;
+  }
+  return ShapeDecoration(
+    color: style.backgroundColor,
+    shape: RoundedRectangleBorder(
+      borderRadius: style.borderRadius ?? BorderRadius.zero,
+      side: dacsSide(style) ?? BorderSide.none,
+    ),
+  );
 }

@@ -17,6 +17,7 @@ class DacsInputDecorationAdapter implements DacsAdapter<InputDecoration> {
     final focused = _stateStyle(st, 'focus');
     final disabled = _stateStyle(st, 'disabled');
     final error = _stateStyle(st, 'error');
+    final focusedOverride = st.variantOverrides['focus'];
     final focusedError = _compoundStyle(st, {
           WidgetState.focused,
           WidgetState.error,
@@ -34,14 +35,20 @@ class DacsInputDecorationAdapter implements DacsAdapter<InputDecoration> {
       prefixText: s.inputPrefixText,
       suffixText: s.inputSuffixText,
       labelStyle: _textStyle(s),
+      floatingLabelStyle: _textStyle(focused ?? s),
       hintStyle: _textStyle(s),
       helperStyle: _textStyle(s),
       errorStyle: _textStyle(error ?? s),
       prefixStyle: _textStyle(s),
       suffixStyle: _textStyle(s),
+      iconColor: s.color,
+      prefixIconColor: focusedOverride?.color ?? s.color,
+      suffixIconColor: focusedOverride?.color ?? s.color,
       filled: s.inputFilled ?? s.backgroundColor != null,
       isDense: s.inputDense,
       fillColor: s.backgroundColor,
+      focusColor: focusedOverride?.backgroundColor,
+      hoverColor: st.variantOverrides['hover']?.backgroundColor,
       border: _outline(s),
       enabledBorder: _outline(s),
       focusedBorder: _outline(focused),
@@ -49,6 +56,9 @@ class DacsInputDecorationAdapter implements DacsAdapter<InputDecoration> {
       errorBorder: _outline(error),
       focusedErrorBorder: _outline(focusedError),
       contentPadding: s.padding,
+      constraints: s.toConstraints(),
+      alignLabelWithHint: s.inputAlignLabelWithHint,
+      floatingLabelBehavior: s.inputFloatingLabelBehavior,
     );
   }
 

@@ -19,6 +19,7 @@ import 'flex_parser.dart';
 import 'aspect_parser.dart';
 import 'alignment_parser.dart';
 import 'input_parser.dart';
+import 'component_parser.dart';
 
 /// Orchestrates parsing of utility class strings into [DacsStyleSheet] objects.
 class ClassParser {
@@ -38,6 +39,7 @@ class ClassParser {
           AspectParser(),
           AlignmentParser(),
           InputParser(),
+          ComponentParser(),
           ArbitraryParser(),
         ];
 

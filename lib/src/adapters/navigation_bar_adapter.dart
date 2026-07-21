@@ -15,9 +15,15 @@ class DacsNavigationBarAdapter implements DacsAdapter<NavigationBarThemeData> {
     final s = sheet.resolveWith(context);
     final st = materialStateFor(sheet, context);
     return NavigationBarThemeData(
+      height: s.height,
       backgroundColor: s.backgroundColor,
-      indicatorColor: s.backgroundColor?.withAlpha(26),
+      elevation: s.boxShadow?.firstOrNull?.blurRadius,
+      shadowColor: s.boxShadow?.firstOrNull?.color,
+      surfaceTintColor: s.backgroundColor,
+      indicatorColor: s.indicatorColor,
       indicatorShape: dacsShape(s),
+      overlayColor:
+          dacsStateOverrideOrBaseProp<Color>(st, (s) => s.overlayColor),
       iconTheme: dacsStateProp<IconThemeData?>(
         st,
         (s) => s.color != null || s.width != null
@@ -25,7 +31,8 @@ class DacsNavigationBarAdapter implements DacsAdapter<NavigationBarThemeData> {
             : null,
       ),
       labelTextStyle: dacsStateProp<TextStyle?>(st, (st) => st.toTextStyle()),
-      labelBehavior: null,
+      labelPadding: s.padding,
+      labelBehavior: s.navigationLabelBehavior,
     );
   }
 }
@@ -43,9 +50,20 @@ class DacsBottomNavigationBarAdapter
     return BottomNavigationBarThemeData(
       backgroundColor: s.backgroundColor,
       selectedItemColor: s.color,
-      unselectedItemColor: s.color?.withAlpha(128),
+      unselectedItemColor: s.unselectedColor,
       selectedLabelStyle: s.toTextStyle(),
       unselectedLabelStyle: s.toTextStyle(),
+      elevation: s.boxShadow?.firstOrNull?.blurRadius,
+      selectedIconTheme: s.color != null || s.width != null
+          ? IconThemeData(color: s.color, size: s.width)
+          : null,
+      unselectedIconTheme: s.unselectedColor != null || s.width != null
+          ? IconThemeData(color: s.unselectedColor, size: s.width)
+          : null,
+      showSelectedLabels: s.bottomNavShowSelectedLabels,
+      showUnselectedLabels: s.bottomNavShowUnselectedLabels,
+      type: s.bottomNavType,
+      landscapeLayout: s.bottomNavLandscapeLayout,
     );
   }
 }

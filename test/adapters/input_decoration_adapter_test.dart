@@ -12,12 +12,16 @@ void main() {
   group('input decoration adapter', () {
     testWidgets('dInput resolves InputDecoration', (t) async {
       final data = await t.run(
-        (ctx) => 'bg-surface border-error rounded-lg p-4'.dInput(ctx),
+        (ctx) => 'bg-surface border-error rounded-lg p-4 w-64 h-12'.dInput(ctx),
       );
       expect(data.filled, isTrue);
       expect(data.fillColor, const Color(0xFFFFFBFE));
       expect(data.border, isNotNull);
       expect(data.contentPadding, isNotNull);
+      expect(data.constraints?.minWidth, 256);
+      expect(data.constraints?.maxWidth, 256);
+      expect(data.constraints?.minHeight, 48);
+      expect(data.constraints?.maxHeight, 48);
     });
 
     testWidgets('dInput resolves text slots and layout flags', (t) async {
@@ -59,12 +63,16 @@ void main() {
 
     testWidgets('dInput respects explicit false flags', (t) async {
       final data = await t.run(
-        (ctx) => 'bg-surface not-filled not-dense'.dInput(ctx),
+        (ctx) =>
+            'bg-surface not-filled not-dense label-align-hint label-float-always'
+                .dInput(ctx),
       );
 
       expect(data.filled, isFalse);
       expect(data.isDense, isFalse);
       expect(data.fillColor, const Color(0xFFFFFBFE));
+      expect(data.alignLabelWithHint, isTrue);
+      expect(data.floatingLabelBehavior, FloatingLabelBehavior.always);
     });
 
     testWidgets('dInput maps error text style from error:text-*', (t) async {
@@ -75,6 +83,19 @@ void main() {
       expect(data.errorText, 'Required');
       expect(data.errorStyle!.color, const Color(0xFFB00020));
       expect(data.labelStyle!.color, const Color(0xFF1C1B1F));
+    });
+
+    testWidgets('dInput maps floating label and icon colors', (t) async {
+      final data = await t.run(
+        (ctx) =>
+            'text-onSurface focus:text-primary hover:bg-surface'.dInput(ctx),
+      );
+
+      expect(data.iconColor, const Color(0xFF1C1B1F));
+      expect(data.prefixIconColor, const Color(0xFF6200EE));
+      expect(data.suffixIconColor, const Color(0xFF6200EE));
+      expect(data.floatingLabelStyle?.color, const Color(0xFF6200EE));
+      expect(data.hoverColor, const Color(0xFFFFFBFE));
     });
 
     testWidgets('dInput focusedErrorBorder can override radius and width', (
