@@ -9,12 +9,17 @@ import 'layout_parser.dart';
 import 'position_parser.dart';
 import 'transform_parser.dart';
 import 'gradient_parser.dart';
+import 'arbitrary_parser.dart';
 
+/// Orchestrates parsing of utility class strings into [DacsStyle] objects.
+///
+/// Maintains an internal LRU cache (up to 750 entries) keyed by input string
+/// to avoid redundant parsing. Shared across the entire app via singleton
+/// factory constructor.
 class ClassParser {
-  final List<DacsParser> _parsers;
-  static final _cache = <String, DacsStyle>{};
-
-  ClassParser()
+  static final _instance = ClassParser._();
+  factory ClassParser() => _instance;
+  ClassParser._()
     : _parsers = [
         TypographyParser(),
         ColorParser(),
@@ -24,11 +29,31 @@ class ClassParser {
         TransformParser(),
         GradientParser(),
         LayoutParser(),
+        ArbitraryParser(),
       ];
 
+  final List<DacsParser> _parsers;
+  static final _cache = <String, DacsStyle>{};
+  static const _maxCacheSize = 750;
+
+  /// Parses a space-separated string of utility classes into a [DacsStyle].
+  ///
+  /// Returns a cached [DacsStyle] if [input] has been parsed before.
+  /// An empty string returns a default [DacsStyle] with no values set.
   DacsStyle parse(String input) {
     if (input.isEmpty) return DacsStyle();
-    return _cache.putIfAbsent(input, () => _doParse(input));
+    final cached = _cache[input];
+    if (cached != null) {
+      _cache.remove(input);
+      _cache[input] = cached;
+      return cached;
+    }
+    final style = _doParse(input);
+    if (_cache.length >= _maxCacheSize) {
+      _cache.remove(_cache.keys.first);
+    }
+    _cache[input] = style;
+    return style;
   }
 
   DacsStyle _doParse(String input) {
@@ -38,28 +63,31 @@ class ClassParser {
       final trimmed = token.trim();
       if (trimmed.isEmpty) continue;
 
-      String? variantPrefix;
+      List<String>? variantPrefixes;
       String classPart = trimmed;
 
-      final colonIdx = trimmed.indexOf(':');
-      if (colonIdx > 0) {
-        final prefix = trimmed.substring(0, colonIdx);
-        if (dacsVariantPrefixes.contains(prefix)) {
-          variantPrefix = prefix;
-          classPart = trimmed.substring(colonIdx + 1);
+      final parts = trimmed.split(':');
+      if (parts.length > 1) {
+        final last = parts.last;
+        final prefixes = parts.take(parts.length - 1).toList();
+        if (prefixes.every((p) => dacsVariantPrefixes.contains(p))) {
+          variantPrefixes = prefixes;
+          classPart = last;
+        } else if (parts.length == 2 &&
+            dacsVariantPrefixes.contains(parts.first)) {
+          variantPrefixes = [parts.first];
+          classPart = parts.last;
         }
       }
 
-      if (variantPrefix == null) {
+      if (variantPrefixes == null) {
         for (final parser in _parsers) {
           if (parser.parse(classPart, base)) break;
         }
       } else {
+        final key = variantPrefixes.join(':');
         base.variants ??= {};
-        final variantStyle = base.variants!.putIfAbsent(
-          variantPrefix,
-          () => DacsStyle(),
-        );
+        final variantStyle = base.variants!.putIfAbsent(key, () => DacsStyle());
         for (final parser in _parsers) {
           if (parser.parse(classPart, variantStyle)) break;
         }
@@ -67,6 +95,4 @@ class ClassParser {
     }
     return base;
   }
-
-  static void clearCache() => _cache.clear();
 }

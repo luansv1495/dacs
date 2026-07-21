@@ -4,6 +4,7 @@ import 'package:flutter/painting.dart';
 class DacsColor {
   /// Map of shade (50, 100, 200, ..., 950) to [Color].
   final Map<int, Color> shades;
+
   /// Creates a color palette with the given [shades] map.
   const DacsColor(this.shades);
 

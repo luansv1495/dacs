@@ -15,6 +15,8 @@ const Map<String, double> _dacsScaleValues = {
   '150': 1.5,
 };
 
+/// Parses transform tokens: `scale-*`, `scale-x-*`, `scale-y-*`, `rotate-*`,
+/// `translate-x-*`, `translate-y-*`, `skew-x-*`, `skew-y-*`.
 class TransformParser extends DacsParser {
   @override
   bool parse(String token, DacsStyle style) {

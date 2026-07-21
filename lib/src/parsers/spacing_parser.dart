@@ -3,6 +3,8 @@ import '../dacs_style.dart';
 import '../tokens/spacing.dart';
 import 'parser.dart';
 
+/// Parses spacing tokens: padding (`p-*`, `px-*`, `py-*`, `pt-*`, etc.) and
+/// margin (`m-*`, `mx-*`, `my-*`, `mt-*`, etc.) using the Tailwind spacing scale.
 class SpacingParser extends DacsParser {
   @override
   bool parse(String token, DacsStyle style) {
@@ -12,9 +14,8 @@ class SpacingParser extends DacsParser {
       final sizeKey = padMatch.group(2)!;
       final size = dacsSpacing(sizeKey);
       if (size == null) return false;
-
-      style.edgeInsets = _mergeEdgeInsets(
-        style.edgeInsets,
+      style.padding = _mergeEdgeInsets(
+        style.padding,
         _edgeInsets(direction, size),
       );
       return true;
@@ -24,14 +25,11 @@ class SpacingParser extends DacsParser {
     if (marginMatch != null) {
       final direction = marginMatch.group(1);
       final sizeKey = marginMatch.group(2)!;
-
       if (sizeKey == 'auto') return false;
-
       final size = dacsSpacing(sizeKey);
       if (size == null) return false;
-
-      style.edgeInsets = _mergeEdgeInsets(
-        style.edgeInsets,
+      style.margin = _mergeEdgeInsets(
+        style.margin,
         _edgeInsets(direction, size),
       );
       return true;

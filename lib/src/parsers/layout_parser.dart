@@ -3,6 +3,8 @@ import '../tokens/spacing.dart';
 import '../tokens/shadows.dart';
 import 'parser.dart';
 
+/// Parses layout tokens: width (`w-*`), height (`h-*`), opacity (`opacity-*`),
+/// and box shadows (`shadow-sm`…`shadow-2xl`, `shadow-inner`, `shadow-none`).
 class LayoutParser extends DacsParser {
   @override
   bool parse(String token, DacsStyle style) {

@@ -1,19 +1,37 @@
 import 'dart:math' as math;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart' as vmath;
 import 'tokens/variants.dart';
 
-/// Direction for linear gradient.
+/// Direction for a linear gradient.
+///
+/// Maps to [Alignment] begin/end pairs for use with [LinearGradient].
 enum DacsGradientDirection {
+  /// Left to right.
   toR,
+
+  /// Right to left.
   toL,
+
+  /// Bottom to top.
   toT,
+
+  /// Top to bottom.
   toB,
+
+  /// Bottom-left to top-right.
   toTR,
+
+  /// Bottom-right to top-left.
   toTL,
+
+  /// Top-left to bottom-right.
   toBR,
+
+  /// Top-right to bottom-left.
   toBL;
 
+  /// The start [Alignment] for this gradient direction.
   Alignment get begin => switch (this) {
     toR => Alignment.centerLeft,
     toL => Alignment.centerRight,
@@ -25,6 +43,7 @@ enum DacsGradientDirection {
     toBL => Alignment.topRight,
   };
 
+  /// The end [Alignment] for this gradient direction.
   Alignment get end => switch (this) {
     toR => Alignment.centerRight,
     toL => Alignment.centerLeft,
@@ -37,82 +56,145 @@ enum DacsGradientDirection {
   };
 }
 
-/// Holds parsed Tailwind-like utility class values.
+/// Holds parsed utility class values from DACS string expressions.
 ///
-/// Use [toTextStyle], [toEdgeInsets], [toBoxDecoration] to convert to Flutter types.
+/// Each field corresponds to a Flutter style property and is set by one or
+/// more [DacsParser] implementations during parsing. Use [resolve] or
+/// [resolveFor] to merge variants, and conversion methods like [toTextStyle]
+/// or [toBoxDecoration] to produce Flutter objects.
 class DacsStyle {
-  /// Font size in logical pixels.
+  /// Font size in logical pixels (e.g. `text-base` → 16.0).
   double? fontSize;
-  /// Font weight (e.g. bold, medium).
+
+  /// Font weight (e.g. `font-bold` → w700).
   FontWeight? fontWeight;
-  /// Text or foreground color.
+
+  /// Text color (e.g. `text-red-500`).
   Color? color;
-  /// Background color.
+
+  /// Background color (e.g. `bg-blue-200`).
   Color? backgroundColor;
-  /// Border color.
+
+  /// Border color (e.g. `border-gray-300`).
   Color? borderColor;
-  /// Border width in logical pixels.
+
+  /// Border width in logical pixels (e.g. `border-2` → 2.0).
   double? borderWidth;
-  /// Padding or margin insets.
-  EdgeInsets? edgeInsets;
-  /// Border radius.
+
+  /// Padding (e.g. `p-4` → all 16, `px-2` → horizontal 8).
+  EdgeInsets? padding;
+
+  /// Margin (e.g. `m-4` → all 16, `mt-2` → top 8).
+  EdgeInsets? margin;
+
+  /// Border radius (e.g. `rounded-lg`).
   BorderRadiusGeometry? borderRadius;
-  /// Explicit width.
+
+  /// Width constraint in logical pixels (e.g. `w-64` → 256.0, `w-full` → inf).
   double? width;
-  /// Explicit height.
+
+  /// Height constraint in logical pixels (e.g. `h-32` → 128.0).
   double? height;
-  /// Opacity from 0.0 to 1.0.
+
+  /// Opacity value 0.0–1.0 (e.g. `opacity-50` → 0.5).
   double? opacity;
-  /// Font style (normal or italic).
+
+  /// Font style (e.g. `italic` → italic).
   FontStyle? fontStyle;
-  /// Text decoration (underline, line-through, etc.).
+
+  /// Text decoration (e.g. `underline`, `line-through`).
   TextDecoration? textDecoration;
+
   /// Text decoration color.
   Color? textDecorationColor;
-  /// Text decoration style (solid, double, dotted, dashed, wavy).
+
+  /// Text decoration style (e.g. `wavy`, `dotted`).
   TextDecorationStyle? textDecorationStyle;
-  /// Text decoration thickness.
+
+  /// Text decoration thickness multiplier.
   double? textDecorationThickness;
+
   /// Letter spacing in logical pixels.
   double? letterSpacing;
-  /// Line height (multiplier of font size).
+
+  /// Line height as a multiplier of font size.
   double? lineHeight;
-  /// Shadow effects.
+
+  /// List of box shadows (e.g. `shadow-lg`).
   List<BoxShadow>? boxShadow;
-  /// Inset top position.
+
+  /// Inset top value for [Positioned] widgets.
   double? insetTop;
-  /// Inset right position.
+
+  /// Inset right value for [Positioned] widgets.
   double? insetRight;
-  /// Inset bottom position.
+
+  /// Inset bottom value for [Positioned] widgets.
   double? insetBottom;
-  /// Inset left position.
+
+  /// Inset left value for [Positioned] widgets.
   double? insetLeft;
-  /// Scale factor on X axis.
+
+  /// Horizontal scale factor (e.g. `scale-125` → 1.25).
   double? scaleX;
-  /// Scale factor on Y axis.
+
+  /// Vertical scale factor.
   double? scaleY;
-  /// Rotation in degrees.
+
+  /// Rotation in degrees (e.g. `rotate-45` → 45).
   double? rotateDegrees;
-  /// Translation on X axis.
+
+  /// Horizontal translation in logical pixels.
   double? translateX;
-  /// Translation on Y axis.
+
+  /// Vertical translation in logical pixels.
   double? translateY;
-  /// Skew angle on X axis in degrees.
+
+  /// Horizontal skew in degrees.
   double? skewX;
-  /// Skew angle on Y axis in degrees.
+
+  /// Vertical skew in degrees.
   double? skewY;
-  /// Gradient direction.
+
+  /// Gradient direction (e.g. `bg-gradient-to-r`).
   DacsGradientDirection? gradientDirection;
-  /// Start color of the gradient.
+
+  /// Gradient start color (e.g. `from-red-500`).
   Color? gradientFromColor;
-  /// Midpoint color of a three-stop gradient.
+
+  /// Gradient midpoint color (e.g. `via-blue-500`).
   Color? gradientViaColor;
-  /// End color of the gradient.
+
+  /// Gradient end color (e.g. `to-green-500`).
   Color? gradientToColor;
-  /// Responsive and dark/light variant overrides.
+
+  /// Variant conditions mapped to their [DacsStyle] overrides.
+  /// Keys are variant names (e.g. `"dark"`, `"md"`, `"hover"`, `"dark:hover"`).
   Map<String, DacsStyle>? variants;
 
-  /// Converts parsed transform properties to a [vmath.Matrix4].
+  /// Theme color key for text color (e.g. `"primary"`).
+  String? textThemeColor;
+
+  /// Theme color key for background color (e.g. `"surface"`).
+  String? bgThemeColor;
+
+  /// Theme color key for border color.
+  String? borderThemeColor;
+
+  /// Theme color key for text decoration color.
+  String? decorationThemeColor;
+
+  /// Theme color key for gradient start color.
+  String? gradientFromThemeColor;
+
+  /// Theme color key for gradient midpoint color.
+  String? gradientViaThemeColor;
+
+  /// Theme color key for gradient end color.
+  String? gradientToThemeColor;
+
+  /// Converts transform properties (scale, rotate, translate, skew)
+  /// into a single [Matrix4] for use with [Transform.transform].
   vmath.Matrix4 toMatrix4() {
     final m = vmath.Matrix4.identity();
     if (translateX != null || translateY != null) {
@@ -133,7 +215,8 @@ class DacsStyle {
     return m;
   }
 
-  /// Converts parsed properties to a [TextStyle].
+  /// Converts applicable fields into a [TextStyle] for use with
+  /// [Text], [RichText], or any widget that accepts a [TextStyle].
   TextStyle toTextStyle() {
     return TextStyle(
       fontSize: fontSize,
@@ -149,12 +232,16 @@ class DacsStyle {
     );
   }
 
-  /// Converts parsed edge insets to [EdgeInsets]. Returns [EdgeInsets.zero] if none set.
-  EdgeInsets toEdgeInsets() {
-    return edgeInsets ?? EdgeInsets.zero;
-  }
+  /// Returns padding as [EdgeInsets], or [EdgeInsets.zero] if unset.
+  EdgeInsets toPadding() => padding ?? EdgeInsets.zero;
 
-  /// Builds a [LinearGradient] from parsed gradient properties, or null.
+  /// Returns margin as [EdgeInsets], or [EdgeInsets.zero] if unset.
+  EdgeInsets toMargin() => margin ?? EdgeInsets.zero;
+
+  /// Builds a [LinearGradient] from [gradientDirection] / [gradientFromColor] /
+  /// [gradientViaColor] / [gradientToColor].
+  ///
+  /// Returns `null` when direction or end color are missing.
   LinearGradient? toGradient() {
     if (gradientDirection == null || gradientToColor == null) return null;
     final colors = <Color>[
@@ -171,7 +258,11 @@ class DacsStyle {
     );
   }
 
-  /// Converts parsed properties to a [BoxDecoration].
+  /// Converts applicable fields into a [BoxDecoration] for use with
+  /// [Container], [DecoratedBox], etc.
+  ///
+  /// Automatically includes border, gradient, border radius, and box shadow
+  /// when their respective fields are set.
   BoxDecoration toBoxDecoration() {
     BoxBorder? border;
     if (borderColor != null || borderWidth != null) {
@@ -180,7 +271,6 @@ class DacsStyle {
         width: borderWidth ?? 1.0,
       );
     }
-
     return BoxDecoration(
       color: backgroundColor,
       gradient: toGradient(),
@@ -190,45 +280,140 @@ class DacsStyle {
     );
   }
 
-  /// Resolves variants using [context] (brightness + screen width).
+  /// Resolves all `*ThemeColor` string keys to concrete [Color] values
+  /// from [Theme.of(context).colorScheme].
+  ///
+  /// Does nothing for keys that are already resolved or `null`.
+  void resolveThemeColors(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    color ??= _themeColor(scheme, textThemeColor);
+    backgroundColor ??= _themeColor(scheme, bgThemeColor);
+    borderColor ??= _themeColor(scheme, borderThemeColor);
+    textDecorationColor ??= _themeColor(scheme, decorationThemeColor);
+    gradientFromColor ??= _themeColor(scheme, gradientFromThemeColor);
+    gradientViaColor ??= _themeColor(scheme, gradientViaThemeColor);
+    gradientToColor ??= _themeColor(scheme, gradientToThemeColor);
+  }
+
+  Color? _themeColor(ColorScheme s, String? key) {
+    if (key == null) return null;
+    return switch (key) {
+      'primary' => s.primary,
+      'onPrimary' => s.onPrimary,
+      'primaryContainer' => s.primaryContainer,
+      'onPrimaryContainer' => s.onPrimaryContainer,
+      'secondary' => s.secondary,
+      'onSecondary' => s.onSecondary,
+      'secondaryContainer' => s.secondaryContainer,
+      'onSecondaryContainer' => s.onSecondaryContainer,
+      'tertiary' => s.tertiary,
+      'onTertiary' => s.onTertiary,
+      'tertiaryContainer' => s.tertiaryContainer,
+      'onTertiaryContainer' => s.onTertiaryContainer,
+      'error' => s.error,
+      'onError' => s.onError,
+      'errorContainer' => s.errorContainer,
+      'onErrorContainer' => s.onErrorContainer,
+      'surface' => s.surface,
+      'onSurface' => s.onSurface,
+      'surfaceVariant' => s.surfaceContainerHighest,
+      'onSurfaceVariant' => s.onSurfaceVariant,
+      'outline' => s.outline,
+      'outlineVariant' => s.outlineVariant,
+      'inverseSurface' => s.inverseSurface,
+      'onInverseSurface' => s.onInverseSurface,
+      'inversePrimary' => s.inversePrimary,
+      'shadow' => s.shadow,
+      'scrim' => s.scrim,
+      _ => null,
+    };
+  }
+
+  /// Resolves variants using [MediaQuery] from [context], then resolves
+  /// theme colors via [resolveThemeColors].
+  ///
+  /// This is the main entry point for context-aware resolution.
   DacsStyle resolveFor(BuildContext context) {
     final brightness = MediaQuery.of(context).platformBrightness;
     final screenWidth = MediaQuery.of(context).size.width;
-    return resolve(brightness: brightness, screenWidth: screenWidth);
+    final result = resolve(brightness: brightness, screenWidth: screenWidth);
+    result.resolveThemeColors(context);
+    return result;
   }
 
-  /// Resolves variants with explicit [brightness] and [screenWidth] values.
+  /// Resolves variants against the given [brightness] and [screenWidth].
+  ///
+  /// Simple variant keys (`"dark"`, `"md"`, etc.) are merged directly into
+  /// the result when their conditions match. Compound keys (joined with `:`)
+  /// are decomposed: if all conditions match and only WidgetState conditions
+  /// remain, the variant is re-mapped under the remaining simple key.
   DacsStyle resolve({Brightness? brightness, double? screenWidth}) {
     if (variants == null || variants!.isEmpty) return this;
     final result = clone();
 
-    if (screenWidth != null) {
-      for (final bp in dacsBreakpointOrder) {
-        final minWidth = dacsBreakpoints[bp] ?? double.infinity;
-        if (screenWidth >= minWidth) {
-          final variant = variants![bp];
-          if (variant != null) result.mergeFrom(variant);
+    for (final entry in variants!.entries.toList()) {
+      final key = entry.key;
+      final variant = entry.value;
+
+      if (key.contains(':')) {
+        final conditions = splitVariantKey(key);
+        bool allMatch = true;
+        final remaining = <String>[];
+
+        for (final c in conditions) {
+          if (dacsBreakpoints.containsKey(c)) {
+            if (screenWidth == null ||
+                screenWidth < (dacsBreakpoints[c] ?? double.infinity)) {
+              allMatch = false;
+            }
+          } else if (c == 'dark') {
+            if (brightness != Brightness.dark) allMatch = false;
+          } else if (c == 'light') {
+            if (brightness != Brightness.light) allMatch = false;
+          } else {
+            remaining.add(c);
+          }
+        }
+
+        if (allMatch) {
+          if (remaining.isEmpty) {
+            result.mergeFrom(variant);
+          } else {
+            final newKey = remaining.join(':');
+            result.variants ??= {};
+            result.variants![newKey] = variant;
+          }
+        }
+      } else {
+        if (screenWidth != null && dacsBreakpoints.containsKey(key)) {
+          final minWidth = dacsBreakpoints[key] ?? double.infinity;
+          if (screenWidth >= minWidth) {
+            result.mergeFrom(variant);
+          }
+        } else if (brightness != null && (key == 'dark' || key == 'light')) {
+          final expected = key == 'dark' ? Brightness.dark : Brightness.light;
+          if (brightness == expected) {
+            result.mergeFrom(variant);
+          }
         }
       }
-    }
-
-    if (brightness != null) {
-      final mode = brightness == Brightness.dark ? 'dark' : 'light';
-      final variant = variants![mode];
-      if (variant != null) result.mergeFrom(variant);
     }
 
     return result;
   }
 
-  /// Returns a deep copy of this style.
+  /// Returns a deep copy of this [DacsStyle] including all fields and variants.
   DacsStyle clone() {
     final target = DacsStyle();
     target.mergeFrom(this);
     return target;
   }
 
-  /// Merges non-null properties from [source] into this style.
+  /// Merges all non-null fields from [source] into this instance.
+  ///
+  /// Uses `??=` semantics — existing values are preserved unless the
+  /// source provides a new non-null value. Variant maps are merged with
+  /// `addAll` and may overwrite existing entries with the same key.
   void mergeFrom(DacsStyle source) {
     fontSize = source.fontSize ?? fontSize;
     fontWeight = source.fontWeight ?? fontWeight;
@@ -236,7 +421,8 @@ class DacsStyle {
     backgroundColor = source.backgroundColor ?? backgroundColor;
     borderColor = source.borderColor ?? borderColor;
     borderWidth = source.borderWidth ?? borderWidth;
-    edgeInsets = source.edgeInsets ?? edgeInsets;
+    padding = source.padding ?? padding;
+    margin = source.margin ?? margin;
     borderRadius = source.borderRadius ?? borderRadius;
     width = source.width ?? width;
     height = source.height ?? height;
@@ -265,9 +451,22 @@ class DacsStyle {
     gradientFromColor = source.gradientFromColor ?? gradientFromColor;
     gradientViaColor = source.gradientViaColor ?? gradientViaColor;
     gradientToColor = source.gradientToColor ?? gradientToColor;
+    textThemeColor = source.textThemeColor ?? textThemeColor;
+    bgThemeColor = source.bgThemeColor ?? bgThemeColor;
+    borderThemeColor = source.borderThemeColor ?? borderThemeColor;
+    decorationThemeColor = source.decorationThemeColor ?? decorationThemeColor;
+    gradientFromThemeColor =
+        source.gradientFromThemeColor ?? gradientFromThemeColor;
+    gradientViaThemeColor =
+        source.gradientViaThemeColor ?? gradientViaThemeColor;
+    gradientToThemeColor = source.gradientToThemeColor ?? gradientToThemeColor;
     if (source.variants != null) {
       variants ??= {};
       variants!.addAll(source.variants!);
     }
   }
 }
+
+/// Splits a compound variant key into individual conditions.
+/// For example, `"dark:md:hover"` returns `["dark", "md", "hover"]`.
+List<String> splitVariantKey(String key) => key.split(':');

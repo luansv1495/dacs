@@ -20,13 +20,18 @@ Text('Hello, World!', style: 'text-2xl font-medium text-sky-500'.dText)
 - **Position** — inset-*, top-*, right-*, bottom-*, left-*
 - **Transform** — scale, rotate, translate, skew
 - **Gradient** — linear gradients from Tailwind color tokens
+- **Theme colors from `ColorScheme`** — `text-primary`, `bg-surface`, `border-error`
+- **Arbitrary values** — `text-[#ff0000]`, `p-[20]`, `w-[50%]`, `rounded-[12]`
+- **Material widget extensions** — style any Material widget: `.dButton(context)`, `.dCheckbox(context)`, `.dCard(context)`, etc.
+- **WidgetState variants** — `hover:`, `focus:`, `disabled:`, `pressed:`, `selected:`, `error:`, `dragged:`, `scrolledUnder:`
+- **Chained compound variants** — combine any prefixes: `dark:hover:`, `dark:md:focus:`, `light:lg:disabled:`
 - **Dark/Light mode & responsive variants** — `dark:`, `light:`, `sm:`, `md:`, `lg:`, `xl:`, `2xl:`
 
 ## Installation
 
 ```yaml
 dependencies:
-  dacs: ^0.2.0
+  dacs: ^0.3.0
 ```
 
 ## Usage
@@ -132,6 +137,86 @@ Container(
 )
 ```
 
+### Theme colors
+
+Use any `ColorScheme` key as a color — no need to import or reference the theme directly:
+
+```dart
+Text('Primary', style: 'text-primary font-bold'.dTextOf(context))
+Container(decoration: 'bg-surface rounded-lg border-outline'.dBoxOf(context))
+Checkbox(checkboxTheme: 'checked:bg-primary unchecked:bg-surface'.dCheckbox(context))
+```
+
+Supported keys: `primary`, `onPrimary`, `primaryContainer`, `onPrimaryContainer`, `secondary`, `onSecondary`, `secondaryContainer`, `onSecondaryContainer`, `tertiary`, `onTertiary`, `tertiaryContainer`, `onTertiaryContainer`, `error`, `onError`, `errorContainer`, `onErrorContainer`, `surface`, `onSurface`, `surfaceVariant`, `onSurfaceVariant`, `outline`, `outlineVariant`, `inverseSurface`, `onInverseSurface`, `inversePrimary`, `shadow`, `scrim`
+
+### Arbitrary values
+
+Use square brackets for one-off values:
+
+```dart
+'text-[#ff0000]'         // exact color
+'bg-[rgb(255,0,0)]'      // rgb syntax
+'p-[20]'                  // 20px padding
+'w-[50%]'                 // 50% width
+'rounded-[12]'            // 12px border radius
+'opacity-[0.75]'          // 75% opacity
+'scale-[200]'             // 2x scale
+```
+
+### Material widget extensions
+
+Style Material widgets directly via context-aware methods:
+
+```dart
+ElevatedButton(
+  style: 'bg-primary text-white rounded-lg'.dButton(context),
+  onPressed: () {},
+  child: const Text('Submit'),
+)
+
+Checkbox(
+  theme: 'bg-primary hover:bg-primaryContainer'.dCheckbox(context),
+)
+
+Card(
+  theme: 'bg-surface rounded-xl shadow-md'.dCard(context),
+)
+```
+
+All 26 Material widgets are supported: `dButton`, `dCheckbox`, `dSwitch`, `dRadio`, `dChip`, `dAppBar`, `dCard`, `dListTile`, `dTabBar`, `dBottomNav`, `dInput`, `dProgress`, `dTooltip`, `dDivider`, `dScrollbar`, `dSnackBar`, `dDialog`, `dBottomSheet`, `dExpansionTile`, `dNavBar`, `dFab`, `dDataTable`, `dSearchBar`, `dMenu`, `dIcon`, `dShape`.
+
+### WidgetState variants
+
+For Material widgets, use interactive state variants:
+
+```dart
+ElevatedButton(
+  style: 'bg-primary hover:bg-primaryContainer disabled:bg-surface'.
+      dButton(context),
+  onPressed: () {},
+  child: const Text('Submit'),
+)
+```
+
+State order: base → disabled → pressed → hover → focus → selected → error → dragged → scrolledUnder.
+
+### Chained compound variants
+
+Combine any variant prefixes with `:`:
+
+```dart
+// Applies only in dark mode AND when hovered
+Text(
+  'Styled text',
+  style: 'text-white dark:hover:text-primary'.dTextOf(context),
+)
+
+// Triple compound: dark mode, medium breakpoint, hover
+Container(
+  decoration: 'bg-primary dark:md:hover:bg-error'.dBoxOf(context),
+)
+```
+
 ### Raw style access
 
 ```dart
@@ -161,12 +246,13 @@ These parse classes and convert immediately. Useful when you don't need variant 
 
 ### Context-aware methods (resolve variants)
 
-These accept a `BuildContext` to resolve dark/light mode and responsive breakpoints from `MediaQuery`.
+These accept a `BuildContext` to resolve dark/light mode, responsive breakpoints, and theme colors from `MediaQuery` / `Theme`.
 
 | Method | Returns |
 |---|---|
 | `.dTextOf(context)` | `TextStyle` |
 | `.dPadsOf(context)` | `EdgeInsets` |
+| `.dMarginOf(context)` | `EdgeInsets` |
 | `.dBoxOf(context)` | `BoxDecoration` |
 | `.dStyleOf(context)` | `DacsStyle` |
 | `.dShadowOf(context)` | `List<BoxShadow>` |
@@ -174,6 +260,39 @@ These accept a `BuildContext` to resolve dark/light mode and responsive breakpoi
 | `.dPositionOf(context)` | `(double?, double?, double?, double?)` |
 | `.dTransformOf(context)` | `Matrix4` |
 | `.dGradientOf(context)` | `LinearGradient?` |
+
+### Material widget extensions
+
+These accept a `BuildContext` and return Material theme data with variant resolution.
+
+| Method | Returns |
+|---|---|
+| `.dButton(context)` | `ButtonStyle` |
+| `.dCheckbox(context)` | `CheckboxThemeData` |
+| `.dSwitch(context)` | `SwitchThemeData` |
+| `.dRadio(context)` | `RadioThemeData` |
+| `.dChip(context)` | `ChipThemeData` |
+| `.dAppBar(context)` | `AppBarTheme` |
+| `.dCard(context)` | `CardTheme` |
+| `.dListTile(context)` | `ListTileThemeData` |
+| `.dTabBar(context)` | `TabBarTheme` |
+| `.dBottomNav(context)` | `BottomNavigationBarThemeData` |
+| `.dInput(context)` | `InputDecoration` |
+| `.dProgress(context)` | `ProgressIndicatorThemeData` |
+| `.dTooltip(context)` | `TooltipThemeData` |
+| `.dDivider(context)` | `DividerThemeData` |
+| `.dScrollbar(context)` | `ScrollbarThemeData` |
+| `.dSnackBar(context)` | `SnackBarThemeData` |
+| `.dDialog(context)` | `DialogTheme` |
+| `.dBottomSheet(context)` | `BottomSheetThemeData` |
+| `.dExpansionTile(context)` | `ExpansionTileThemeData` |
+| `.dNavBar(context)` | `NavigationBarThemeData` |
+| `.dFab(context)` | `FloatingActionButtonThemeData` |
+| `.dDataTable(context)` | `DataTableThemeData` |
+| `.dSearchBar(context)` | `SearchBarThemeData` |
+| `.dMenu(context)` | `MenuStyle` |
+| `.dIcon(context)` | `IconThemeData` |
+| `.dShape(context)` | `ShapeDecoration` |
 
 ## Supported classes
 
@@ -298,8 +417,26 @@ Prefix any class with a variant to scope it:
 | `lg:` | Applies at `min-width: 1024px` |
 | `xl:` | Applies at `min-width: 1280px` |
 | `2xl:` | Applies at `min-width: 1536px` |
+| `hover:` | `WidgetState.hovered` |
+| `focus:` | `WidgetState.focused` |
+| `active:` / `pressed:` | `WidgetState.pressed` |
+| `disabled:` | `WidgetState.disabled` |
+| `selected:` | `WidgetState.selected` |
+| `error:` | `WidgetState.error` |
+| `dragged:` | `WidgetState.dragged` |
+| `scrolledUnder:` | `WidgetState.scrolledUnder` |
 
-Resolution order: base → sm → md → lg → xl → 2xl → dark/light. Later overrides earlier.
+Resolution order (Material contexts): base → disabled → pressed → hover → focus → selected → error → dragged → scrolledUnder.
+
+**Chained compound variants**: combine multiple prefix types with `:`.
+
+```dart
+'dark:hover:text-white'      // dark mode + hover
+'light:md:bg-primary'        // light mode + md breakpoint
+'dark:lg:focus:border-error' // dark + lg + focus
+```
+
+Compound variants match only when ALL conditions are met. WidgetState conditions re-map to simple keys for Material widget resolution.
 
 ## Additional information
 

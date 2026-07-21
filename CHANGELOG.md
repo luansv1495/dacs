@@ -1,3 +1,15 @@
+## 0.3.0
+
+- **Theme colors**: use `ColorScheme` keys directly — `text-primary`, `bg-surface`, `border-error`, `from-tertiary`, etc.
+- **Arbitrary values**: `text-[#ff0000]`, `bg-[rgb(255,0,0)]`, `p-[20]`, `w-[50%]`, `rounded-[12]`
+- **Material widget extensions**: 26 widgets — `.dButton(context)`, `.dCheckbox(context)`, `.dCard(context)`, `.dAppBar(context)`, etc.
+- **WidgetState variants**: `hover:`, `focus:`, `active:`, `disabled:`, `selected:`, `error:`, `pressed:`, `dragged:`, `scrolledUnder:`
+- **Chained compound variants**: combine any prefixes — `dark:hover:`, `dark:md:focus:`, `light:lg:disabled:`
+- **Split padding/margin**: `.dPads` returns padding, `.dMargin` for margin (breaking change from 0.2.0)
+- **`ClassParser` singleton + LRU cache**: single instance with auto-eviction at 500 entries
+- Internal: `_addCompoundVariant` correctly resolves theme colors over base
+- Removed public `ClassParser` export and `clearCache()` — cache is self-managed
+
 ## 0.2.0
 
 - **Variants**: dark/light mode (`dark:`, `light:`) and responsive breakpoints (`sm:`, `md:`, `lg:`, `xl:`, `2xl:`)

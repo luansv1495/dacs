@@ -3,6 +3,10 @@ import '../dacs_style.dart';
 import '../tokens/typography.dart';
 import 'parser.dart';
 
+/// Parses typography tokens: font size (`text-xs`…`text-9xl`), font weight
+/// (`font-thin`…`font-black`), line height (`leading-*`), letter spacing
+/// (`tracking-*`), font style (`italic`, `not-italic`), and text decoration
+/// (`underline`, `line-through`, `no-underline`, `decoration-*`).
 class TypographyParser extends DacsParser {
   @override
   bool parse(String token, DacsStyle style) {

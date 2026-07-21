@@ -1,4 +1,4 @@
-/// Set of known variant prefixes (dark/light mode and responsive breakpoints).
+/// Set of known variant prefixes.
 const Set<String> dacsVariantPrefixes = {
   'dark',
   'light',
@@ -7,6 +7,15 @@ const Set<String> dacsVariantPrefixes = {
   'lg',
   'xl',
   '2xl',
+  'hover',
+  'focus',
+  'active',
+  'pressed',
+  'disabled',
+  'selected',
+  'error',
+  'dragged',
+  'scrolledUnder',
 };
 
 /// Breakpoints for responsive variants mapped to min-width in pixels.

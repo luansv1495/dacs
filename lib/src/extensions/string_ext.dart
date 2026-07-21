@@ -3,36 +3,37 @@ import 'package:vector_math/vector_math_64.dart' as vmath;
 import '../dacs_style.dart';
 import '../parsers/class_parser.dart';
 
-/// Extension methods on [String] to parse Tailwind-like utility classes.
-///
-/// ```dart
-/// 'text-2xl font-medium text-sky-500'.dText
-/// 'px-4 py-2'.dPads
-/// 'bg-blue-500 rounded-lg'.dBox
-/// ```
+/// Extension providing simple getters on [String] that parse DACS classes
+/// and return Flutter style objects directly (no context required, no
+/// variant resolution).
 extension DacsStringExtension on String {
-  /// Parses the string and returns the raw [DacsStyle] object.
+  /// Parses this string into a raw [DacsStyle] without variant resolution.
   DacsStyle get dStyle {
     final parser = ClassParser();
     return parser.parse(this);
   }
 
-  /// Parses the string and converts to a [TextStyle].
+  /// Parses this string into a [TextStyle].
   TextStyle get dText => dStyle.toTextStyle();
 
-  /// Parses the string and converts to [EdgeInsets].
-  EdgeInsets get dPads => dStyle.toEdgeInsets();
+  /// Parses padding classes (p-*, px-*, py-*, pt-*, etc.) into [EdgeInsets].
+  EdgeInsets get dPads => dStyle.toPadding();
 
-  /// Parses the string and converts to a [BoxDecoration].
+  /// Parses margin classes (m-*, mx-*, my-*, mt-*, etc.) into [EdgeInsets].
+  EdgeInsets get dMargin => dStyle.toMargin();
+
+  /// Parses background, border, shadow, and gradient classes into a
+  /// [BoxDecoration].
   BoxDecoration get dBox => dStyle.toBoxDecoration();
 
-  /// Parses the string and returns shadow [BoxShadow] list.
+  /// Parses shadow classes into a list of [BoxShadow].
   List<BoxShadow> get dShadow => dStyle.boxShadow ?? [];
 
-  /// Parses the string and returns a (width, height) record.
+  /// Parses width and height classes into a `(width, height)` tuple.
   (double?, double?) get dSize => (dStyle.width, dStyle.height);
 
-  /// Parses the string and returns a (top, right, bottom, left) position tuple.
+  /// Parses inset classes into a `(top, right, bottom, left)` tuple for use
+  /// with [Positioned].
   (double?, double?, double?, double?) get dPosition => (
     dStyle.insetTop,
     dStyle.insetRight,
@@ -40,54 +41,62 @@ extension DacsStringExtension on String {
     dStyle.insetLeft,
   );
 
-  /// Parses the string and returns a [Matrix4] combining all transforms.
+  /// Parses transform classes into a [Matrix4].
   vmath.Matrix4 get dTransform => dStyle.toMatrix4();
 
-  /// Parses the string and returns a [LinearGradient].
+  /// Parses gradient classes into a [LinearGradient], or `null` if no
+  /// gradient is configured.
   LinearGradient? get dGradient => dStyle.toGradient();
 }
 
-/// Context-aware extension methods on [String].
-///
-/// These methods resolve responsive and dark/light variants using [BuildContext].
+/// Extension providing context-aware methods on [String] that parse DACS
+/// classes, resolve variants (dark/light, responsive), and resolve theme
+/// colors from the current [BuildContext].
 extension DacsContextExtension on String {
-  /// Parses the string and resolves variants into a [DacsStyle].
+  /// Parses this string into a [DacsStyle] with variants and theme colors
+  /// resolved from [context].
   DacsStyle dStyleOf(BuildContext context) =>
       ClassParser().parse(this).resolveFor(context);
 
-  /// Parses and resolves variants into a [TextStyle].
+  /// Parses this string into a [TextStyle] with variant and theme resolution.
   TextStyle dTextOf(BuildContext context) =>
       ClassParser().parse(this).resolveFor(context).toTextStyle();
 
-  /// Parses and resolves variants into [EdgeInsets].
+  /// Parses padding classes into [EdgeInsets] with variant resolution.
   EdgeInsets dPadsOf(BuildContext context) =>
-      ClassParser().parse(this).resolveFor(context).toEdgeInsets();
+      ClassParser().parse(this).resolveFor(context).toPadding();
 
-  /// Parses and resolves variants into a [BoxDecoration].
+  /// Parses margin classes into [EdgeInsets] with variant resolution.
+  EdgeInsets dMarginOf(BuildContext context) =>
+      ClassParser().parse(this).resolveFor(context).toMargin();
+
+  /// Parses decoration classes into a [BoxDecoration] with variant resolution.
   BoxDecoration dBoxOf(BuildContext context) =>
       ClassParser().parse(this).resolveFor(context).toBoxDecoration();
 
-  /// Parses and resolves variants into a shadow list.
+  /// Parses shadow classes into a list of [BoxShadow] with variant resolution.
   List<BoxShadow> dShadowOf(BuildContext context) =>
       ClassParser().parse(this).resolveFor(context).boxShadow ?? [];
 
-  /// Parses and resolves variants into a (width, height) record.
+  /// Parses width/height classes into a `(width, height)` tuple with variant
+  /// resolution.
   (double?, double?) dSizeOf(BuildContext context) {
     final s = ClassParser().parse(this).resolveFor(context);
     return (s.width, s.height);
   }
 
-  /// Parses and resolves variants into a position tuple.
+  /// Parses inset classes into a `(top, right, bottom, left)` tuple with
+  /// variant resolution.
   (double?, double?, double?, double?) dPositionOf(BuildContext context) {
     final s = ClassParser().parse(this).resolveFor(context);
     return (s.insetTop, s.insetRight, s.insetBottom, s.insetLeft);
   }
 
-  /// Parses and resolves variants into a [Matrix4].
+  /// Parses transform classes into a [Matrix4] with variant resolution.
   vmath.Matrix4 dTransformOf(BuildContext context) =>
       ClassParser().parse(this).resolveFor(context).toMatrix4();
 
-  /// Parses and resolves variants into a [LinearGradient].
+  /// Parses gradient classes into a [LinearGradient] with variant resolution.
   LinearGradient? dGradientOf(BuildContext context) =>
       ClassParser().parse(this).resolveFor(context).toGradient();
 }

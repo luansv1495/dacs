@@ -2,6 +2,8 @@ import '../dacs_style.dart';
 import '../tokens/spacing.dart';
 import 'parser.dart';
 
+/// Parses position tokens: `inset-*` (all four edges), `inset-x-*` / `inset-y-*`,
+/// and individual `top-*`, `right-*`, `bottom-*`, `left-*`.
 class PositionParser extends DacsParser {
   @override
   bool parse(String token, DacsStyle style) {

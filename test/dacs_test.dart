@@ -48,9 +48,15 @@ void main() {
       expect(pad.bottom, 8);
     });
 
-    test('parses margin via dPads', () {
-      final pad = 'mt-4'.dPads;
-      expect(pad.top, 16);
+    test('parses margin via dMargin', () {
+      final margin = 'mt-4'.dMargin;
+      expect(margin.top, 16);
+    });
+
+    test('parses margin separately from padding', () {
+      final style = 'p-2 m-4'.dStyle;
+      expect(style.padding?.left, 8);
+      expect(style.margin?.left, 16);
     });
 
     test('parses border radius', () {
@@ -114,6 +120,113 @@ void main() {
       expect(style.fontSize, isNull);
       expect(style.fontWeight, isNull);
     });
+
+    test('parses not-italic', () {
+      final style = 'not-italic'.dStyle;
+      expect(style.fontStyle, FontStyle.normal);
+    });
+
+    test('parses line-through', () {
+      final style = 'line-through'.dStyle;
+      expect(style.textDecoration, TextDecoration.lineThrough);
+    });
+
+    test('parses no-underline', () {
+      final style = 'no-underline'.dStyle;
+      expect(style.textDecoration, TextDecoration.none);
+    });
+
+    test('parses decoration-double', () {
+      expect(
+        'decoration-double'.dStyle.textDecorationStyle,
+        TextDecorationStyle.double,
+      );
+    });
+
+    test('parses decoration-dotted', () {
+      expect(
+        'decoration-dotted'.dStyle.textDecorationStyle,
+        TextDecorationStyle.dotted,
+      );
+    });
+
+    test('parses decoration-dashed', () {
+      expect(
+        'decoration-dashed'.dStyle.textDecorationStyle,
+        TextDecorationStyle.dashed,
+      );
+    });
+
+    test('parses text-3xl through text-8xl', () {
+      expect('text-3xl'.dStyle.fontSize, 30);
+      expect('text-4xl'.dStyle.fontSize, 36);
+      expect('text-5xl'.dStyle.fontSize, 48);
+      expect('text-6xl'.dStyle.fontSize, 60);
+      expect('text-7xl'.dStyle.fontSize, 72);
+      expect('text-8xl'.dStyle.fontSize, 96);
+    });
+
+    test('parses text-sm and text-base', () {
+      expect('text-sm'.dStyle.fontSize, 14);
+      expect('text-base'.dStyle.fontSize, 16);
+    });
+
+    test('parses absolute leading values', () {
+      final style = 'text-base leading-6'.dStyle;
+      expect(style.lineHeight, 24 / 16);
+    });
+
+    test('parses relative leading values', () {
+      expect('leading-none'.dStyle.lineHeight, 1.0);
+      expect('leading-tight'.dStyle.lineHeight, 1.25);
+      expect('leading-snug'.dStyle.lineHeight, 1.375);
+      expect('leading-normal'.dStyle.lineHeight, 1.5);
+      expect('leading-relaxed'.dStyle.lineHeight, 1.625);
+      expect('leading-loose'.dStyle.lineHeight, 2.0);
+    });
+
+    test('parses all tracking values', () {
+      expect('tracking-tighter'.dStyle.letterSpacing, -0.05);
+      expect('tracking-tight'.dStyle.letterSpacing, -0.025);
+      expect('tracking-normal'.dStyle.letterSpacing, 0.0);
+      expect('tracking-wide'.dStyle.letterSpacing, 0.025);
+      expect('tracking-wider'.dStyle.letterSpacing, 0.05);
+      expect('tracking-widest'.dStyle.letterSpacing, 0.1);
+    });
+
+    test('parses text-black, text-white, text-transparent', () {
+      expect('text-black'.dStyle.color, const Color(0xFF000000));
+      expect('text-white'.dStyle.color, const Color(0xFFFFFFFF));
+      expect('text-transparent'.dStyle.color, const Color(0x00000000));
+    });
+
+    test('parses more color families', () {
+      expect('text-slate-500'.dStyle.color, const Color(0xFF64748B));
+      expect('text-gray-500'.dStyle.color, const Color(0xFF6B7280));
+      expect('text-zinc-500'.dStyle.color, const Color(0xFF71717A));
+      expect('text-neutral-500'.dStyle.color, const Color(0xFF737373));
+      expect('text-stone-500'.dStyle.color, const Color(0xFF78716C));
+      expect('text-orange-500'.dStyle.color, const Color(0xFFF97316));
+      expect('text-amber-500'.dStyle.color, const Color(0xFFF59E0B));
+      expect('text-yellow-500'.dStyle.color, const Color(0xFFEAB308));
+      expect('text-lime-500'.dStyle.color, const Color(0xFF84CC16));
+      expect('text-emerald-500'.dStyle.color, const Color(0xFF10B981));
+      expect('text-teal-500'.dStyle.color, const Color(0xFF14B8A6));
+      expect('text-cyan-500'.dStyle.color, const Color(0xFF06B6D4));
+      expect('text-violet-500'.dStyle.color, const Color(0xFF8B5CF6));
+      expect('text-fuchsia-500'.dStyle.color, const Color(0xFFD946EF));
+      expect('text-rose-500'.dStyle.color, const Color(0xFFF43F5E));
+    });
+
+    test('parses color with different shades', () {
+      expect('text-blue-50'.dStyle.color, const Color(0xFFEFF6FF));
+      expect('text-blue-100'.dStyle.color, const Color(0xFFDBEAFE));
+      expect('text-blue-200'.dStyle.color, const Color(0xFFBFDBFE));
+      expect('text-blue-700'.dStyle.color, const Color(0xFF1D4ED8));
+      expect('text-blue-800'.dStyle.color, const Color(0xFF1E40AF));
+      expect('text-blue-900'.dStyle.color, const Color(0xFF1E3A8A));
+      expect('text-blue-950'.dStyle.color, const Color(0xFF172554));
+    });
   });
 
   group('Shadows', () {
@@ -141,6 +254,22 @@ void main() {
       final box = 'shadow-lg'.dBox;
       expect(box.boxShadow, isNotNull);
       expect(box.boxShadow!.length, 2);
+    });
+
+    test('parses shadow-md', () {
+      expect('shadow-md'.dShadow.length, 2);
+    });
+
+    test('parses shadow-xl', () {
+      expect('shadow-xl'.dShadow.length, 2);
+    });
+
+    test('parses shadow-2xl', () {
+      expect('shadow-2xl'.dShadow.length, 1);
+    });
+
+    test('parses shadow-inner', () {
+      expect('shadow-inner'.dShadow.length, 1);
     });
   });
 
@@ -234,6 +363,26 @@ void main() {
       expect(style.insetBottom, 0);
       expect(style.insetLeft, 0);
     });
+
+    test('parses inset-t-4', () {
+      final (t, _, _, _) = 'inset-t-4'.dPosition;
+      expect(t, 16);
+    });
+
+    test('parses inset-b-8', () {
+      final (_, _, b, _) = 'inset-b-8'.dPosition;
+      expect(b, 32);
+    });
+
+    test('parses inset-l-2', () {
+      final (_, _, _, l) = 'inset-l-2'.dPosition;
+      expect(l, 8);
+    });
+
+    test('parses inset-r-6', () {
+      final (_, r, _, _) = 'inset-r-6'.dPosition;
+      expect(r, 24);
+    });
   });
 
   group('Transform', () {
@@ -285,6 +434,39 @@ void main() {
       expect(style.scaleX, 1.25);
       expect(style.rotateDegrees, 90);
     });
+
+    test('parses scale-y-150', () {
+      final style = 'scale-y-150'.dStyle;
+      expect(style.scaleY, 1.5);
+      expect(style.scaleX, isNull);
+    });
+
+    test('parses all scale values', () {
+      expect('scale-50'.dStyle.scaleX, 0.5);
+      expect('scale-75'.dStyle.scaleX, 0.75);
+      expect('scale-90'.dStyle.scaleX, 0.9);
+      expect('scale-95'.dStyle.scaleX, 0.95);
+      expect('scale-100'.dStyle.scaleX, 1.0);
+      expect('scale-105'.dStyle.scaleX, 1.05);
+      expect('scale-110'.dStyle.scaleX, 1.1);
+      expect('scale-0'.dStyle.scaleX, 0);
+    });
+
+    test('parses negative rotate', () {
+      expect('rotate--45'.dStyle.rotateDegrees, -45);
+      expect('rotate--90'.dStyle.rotateDegrees, -90);
+    });
+
+    test('parses skew-y-12', () {
+      final style = 'skew-y-12'.dStyle;
+      expect(style.skewY, 12);
+      expect(style.skewX, isNull);
+    });
+
+    test('parses translate-x-auto gracefully', () {
+      final style = 'translate-x-auto'.dStyle;
+      expect(style.translateX, isNull);
+    });
   });
 
   group('Gradient', () {
@@ -330,6 +512,16 @@ void main() {
       expect(box.gradient, isA<LinearGradient>());
     });
 
+    test('dGradient returns null with only direction', () {
+      expect('bg-gradient-to-r'.dGradient, isNull);
+    });
+
+    test('parses from-primary sets from theme color key', () {
+      final style = 'bg-gradient-to-r from-primary to-secondary'.dStyle;
+      expect(style.gradientFromThemeColor, 'primary');
+      expect(style.gradientToThemeColor, 'secondary');
+    });
+
     test('all gradient directions', () {
       expect(
         'bg-gradient-to-r'.dStyle.gradientDirection,
@@ -363,6 +555,100 @@ void main() {
         'bg-gradient-to-bl'.dStyle.gradientDirection,
         DacsGradientDirection.toBL,
       );
+    });
+  });
+
+  group('Border', () {
+    test('parses rounded (no suffix)', () {
+      final br = 'rounded'.dStyle.borderRadius as BorderRadius;
+      expect(br.topLeft.x, 4);
+    });
+
+    test('parses rounded-none', () {
+      final br = 'rounded-none'.dStyle.borderRadius as BorderRadius;
+      expect(br.topLeft.x, 0);
+    });
+
+    test('parses rounded-sm', () {
+      final br = 'rounded-sm'.dStyle.borderRadius as BorderRadius;
+      expect(br.topLeft.x, 2);
+    });
+
+    test('parses rounded-md', () {
+      final br = 'rounded-md'.dStyle.borderRadius as BorderRadius;
+      expect(br.topLeft.x, 6);
+    });
+
+    test('parses rounded-xl', () {
+      final br = 'rounded-xl'.dStyle.borderRadius as BorderRadius;
+      expect(br.topLeft.x, 12);
+    });
+
+    test('parses rounded-2xl', () {
+      final br = 'rounded-2xl'.dStyle.borderRadius as BorderRadius;
+      expect(br.topLeft.x, 16);
+    });
+
+    test('parses rounded-3xl', () {
+      final br = 'rounded-3xl'.dStyle.borderRadius as BorderRadius;
+      expect(br.topLeft.x, 24);
+    });
+
+    test('parses directional rounded-t', () {
+      final br = 'rounded-t-lg'.dStyle.borderRadius as BorderRadius;
+      expect(br.topLeft.x, 8);
+      expect(br.topRight.x, 8);
+      expect(br.bottomLeft.x, 0);
+      expect(br.bottomRight.x, 0);
+    });
+
+    test('parses directional rounded-b', () {
+      final br = 'rounded-b-lg'.dStyle.borderRadius as BorderRadius;
+      expect(br.bottomLeft.x, 8);
+      expect(br.bottomRight.x, 8);
+      expect(br.topLeft.x, 0);
+    });
+
+    test('parses directional rounded-l', () {
+      final br = 'rounded-l-lg'.dStyle.borderRadius as BorderRadius;
+      expect(br.topLeft.x, 8);
+      expect(br.bottomLeft.x, 8);
+      expect(br.topRight.x, 0);
+    });
+
+    test('parses directional rounded-r', () {
+      final br = 'rounded-r-lg'.dStyle.borderRadius as BorderRadius;
+      expect(br.topRight.x, 8);
+      expect(br.bottomRight.x, 8);
+      expect(br.topLeft.x, 0);
+    });
+
+    test('parses rounded-tl', () {
+      final br = 'rounded-tl-lg'.dStyle.borderRadius as BorderRadius;
+      expect(br.topLeft.x, 8);
+      expect(br.topRight.x, 0);
+    });
+
+    test('parses rounded-tr', () {
+      final br = 'rounded-tr-lg'.dStyle.borderRadius as BorderRadius;
+      expect(br.topRight.x, 8);
+      expect(br.topLeft.x, 0);
+    });
+
+    test('parses rounded-bl', () {
+      final br = 'rounded-bl-lg'.dStyle.borderRadius as BorderRadius;
+      expect(br.bottomLeft.x, 8);
+      expect(br.bottomRight.x, 0);
+    });
+
+    test('parses rounded-br', () {
+      final br = 'rounded-br-lg'.dStyle.borderRadius as BorderRadius;
+      expect(br.bottomRight.x, 8);
+      expect(br.bottomLeft.x, 0);
+    });
+
+    test('parses border (no width value)', () {
+      expect('border'.dStyle.borderWidth, 1);
     });
   });
 
@@ -412,6 +698,13 @@ void main() {
     test('parses opacity edge cases', () {
       expect('opacity-0'.dStyle.opacity, 0);
       expect('opacity-100'.dStyle.opacity, 1);
+      expect('opacity-25'.dStyle.opacity, 0.25);
+      expect('opacity-75'.dStyle.opacity, 0.75);
+    });
+
+    test('parses w-auto and h-auto', () {
+      expect('w-auto'.dStyle.width, 0);
+      expect('h-auto'.dStyle.height, 0);
     });
   });
 
@@ -438,6 +731,24 @@ void main() {
       expect(style.variants!['lg']!.fontSize, 18);
       expect(style.variants!['xl']!.fontSize, 20);
       expect(style.variants!['2xl']!.fontSize, 24);
+    });
+
+    test('parses hover variant prefix', () {
+      final style = 'bg-blue-500 hover:bg-blue-700'.dStyle;
+      expect(style.backgroundColor, const Color(0xFF3B82F6));
+      expect(
+        style.variants!['hover']!.backgroundColor,
+        const Color(0xFF1D4ED8),
+      );
+    });
+
+    test('parses focus and active variant prefixes', () {
+      final style = 'bg-blue-500 focus:border-2 active:bg-blue-800'.dStyle;
+      expect(style.variants!['focus']!.borderWidth, 8);
+      expect(
+        style.variants!['active']!.backgroundColor,
+        const Color(0xFF1E40AF),
+      );
     });
 
     test('mixes variant prefixes with base classes', () {
@@ -513,10 +824,12 @@ void main() {
       expect(style.fontSize, isNull);
     });
 
-    test('px- py- and other compound tokens work with variants', () {
-      final style = 'px-4 dark:px-8'.dStyle;
-      expect(style.edgeInsets?.left, 16);
-      expect(style.variants!['dark']!.edgeInsets?.left, 32);
+    test('padding and margin work with variants', () {
+      final style = 'px-4 dark:px-8 mt-2 dark:mt-4'.dStyle;
+      expect(style.padding?.left, 16);
+      expect(style.variants!['dark']!.padding?.left, 32);
+      expect(style.margin?.top, 8);
+      expect(style.variants!['dark']!.margin?.top, 16);
     });
 
     test('dGradient with variants', () {
@@ -543,6 +856,308 @@ void main() {
       final b = a.clone();
       a.fontSize = 20;
       expect(b.fontSize, 16);
+    });
+
+    test('parses pressed variant prefix', () {
+      final style = 'bg-blue-500 pressed:bg-blue-800'.dStyle;
+      expect(
+        style.variants!['pressed']!.backgroundColor,
+        const Color(0xFF1E40AF),
+      );
+    });
+
+    test('parses disabled variant prefix', () {
+      final style = 'opacity-100 disabled:opacity-50'.dStyle;
+      expect(style.variants!['disabled']!.opacity, 0.5);
+    });
+
+    test('parses selected variant prefix', () {
+      final style = 'bg-blue-500 selected:bg-blue-700'.dStyle;
+      expect(
+        style.variants!['selected']!.backgroundColor,
+        const Color(0xFF1D4ED8),
+      );
+    });
+
+    test('parses error variant prefix', () {
+      final style = 'border-gray-300 error:border-red-500'.dStyle;
+      expect(style.variants!['error']!.borderColor, const Color(0xFFEF4444));
+    });
+
+    test('parses dragged variant prefix', () {
+      final style = 'opacity-100 dragged:opacity-75'.dStyle;
+      expect(style.variants!['dragged']!.opacity, 0.75);
+    });
+
+    test('parses scrolledUnder variant prefix', () {
+      final style = 'shadow-sm scrolledUnder:shadow-lg'.dStyle;
+      expect(style.variants!['scrolledUnder']!.boxShadow?.length, 2);
+    });
+
+    test('parses variants with arbitrary values', () {
+      final style = 'text-[#ff0000] dark:text-[#00ff00]'.dStyle;
+      expect(style.color, const Color(0xFFFF0000));
+      expect(style.variants!['dark']!.color, const Color(0xFF00FF00));
+    });
+
+    test('parses variants with leading classes', () {
+      final style = 'leading-normal dark:leading-loose'.dStyle;
+      expect(style.variants!['dark']!.lineHeight, 2.0);
+    });
+
+    test('parses chained variant prefix dark:hover:', () {
+      final style = 'bg-blue-500 dark:hover:bg-blue-700'.dStyle;
+      expect(style.variants, isNotNull);
+      expect(style.variants!['dark:hover'], isNotNull);
+      expect(
+        style.variants!['dark:hover']!.backgroundColor,
+        const Color(0xFF1D4ED8),
+      );
+    });
+
+    test('parses chained variant md:focus:', () {
+      final style = 'border-0 md:focus:border-2'.dStyle;
+      expect(style.variants!['md:focus']!.borderWidth, 8);
+    });
+
+    test('parses chained variant dark:md:hover:', () {
+      final style = 'text-sm dark:md:hover:text-lg'.dStyle;
+      expect(style.variants!['dark:md:hover']!.fontSize, 18);
+    });
+
+    test('resolve applies chained dark:md variant', () {
+      final style = 'text-sm dark:md:text-lg'.dStyle.resolve(
+        brightness: Brightness.dark,
+        screenWidth: 800,
+      );
+      expect(style.fontSize, 18);
+    });
+
+    test('resolve does not apply chained dark:md in wrong brightness', () {
+      final style = 'text-sm dark:md:text-lg'.dStyle.resolve(
+        brightness: Brightness.light,
+        screenWidth: 800,
+      );
+      expect(style.fontSize, 14);
+    });
+
+    test('resolve does not apply chained dark:md at small screen', () {
+      final style = 'text-sm dark:md:text-lg'.dStyle.resolve(
+        brightness: Brightness.dark,
+        screenWidth: 700,
+      );
+      expect(style.fontSize, 14);
+    });
+
+    test('resolve re-maps chained variant with WidgetState condition', () {
+      final result = 'bg-blue-500 dark:hover:bg-blue-700'.dStyle.resolve(
+        brightness: Brightness.dark,
+      );
+      expect(result.backgroundColor, const Color(0xFF3B82F6));
+      expect(result.variants, isNotNull);
+      expect(result.variants!['hover'], isNotNull);
+      expect(
+        result.variants!['hover']!.backgroundColor,
+        const Color(0xFF1D4ED8),
+      );
+    });
+
+    test('resolve does not merge WidgetState compound variant into base', () {
+      final result = 'bg-blue-500 dark:hover:bg-blue-700'.dStyle.resolve(
+        brightness: Brightness.dark,
+      );
+      expect(result.backgroundColor, const Color(0xFF3B82F6));
+    });
+  });
+
+  group('Theme colors', () {
+    test('text-primary sets theme key', () {
+      final style = 'text-primary'.dStyle;
+      expect(style.color, isNull);
+      expect(style.textThemeColor, 'primary');
+    });
+
+    test('bg-surface sets bg theme key', () {
+      final style = 'bg-surface'.dStyle;
+      expect(style.backgroundColor, isNull);
+      expect(style.bgThemeColor, 'surface');
+    });
+
+    test('all theme color prefixes work', () {
+      final style = 'text-onPrimary bg-secondaryContainer border-error'.dStyle;
+      expect(style.textThemeColor, 'onPrimary');
+      expect(style.bgThemeColor, 'secondaryContainer');
+      expect(style.borderThemeColor, 'error');
+    });
+
+    test('theme color does not conflict with regular colors', () {
+      final style = 'text-blue-500'.dStyle;
+      expect(style.textThemeColor, isNull);
+      expect(style.color, const Color(0xFF3B82F6));
+    });
+
+    test('parses decoration theme color', () {
+      final style = 'decoration-primary'.dStyle;
+      expect(style.decorationThemeColor, 'primary');
+    });
+
+    test('parses from-theme, via-theme, to-theme gradient colors', () {
+      final style = 'from-primary via-secondary to-tertiary'.dStyle;
+      expect(style.gradientFromThemeColor, 'primary');
+      expect(style.gradientViaThemeColor, 'secondary');
+      expect(style.gradientToThemeColor, 'tertiary');
+    });
+  });
+
+  group('cache', () {
+    test('same string returns same cached object', () {
+      final a = 'text-lg font-bold'.dStyle;
+      final b = 'text-lg font-bold'.dStyle;
+      expect(identical(a, b), isTrue);
+    });
+
+    test('different strings produce different objects', () {
+      final a = 'text-lg'.dStyle;
+      final b = 'font-bold'.dStyle;
+      expect(identical(a, b), isFalse);
+    });
+  });
+
+  group('Arbitrary values', () {
+    test('parses text-[#ff0000]', () {
+      final style = 'text-[#ff0000]'.dStyle;
+      expect(style.color, const Color(0xFFFF0000));
+    });
+
+    test('parses bg-[rgb(255,0,0)]', () {
+      final style = 'bg-[rgb(255,0,0)]'.dStyle;
+      expect(style.backgroundColor, const Color(0xFFFF0000));
+    });
+
+    test('parses p-[20]', () {
+      final style = 'p-[20]'.dStyle;
+      expect(style.padding?.left, 20);
+    });
+
+    test('parses w-[100] h-[50]', () {
+      final style = 'w-[100] h-[50]'.dStyle;
+      expect(style.width, 100);
+      expect(style.height, 50);
+    });
+
+    test('parses rounded-[12]', () {
+      final style = 'rounded-[12]'.dStyle;
+      expect(style.borderRadius, isA<BorderRadius>());
+      final br = style.borderRadius as BorderRadius;
+      expect(br.topLeft.x, 12);
+    });
+
+    test('parses opacity-[0.75]', () {
+      final style = 'opacity-[0.75]'.dStyle;
+      expect(style.opacity, 0.75);
+    });
+
+    test('parses text-[#f00] (3-hex)', () {
+      final style = 'text-[#f00]'.dStyle;
+      expect(style.color, const Color(0xFFFF0000));
+    });
+
+    test('parses bg-[#80ff0000] (8-hex ARGB)', () {
+      final style = 'bg-[#80ff0000]'.dStyle;
+      expect(style.backgroundColor, const Color(0x80FF0000));
+    });
+
+    test('parses rgba with alpha', () {
+      final style = 'bg-[rgba(255,0,0,0.5)]'.dStyle;
+      expect(style.backgroundColor, const Color(0x80FF0000));
+    });
+
+    test('parses w-[50%] percentage', () {
+      final style = 'w-[50%]'.dStyle;
+      expect(style.width, 50);
+    });
+
+    test('parses from-[#ff0000] via-[#00ff00] to-[#0000ff]', () {
+      final style =
+          'bg-gradient-to-r from-[#ff0000] via-[#00ff00] to-[#0000ff]'.dStyle;
+      expect(style.gradientFromColor, const Color(0xFFFF0000));
+      expect(style.gradientViaColor, const Color(0xFF00FF00));
+      expect(style.gradientToColor, const Color(0xFF0000FF));
+    });
+
+    test('parses border-[#ff0000] arbitrary color', () {
+      final style = 'border-[#ff0000]'.dStyle;
+      expect(style.borderColor, const Color(0xFFFF0000));
+    });
+
+    test('parses px-[20] py-[10] arbitrary directional padding', () {
+      final style = 'px-[20] py-[10]'.dStyle;
+      expect(style.padding?.left, 20);
+      expect(style.padding?.right, 20);
+      expect(style.padding?.top, 10);
+      expect(style.padding?.bottom, 10);
+    });
+
+    test('parses mx-[20] my-[10] arbitrary directional margin', () {
+      final style = 'mx-[20] my-[10]'.dStyle;
+      expect(style.margin?.left, 20);
+      expect(style.margin?.right, 20);
+      expect(style.margin?.top, 10);
+      expect(style.margin?.bottom, 10);
+    });
+
+    test('parses scale-[200] arbitrary scale', () {
+      final style = 'scale-[200]'.dStyle;
+      expect(style.scaleX, 2.0);
+      expect(style.scaleY, 2.0);
+    });
+
+    test('parses rotate-[45] arbitrary rotate', () {
+      final style = 'rotate-[45]'.dStyle;
+      expect(style.rotateDegrees, 45);
+    });
+
+    test('parses skew-x-[15] arbitrary skew', () {
+      final style = 'skew-x-[15]'.dStyle;
+      expect(style.skewX, 15);
+    });
+
+    test('parses pt-[8] pb-[4] arbitrary directional padding', () {
+      final style = 'pt-[8] pb-[4]'.dStyle;
+      expect(style.padding?.top, 8);
+      expect(style.padding?.bottom, 4);
+    });
+
+    test('parses mt-[8] mb-[4] arbitrary directional margin', () {
+      final style = 'mt-[8] mb-[4]'.dStyle;
+      expect(style.margin?.top, 8);
+      expect(style.margin?.bottom, 4);
+    });
+
+    test('parses inset-[20] arbitrary position', () {
+      final style = 'inset-[20]'.dStyle;
+      expect(style.insetTop, 20);
+      expect(style.insetRight, 20);
+      expect(style.insetBottom, 20);
+      expect(style.insetLeft, 20);
+    });
+
+    test('parses decoration-[#ff0000] arbitrary color', () {
+      final style = 'decoration-[#ff0000]'.dStyle;
+      expect(style.textDecorationColor, const Color(0xFFFF0000));
+    });
+
+    test('parses rounded-t-[10] arbitrary directional radius', () {
+      final style = 'rounded-t-[10]'.dStyle;
+      final br = style.borderRadius as BorderRadius;
+      expect(br.topLeft.x, 10);
+      expect(br.topRight.x, 10);
+      expect(br.bottomLeft.x, 0);
+    });
+
+    test('parses gap-[10] returns false gracefully', () {
+      final style = 'gap-[10]'.dStyle;
+      expect(style.fontSize, isNull);
     });
   });
 }

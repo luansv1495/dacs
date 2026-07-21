@@ -10,6 +10,7 @@ library;
 
 export 'src/dacs_style.dart';
 export 'src/extensions/string_ext.dart';
+export 'src/extensions/material_ext.dart';
 export 'src/tokens/colors.dart';
 export 'src/tokens/typography.dart';
 export 'src/tokens/shadows.dart';

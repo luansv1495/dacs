@@ -22,6 +22,8 @@ double? _radiusSize(String key) {
   return dacsSpacing(key);
 }
 
+/// Parses border tokens: border radius (`rounded-*` with directional variants)
+/// and border width (`border`, `border-2`…`border-8`).
 class BorderParser extends DacsParser {
   @override
   bool parse(String token, DacsStyle style) {

@@ -2,6 +2,8 @@ import '../dacs_style.dart';
 import '../tokens/colors.dart';
 import 'parser.dart';
 
+/// Parses gradient tokens: `bg-gradient-to-{direction}`, `from-{color}`,
+/// `via-{color}`, `to-{color}` — including theme color variants.
 class GradientParser extends DacsParser {
   @override
   bool parse(String token, DacsStyle style) {
