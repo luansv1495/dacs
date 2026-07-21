@@ -1,0 +1,20 @@
+name: dacs
+description: Tailwind-like utility classes for Flutter. Apply text styles, padding, margins, colors, and borders via concise string expressions.
+version: 0.1.0
+homepage: https://github.com/luansv1495/dacs
+repository: https://github.com/luansv1495/dacs
+issue_tracker: https://github.com/luansv1495/dacs/issues
+documentation: https://github.com/luansv1495/dacs#readme
+
+environment:
+  sdk: ^3.11.4
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
