@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../dacs_resolve_context.dart';
+import '../dacs_resolved_style.dart';
 import '../dacs_style.dart';
 import '../dacs_style_sheet.dart';
 
@@ -25,6 +26,7 @@ DacsMaterialState materialStateFor(
   DacsResolveContext context,
 ) {
   final resolved = sheet.resolveWith(context);
+  final base = resolved.toMutableStyle();
   final buildContext = context.buildContext;
   final variants = <String, DacsStyle>{};
   final compoundVariants = <DacsStateRule>[];
@@ -33,7 +35,7 @@ DacsMaterialState materialStateFor(
     for (final entry in resolved.variants!.entries) {
       final key = entry.key;
       final variantStyle = entry.value;
-      final merged = resolved.clone();
+      final merged = resolved.toMutableStyle();
 
       if (variantStyle.bgThemeColor != null) merged.backgroundColor = null;
       if (variantStyle.textThemeColor != null) merged.color = null;
@@ -64,7 +66,7 @@ DacsMaterialState materialStateFor(
     }
   }
 
-  return DacsMaterialState(resolved, variants, compoundVariants);
+  return DacsMaterialState(base, variants, compoundVariants);
 }
 
 WidgetState widgetStateForName(String name) => switch (name) {
@@ -79,7 +81,8 @@ WidgetState widgetStateForName(String name) => switch (name) {
       _ => WidgetState.hovered,
     };
 
-BorderSide? dacsSide(DacsStyle s) {
+BorderSide? dacsSide(Object style) {
+  final s = _asStyle(style);
   if (s.borderColor == null && s.borderWidth == null) return null;
   return BorderSide(
     color: s.borderColor ?? const Color(0xFF000000),
@@ -87,12 +90,14 @@ BorderSide? dacsSide(DacsStyle s) {
   );
 }
 
-OutlinedBorder? dacsShape(DacsStyle s) {
+OutlinedBorder? dacsShape(Object style) {
+  final s = _asStyle(style);
   if (s.borderRadius == null) return null;
   return RoundedRectangleBorder(borderRadius: s.borderRadius!);
 }
 
-OutlineInputBorder? dacsOutline(DacsStyle s) {
+OutlineInputBorder? dacsOutline(Object style) {
+  final s = _asStyle(style);
   if (s.borderColor == null && s.borderWidth == null) return null;
   return OutlineInputBorder(
     borderSide: dacsSide(s) ?? BorderSide.none,
@@ -100,6 +105,14 @@ OutlineInputBorder? dacsOutline(DacsStyle s) {
         ? (s.borderRadius as BorderRadius)
         : BorderRadius.zero,
   );
+}
+
+DacsStyle _asStyle(Object style) {
+  return switch (style) {
+    DacsStyle s => s,
+    DacsResolvedStyle s => s.toMutableStyle(),
+    _ => throw ArgumentError.value(style, 'style', 'Expected a DACS style'),
+  };
 }
 
 WidgetStateProperty<T> dacsStateProp<T>(

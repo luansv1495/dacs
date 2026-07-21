@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import '../dacs_layout_style.dart';
 import '../dacs_resolve_context.dart';
 import '../dacs_resolved_style.dart';
-import '../dacs_style.dart';
 import '../dacs_style_sheet.dart';
 import 'adapter.dart';
 
@@ -35,7 +34,7 @@ extension DacsLayoutAdapterExtension on DacsResolvedStyle {
     );
   }
 
-  BoxConstraints? _constraints(DacsStyle s) {
+  BoxConstraints? _constraints(DacsResolvedStyle s) {
     if (s.width == null &&
         s.height == null &&
         s.minWidth == null &&

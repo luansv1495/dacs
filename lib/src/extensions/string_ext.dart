@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:vector_math/vector_math_64.dart' as vmath;
 import '../dacs_compiler.dart';
 import '../dacs_layout_style.dart';
+import '../dacs_resolved_style.dart';
 import '../dacs_style.dart';
 import '../dacs_style_sheet.dart';
 
@@ -17,72 +18,72 @@ extension DacsStringExtension on String {
   DacsStyle get dBase => dStyle.base;
 
   /// Parses this string into a [TextStyle].
-  TextStyle get dText => dStyle.toTextStyle();
+  TextStyle get dText => dBase.toTextStyle();
 
   /// Parses padding classes (p-*, px-*, py-*, pt-*, etc.) into [EdgeInsets].
-  EdgeInsets get dPads => dStyle.toPadding();
+  EdgeInsets get dPads => dBase.toPadding();
 
   /// Parses margin classes (m-*, mx-*, my-*, mt-*, etc.) into [EdgeInsets].
-  EdgeInsets get dMargin => dStyle.toMargin();
+  EdgeInsets get dMargin => dBase.toMargin();
 
   /// Parses background, border, shadow, and gradient classes into a
   /// [BoxDecoration].
-  BoxDecoration get dBox => dStyle.toBoxDecoration();
+  BoxDecoration get dBox => dBase.toBoxDecoration();
 
   /// Parses shadow classes into a list of [BoxShadow].
-  List<BoxShadow> get dShadow => dStyle.boxShadow ?? [];
+  List<BoxShadow> get dShadow => dBase.boxShadow ?? [];
 
   /// Parses width and height classes into a `(width, height)` tuple.
-  (double?, double?) get dSize => (dStyle.width, dStyle.height);
+  (double?, double?) get dSize => (dBase.width, dBase.height);
 
   /// Parses width and height classes into a [Size], or `null`.
-  Size? get dFixedSize => dStyle.toFixedSize();
+  Size? get dFixedSize => dBase.toFixedSize();
 
   /// Parses layout-related classes into a [DacsLayoutStyle].
-  DacsLayoutStyle get dLayout => dStyle.toLayoutStyle();
+  DacsLayoutStyle get dLayout => dBase.toLayoutStyle();
 
   /// Parses inset classes into a `(top, right, bottom, left)` tuple for use
   /// with [Positioned].
   (double?, double?, double?, double?) get dPosition => (
-        dStyle.insetTop,
-        dStyle.insetRight,
-        dStyle.insetBottom,
-        dStyle.insetLeft,
+        dBase.insetTop,
+        dBase.insetRight,
+        dBase.insetBottom,
+        dBase.insetLeft,
       );
 
   /// Parses transform classes into a [Matrix4].
-  vmath.Matrix4 get dTransform => dStyle.toMatrix4();
+  vmath.Matrix4 get dTransform => dBase.toMatrix4();
 
   /// Parses gradient classes into a [LinearGradient], or `null` if no
   /// gradient is configured.
-  LinearGradient? get dGradient => dStyle.toGradient();
+  LinearGradient? get dGradient => dBase.toGradient();
 
   /// Parses border classes into a [BoxBorder], or `null`.
-  BoxBorder? get dBorder => dStyle.toBorder();
+  BoxBorder? get dBorder => dBase.toBorder();
 
   /// Parses border classes into a [BorderSide], or `null`.
-  BorderSide? get dBorderSide => dStyle.toBorderSide();
+  BorderSide? get dBorderSide => dBase.toBorderSide();
 
   /// Parses rounded classes into a [BorderRadiusGeometry], or `null`.
-  BorderRadiusGeometry? get dRadius => dStyle.toRadius();
+  BorderRadiusGeometry? get dRadius => dBase.toRadius();
 
   /// Parses width/height/min/max classes into [BoxConstraints], or `null`.
-  BoxConstraints? get dConstraints => dStyle.toConstraints();
+  BoxConstraints? get dConstraints => dBase.toConstraints();
 
   /// Parses alignment classes into an [AlignmentGeometry], or `null`.
-  AlignmentGeometry? get dAlignment => dStyle.toAlignment();
+  AlignmentGeometry? get dAlignment => dBase.toAlignment();
 
   /// Parses rounded classes into a [ShapeBorder], or `null`.
-  ShapeBorder? get dShapeBorder => dStyle.toShapeBorder();
+  ShapeBorder? get dShapeBorder => dBase.toShapeBorder();
 }
 
 /// Extension providing context-aware methods on [String] that parse DACS
 /// classes, resolve variants (dark/light, responsive), and resolve theme
 /// colors from the current [BuildContext].
 extension DacsContextExtension on String {
-  /// Parses this string into a [DacsStyle] with variants and theme colors
+  /// Parses this string into a [DacsResolvedStyle] with variants and theme colors
   /// resolved from [context].
-  DacsStyle dStyleOf(BuildContext context) =>
+  DacsResolvedStyle dStyleOf(BuildContext context) =>
       DacsCompiler.compile(this).resolveFor(context);
 
   /// Parses this string into a [TextStyle] with variant and theme resolution.

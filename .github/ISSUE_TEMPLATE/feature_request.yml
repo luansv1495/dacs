@@ -1,0 +1,37 @@
+name: Feature request
+description: Suggest a utility, adapter, parser behavior, or documentation improvement.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to style or express?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API
+      description: Show the DACS classes or extension you would like to use.
+      render: dart
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Core utility
+        - Parser/resolver
+        - Material adapter
+        - Documentation
+        - Testing/tooling
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional context

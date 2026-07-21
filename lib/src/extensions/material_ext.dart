@@ -13,7 +13,7 @@ import '../adapters/slider_theme_adapter.dart';
 import '../adapters/switch_theme_adapter.dart';
 import '../dacs_compiler.dart';
 import '../dacs_resolve_context.dart';
-import '../dacs_style.dart';
+import '../dacs_resolved_style.dart';
 import '../dacs_style_sheet.dart';
 
 DacsStyleSheet _sheet(String input) => DacsCompiler.compile(input);
@@ -21,7 +21,7 @@ DacsStyleSheet _sheet(String input) => DacsCompiler.compile(input);
 DacsResolveContext _context(BuildContext context) =>
     DacsResolveContext.fromBuildContext(context);
 
-DacsStyle _resolve(String input, BuildContext context) =>
+DacsResolvedStyle _resolve(String input, BuildContext context) =>
     _sheet(input).resolveWith(_context(context));
 
 /// Extension providing Material widget theme data constructors on [String].

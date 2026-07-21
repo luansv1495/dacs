@@ -27,6 +27,18 @@ Text('Hello, World!', style: 'text-2xl font-medium text-sky-500'.dText)
 - **Chained compound variants** — combine any prefixes: `dark:hover:`, `dark:md:focus:`, `light:lg:disabled:`
 - **Dark/Light mode & responsive variants** — `dark:`, `light:`, `sm:`, `md:`, `lg:`, `xl:`, `2xl:`
 
+## Documentation
+
+- [Getting started](https://github.com/luansv1495/dacs/blob/main/doc/getting-started.md)
+- [Core concepts](https://github.com/luansv1495/dacs/blob/main/doc/core-concepts.md)
+- [Utilities](https://github.com/luansv1495/dacs/blob/main/doc/utilities.md)
+- [Material widgets](https://github.com/luansv1495/dacs/blob/main/doc/material-widgets.md)
+- [Inputs](https://github.com/luansv1495/dacs/blob/main/doc/inputs.md)
+- [Public API](https://github.com/luansv1495/dacs/blob/main/doc/public-api.md)
+- [Widget support matrix](https://github.com/luansv1495/dacs/blob/main/doc/widget-support.md)
+- [Versioning policy](https://github.com/luansv1495/dacs/blob/main/doc/versioning.md)
+- [Contributing guide](https://github.com/luansv1495/dacs/blob/main/CONTRIBUTING.md)
+
 ## Installation
 
 ```yaml
@@ -213,8 +225,8 @@ CardTheme(
 
 All 27 Material widgets are supported: `dButton`, `dCheckbox`, `dSwitch`, `dRadio`, `dChip`, `dAppBar`, `dCard`, `dListTile`, `dTabBar`, `dBottomNav`, `dInput`, `dProgress`, `dTooltip`, `dDivider`, `dScrollbar`, `dSnackBar`, `dDialog`, `dBottomSheet`, `dExpansionTile`, `dNavBar`, `dFab`, `dDataTable`, `dSearchBar`, `dMenu`, `dSlider`, `dIcon`, `dShape`.
 
-For the detailed per-widget property matrix, see
-[`doc/widget-support.md`](doc/widget-support.md).
+For the detailed per-widget property matrix, see the
+[widget support matrix](https://github.com/luansv1495/dacs/blob/main/doc/widget-support.md).
 
 ### TextField inputs
 
@@ -278,7 +290,7 @@ print(base.fontSize);   // 18
 print(base.fontWeight); // FontWeight.w700
 print(base.color);      // Color(0xFFDC2626)
 
-final resolved = sheet.resolveFor(context);
+final resolved = sheet.resolveFor(context); // DacsResolvedStyle
 ```
 
 ## Extension methods
@@ -318,7 +330,7 @@ These accept a `BuildContext` to resolve dark/light mode, responsive breakpoints
 | `.dPadsOf(context)` | `EdgeInsets` |
 | `.dMarginOf(context)` | `EdgeInsets` |
 | `.dBoxOf(context)` | `BoxDecoration` |
-| `.dStyleOf(context)` | `DacsStyle` |
+| `.dStyleOf(context)` | `DacsResolvedStyle` |
 | `.dShadowOf(context)` | `List<BoxShadow>` |
 | `.dSizeOf(context)` | `(double?, double?)` |
 | `.dFixedSizeOf(context)` | `Size?` |
@@ -337,7 +349,8 @@ These accept a `BuildContext` to resolve dark/light mode, responsive breakpoints
 
 These accept a `BuildContext` and return Material theme data with variant resolution.
 WidgetState support is marked per method.
-For property-level support, see `doc/widget-support.md`.
+For property-level support, see the
+[widget support matrix](https://github.com/luansv1495/dacs/blob/main/doc/widget-support.md).
 
 | Method | Returns | WidgetState |
 |---|---|---|
@@ -517,4 +530,4 @@ Compound variants match only when ALL conditions are met. WidgetState conditions
 
 - [Report issues](https://github.com/luansv1495/dacs/issues)
 - [View source](https://github.com/luansv1495/dacs)
-- Licensed under the [MIT License](LICENSE)
+- Licensed under the [MIT License](https://github.com/luansv1495/dacs/blob/main/LICENSE)

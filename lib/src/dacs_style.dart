@@ -59,10 +59,10 @@ enum DacsGradientDirection {
 
 /// Holds parsed utility class values from DACS string expressions.
 ///
-/// Each field corresponds to a Flutter style property and is set by one or
-/// more [DacsParser] implementations during parsing. Use [resolve] or
-/// [resolveFor] to merge variants, and conversion methods like [toTextStyle]
-/// or [toBoxDecoration] to produce Flutter objects.
+/// Each field corresponds to a Flutter style property and is set by parser
+/// implementations during parsing. Use [DacsStyleSheet.resolve] to merge
+/// variants, and conversion methods like [toTextStyle] or [toBoxDecoration]
+/// to produce Flutter objects.
 class DacsStyle {
   /// Font size in logical pixels (e.g. `text-base` → 16.0).
   double? fontSize;

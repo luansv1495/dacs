@@ -1,0 +1,49 @@
+name: Bug report
+description: Report incorrect parsing, resolution, or adapter behavior.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting a DACS issue. Please include a minimal reproduction.
+  - type: input
+    id: dacs-version
+    attributes:
+      label: DACS version
+      placeholder: "0.4.0"
+    validations:
+      required: true
+  - type: input
+    id: flutter-version
+    attributes:
+      label: Flutter version
+      placeholder: "flutter --version"
+    validations:
+      required: true
+  - type: textarea
+    id: classes
+    attributes:
+      label: DACS classes
+      description: Paste the class string that behaves incorrectly.
+      render: dart
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include a small widget/test snippet if possible.
+      render: dart

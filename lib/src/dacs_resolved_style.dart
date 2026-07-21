@@ -1,8 +1,269 @@
+import 'package:flutter/material.dart';
+import 'dacs_layout_style.dart';
 import 'dacs_style.dart';
 
-/// The result of resolving a [DacsStyleSheet] against a set of conditions.
+/// Immutable result of resolving a DACS stylesheet.
 ///
-/// Currently a type alias for [DacsStyle]. In the future this will become
-/// an immutable class that owns the generated style result, removing the
-/// ambiguity between mutable (programmatic) and immutable (resolved) styles.
-typedef DacsResolvedStyle = DacsStyle;
+/// Parsers write into mutable [DacsStyle] instances. Resolution freezes the
+/// computed values behind this read-only wrapper so adapters and application
+/// code can consume the result without accidentally mutating parser output.
+class DacsResolvedStyle {
+  final DacsStyle _style;
+
+  /// Creates a resolved style from [style].
+  ///
+  /// The input style is cloned so later mutations to it do not change this
+  /// resolved value.
+  DacsResolvedStyle(DacsStyle style) : _style = style.clone();
+
+  /// Creates a mutable copy of this resolved style.
+  DacsStyle toMutableStyle() => _style.clone();
+
+  /// Font size in logical pixels.
+  double? get fontSize => _style.fontSize;
+
+  /// Font weight.
+  FontWeight? get fontWeight => _style.fontWeight;
+
+  /// Text or foreground color.
+  Color? get color => _style.color;
+
+  /// Background color.
+  Color? get backgroundColor => _style.backgroundColor;
+
+  /// Border color.
+  Color? get borderColor => _style.borderColor;
+
+  /// Border width in logical pixels.
+  double? get borderWidth => _style.borderWidth;
+
+  /// Padding value.
+  EdgeInsets? get padding => _style.padding;
+
+  /// Margin value.
+  EdgeInsets? get margin => _style.margin;
+
+  /// Border radius value.
+  BorderRadiusGeometry? get borderRadius => _style.borderRadius;
+
+  /// Explicit width.
+  double? get width => _style.width;
+
+  /// Explicit height.
+  double? get height => _style.height;
+
+  /// Opacity from 0.0 to 1.0.
+  double? get opacity => _style.opacity;
+
+  /// Font style.
+  FontStyle? get fontStyle => _style.fontStyle;
+
+  /// Text decoration.
+  TextDecoration? get textDecoration => _style.textDecoration;
+
+  /// Text decoration color.
+  Color? get textDecorationColor => _style.textDecorationColor;
+
+  /// Text decoration style.
+  TextDecorationStyle? get textDecorationStyle => _style.textDecorationStyle;
+
+  /// Text decoration thickness.
+  double? get textDecorationThickness => _style.textDecorationThickness;
+
+  /// Letter spacing.
+  double? get letterSpacing => _style.letterSpacing;
+
+  /// Line height multiplier.
+  double? get lineHeight => _style.lineHeight;
+
+  /// Box shadows.
+  List<BoxShadow>? get boxShadow => _style.boxShadow == null
+      ? null
+      : List<BoxShadow>.unmodifiable(_style.boxShadow!);
+
+  /// Top inset.
+  double? get insetTop => _style.insetTop;
+
+  /// Right inset.
+  double? get insetRight => _style.insetRight;
+
+  /// Bottom inset.
+  double? get insetBottom => _style.insetBottom;
+
+  /// Left inset.
+  double? get insetLeft => _style.insetLeft;
+
+  /// Horizontal scale.
+  double? get scaleX => _style.scaleX;
+
+  /// Vertical scale.
+  double? get scaleY => _style.scaleY;
+
+  /// Rotation in degrees.
+  double? get rotateDegrees => _style.rotateDegrees;
+
+  /// Horizontal translation.
+  double? get translateX => _style.translateX;
+
+  /// Vertical translation.
+  double? get translateY => _style.translateY;
+
+  /// Horizontal skew.
+  double? get skewX => _style.skewX;
+
+  /// Vertical skew.
+  double? get skewY => _style.skewY;
+
+  /// Gradient direction.
+  DacsGradientDirection? get gradientDirection => _style.gradientDirection;
+
+  /// Gradient start color.
+  Color? get gradientFromColor => _style.gradientFromColor;
+
+  /// Gradient midpoint color.
+  Color? get gradientViaColor => _style.gradientViaColor;
+
+  /// Gradient end color.
+  Color? get gradientToColor => _style.gradientToColor;
+
+  /// Theme color key for text color.
+  String? get textThemeColor => _style.textThemeColor;
+
+  /// Theme color key for background color.
+  String? get bgThemeColor => _style.bgThemeColor;
+
+  /// Theme color key for border color.
+  String? get borderThemeColor => _style.borderThemeColor;
+
+  /// Theme color key for decoration color.
+  String? get decorationThemeColor => _style.decorationThemeColor;
+
+  /// Theme color key for gradient start color.
+  String? get gradientFromThemeColor => _style.gradientFromThemeColor;
+
+  /// Theme color key for gradient midpoint color.
+  String? get gradientViaThemeColor => _style.gradientViaThemeColor;
+
+  /// Theme color key for gradient end color.
+  String? get gradientToThemeColor => _style.gradientToThemeColor;
+
+  /// Gap value.
+  double? get gap => _style.gap;
+
+  /// Flex factor.
+  int? get flex => _style.flex;
+
+  /// Flex direction.
+  Axis? get flexDirection => _style.flexDirection;
+
+  /// Flex wrapping behavior.
+  bool? get flexWrap => _style.flexWrap;
+
+  /// Cross-axis alignment.
+  CrossAxisAlignment? get alignItems => _style.alignItems;
+
+  /// Main-axis alignment.
+  MainAxisAlignment? get justifyContent => _style.justifyContent;
+
+  /// Minimum width.
+  double? get minWidth => _style.minWidth;
+
+  /// Maximum width.
+  double? get maxWidth => _style.maxWidth;
+
+  /// Minimum height.
+  double? get minHeight => _style.minHeight;
+
+  /// Maximum height.
+  double? get maxHeight => _style.maxHeight;
+
+  /// Aspect ratio.
+  double? get aspectRatio => _style.aspectRatio;
+
+  /// Image/object fit.
+  BoxFit? get boxFit => _style.boxFit;
+
+  /// Alignment.
+  AlignmentGeometry? get alignment => _style.alignment;
+
+  /// Overflow clipping behavior.
+  Clip? get overflow => _style.overflow;
+
+  /// Input label text.
+  String? get inputLabelText => _style.inputLabelText;
+
+  /// Input hint text.
+  String? get inputHintText => _style.inputHintText;
+
+  /// Input helper text.
+  String? get inputHelperText => _style.inputHelperText;
+
+  /// Input error text.
+  String? get inputErrorText => _style.inputErrorText;
+
+  /// Input prefix text.
+  String? get inputPrefixText => _style.inputPrefixText;
+
+  /// Input suffix text.
+  String? get inputSuffixText => _style.inputSuffixText;
+
+  /// Whether input decoration should be filled.
+  bool? get inputFilled => _style.inputFilled;
+
+  /// Whether input decoration should be dense.
+  bool? get inputDense => _style.inputDense;
+
+  /// Whether this style blocks conditional overrides.
+  bool get isImportant => _style.isImportant;
+
+  /// Widget-state variants that still need adapter-time resolution.
+  Map<String, DacsStyle>? get variants {
+    final variants = _style.variants;
+    if (variants == null) return null;
+    return Map.unmodifiable(
+      variants.map((key, value) => MapEntry(key, value.clone())),
+    );
+  }
+
+  /// Converts transform properties into a [Matrix4].
+  Matrix4 toMatrix4() => _style.toMatrix4();
+
+  /// Converts applicable fields into a [TextStyle].
+  TextStyle toTextStyle() => _style.toTextStyle();
+
+  /// Returns padding or [EdgeInsets.zero].
+  EdgeInsets toPadding() => _style.toPadding();
+
+  /// Returns margin or [EdgeInsets.zero].
+  EdgeInsets toMargin() => _style.toMargin();
+
+  /// Builds a [LinearGradient], when configured.
+  LinearGradient? toGradient() => _style.toGradient();
+
+  /// Converts applicable fields into a [BoxDecoration].
+  BoxDecoration toBoxDecoration() => _style.toBoxDecoration();
+
+  /// Converts border fields into a [BoxBorder].
+  BoxBorder? toBorder() => _style.toBorder();
+
+  /// Converts border fields into a [BorderSide].
+  BorderSide? toBorderSide() => _style.toBorderSide();
+
+  /// Returns the parsed radius.
+  BorderRadiusGeometry? toRadius() => _style.toRadius();
+
+  /// Builds constraints from sizing fields.
+  BoxConstraints? toConstraints() => _style.toConstraints();
+
+  /// Returns the parsed alignment.
+  AlignmentGeometry? toAlignment() => _style.toAlignment();
+
+  /// Builds a shape from radius fields.
+  ShapeBorder? toShapeBorder() => _style.toShapeBorder();
+
+  /// Builds a fixed size from width and height.
+  Size? toFixedSize() => _style.toFixedSize();
+
+  /// Groups layout-only fields into a [DacsLayoutStyle].
+  DacsLayoutStyle toLayoutStyle() => _style.toLayoutStyle();
+}

@@ -16,6 +16,7 @@
 - **Layout utilities**: expanded reusable parsing for `min-w-*`, `max-w-*`, `min-h-*`, `max-h-*`, `aspect-*`, `overflow-*`, `object-cover`, and `object-contain`.
 - **Material coverage**: added/expanded adapters and tests for `RadioThemeData`, `MenuStyle`, `SearchBarThemeData`, `NavigationBarThemeData`, `DataTableThemeData`, `ScrollbarThemeData`, and `SliderThemeData`.
 - **Documentation**: added `doc/widget-support.md` with per-widget property support tables and updated README examples for TextField styling versus decoration.
+- **Project governance and CI**: added GitHub Actions for format/analyze/tests/docs/pana, contributing guidelines, code of conduct, issue/PR templates, versioning policy, and category docs under `doc/`.
 
 ## 0.3.0
 
