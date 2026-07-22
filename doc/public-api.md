@@ -47,7 +47,7 @@ contracts unless a future release promotes a dedicated token API.
 
 ## Compatibility
 
-There are no temporary compatibility exports in `0.4.0`.
+There are no temporary compatibility exports in `0.5.0`.
 
 Because the package is still pre-`1.0.0`, advanced APIs may evolve in minor
 releases when the change improves the style engine. Main extension APIs should

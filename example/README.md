@@ -9,6 +9,8 @@ It demonstrates:
 - Dark/light and responsive variants.
 - Chained variants such as `dark:hover:*`.
 - Material adapters such as `dButton`, `dCheckbox`, `dInput`, and `dInputOf`.
+- Material 3 theme adapters such as `dNavRail`, `dPopupMenu`, `dDropdownMenu`,
+  `dDatePicker`, and `dTimePicker`.
 - The difference between `TextField.style` (`.dTextOf(context)`) and
   `TextField.decoration` (`.dInputOf(context)`).
 

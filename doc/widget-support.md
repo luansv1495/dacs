@@ -41,6 +41,23 @@ or hover/focus/pressed alpha values inside adapters.
 | backgroundBuilder | [~] | `button-bg-layer` | layer builder preset |
 | foregroundBuilder | [~] | `button-fg-layer` | layer builder preset |
 
+## IconButtonThemeData
+
+`IconButtonThemeData.style` uses the same mapping as `ButtonStyle`.
+
+| Property | Status | DACS source | Native state |
+| --- | --- | --- | --- |
+| style | [x] | ButtonStyle tokens | `ButtonStyle` |
+
+## SegmentedButtonThemeData
+
+`SegmentedButtonThemeData.style` uses the same mapping as `ButtonStyle`.
+
+| Property | Status | DACS source | Native state |
+| --- | --- | --- | --- |
+| style | [x] | ButtonStyle tokens | `ButtonStyle` |
+| selectedIcon | [~] | `selected-icon-*`, icon/text tokens | plain widget preset |
+
 ## CheckboxThemeData
 
 | Property | Status | DACS source | Native state |
@@ -110,6 +127,19 @@ or hover/focus/pressed alpha values inside adapters.
 | avatarBoxConstraints | [~] | `w-*`, `h-*`, `min-*`, `max-*` | plain constraints |
 | deleteIconBoxConstraints | [~] | `disabled:w-*`, `disabled:h-*`, `disabled:min-*`, `disabled:max-*` | plain constraints |
 
+## BadgeThemeData
+
+| Property | Status | DACS source | Native state |
+| --- | --- | --- | --- |
+| backgroundColor | [~] | `bg-*` | plain color |
+| textColor | [~] | `text-*` | plain color |
+| smallSize | [~] | `small:w-*` or `small:h-*` | plain value |
+| largeSize | [~] | `large:w-*` or `large:h-*` | plain value |
+| textStyle | [~] | text tokens | plain text style |
+| padding | [~] | `p-*` | plain padding |
+| alignment | [~] | `align-*` | plain alignment |
+| offset | [~] | `left-*`, `right-*`, `top-*`, `bottom-*` | plain offset |
+
 ## InputDecoration
 
 `TextField.style` controls the typed text. `InputDecoration` controls the input
@@ -169,6 +199,18 @@ borders.
 | titleTextStyle | [~] | text tokens | plain text style |
 | actionsPadding | [~] | `p-*` | plain padding |
 
+## BottomAppBarThemeData
+
+| Property | Status | DACS source | Native state |
+| --- | --- | --- | --- |
+| color | [~] | `bg-*` | plain color |
+| elevation | [~] | `shadow-*` blur radius | plain value |
+| shape | [~] | `bottom-appbar-notch`, `bottom-appbar-no-notch` | notched shape preset |
+| height | [~] | `h-*` | plain value |
+| surfaceTintColor | [~] | `indicator-*` | plain color |
+| shadowColor | [~] | `shadow-*` color | plain color |
+| padding | [~] | `p-*` | plain padding |
+
 ## CardTheme
 
 | Property | Status | DACS source | Native state |
@@ -179,6 +221,20 @@ borders.
 | elevation | [~] | `shadow-*` blur radius | plain value |
 | margin | [~] | `m-*`, `mx-*`, `my-*`, etc. | plain margin |
 | shape | [~] | `rounded-*` | plain shape |
+| clipBehavior | [~] | `overflow-*` | plain value |
+
+## DrawerThemeData
+
+| Property | Status | DACS source | Native state |
+| --- | --- | --- | --- |
+| backgroundColor | [~] | `bg-*` | plain color |
+| scrimColor | [~] | `barrier-*` | plain color |
+| elevation | [~] | `shadow-*` blur radius | plain value |
+| shadowColor | [~] | `shadow-*` color | plain color |
+| surfaceTintColor | [~] | `indicator-*` | plain color |
+| shape | [~] | `rounded-*` | plain shape |
+| endShape | [~] | `rounded-*` | plain shape |
+| width | [~] | `w-*` | plain value |
 | clipBehavior | [~] | `overflow-*` | plain value |
 
 ## ListTileThemeData
@@ -235,6 +291,24 @@ borders.
 | type | [~] | `bottom-nav-fixed`, `bottom-nav-shifting` | plain value |
 | landscapeLayout | [~] | `bottom-nav-layout-*` | plain value |
 
+## NavigationRailThemeData
+
+| Property | Status | DACS source | Native state |
+| --- | --- | --- | --- |
+| backgroundColor | [~] | `bg-*` | plain color |
+| elevation | [~] | `shadow-*` blur radius | plain value |
+| unselectedLabelTextStyle | [~] | `unselected-*`, text tokens | plain text style |
+| selectedLabelTextStyle | [~] | `selected:*`, text tokens | plain text style |
+| unselectedIconTheme | [~] | `unselected-*`, `w-*`, icon axis tokens | plain icon theme |
+| selectedIconTheme | [~] | `selected:text-*`, `w-*`, icon axis tokens | plain icon theme |
+| groupAlignment | [~] | `rail-group-start`, `rail-group-center`, `rail-group-end` | plain value |
+| labelType | [~] | `rail-label-none`, `rail-label-selected`, `rail-label-all` | plain value |
+| useIndicator | [~] | `rail-indicator`, `no-rail-indicator` | plain value |
+| indicatorColor | [~] | `indicator-*` | plain color |
+| indicatorShape | [~] | `rounded-*` | plain shape |
+| minWidth | [~] | `min-w-*` or `w-*` | plain value |
+| minExtendedWidth | [~] | `extended:min-w-*` or `extended:w-*` | plain value |
+
 ## MenuStyle
 
 | Property | Status | DACS source | Native state |
@@ -251,6 +325,117 @@ borders.
 | minimumSize | [x] | `min-w-*`, `min-h-*` | `WidgetStateProperty` |
 | maximumSize | [x] | `max-w-*`, `max-h-*` | `WidgetStateProperty` |
 | visualDensity | [~] | `density-*` | plain value |
+
+## PopupMenuThemeData
+
+| Property | Status | DACS source | Native state |
+| --- | --- | --- | --- |
+| color | [~] | `bg-*` | plain color |
+| shape | [~] | `rounded-*` | plain shape |
+| menuPadding | [~] | `p-*` | plain padding |
+| elevation | [~] | `shadow-*` blur radius | plain value |
+| shadowColor | [~] | `shadow-*` color | plain color |
+| surfaceTintColor | [~] | `indicator-*` | plain color |
+| textStyle | [~] | text tokens | plain text style |
+| labelTextStyle | [x] | text tokens with explicit state variants | `WidgetStateProperty` |
+| enableFeedback | [~] | `feedback`, `no-feedback` | plain value |
+| mouseCursor | [x] | `cursor-*` | `WidgetStateProperty` |
+| position | [~] | `popup-over`, `popup-under` | plain value |
+| iconColor | [~] | `text-*` | plain color |
+| iconSize | [~] | `text-*` size or `w-*` | plain value |
+
+## DropdownMenuThemeData
+
+| Property | Status | DACS source | Native state |
+| --- | --- | --- | --- |
+| textStyle | [~] | text tokens | plain text style |
+| inputDecorationTheme | [~] | InputDecoration tokens | `InputDecorationThemeData` |
+| menuStyle | [x] | MenuStyle tokens | `MenuStyle` |
+| disabledColor | [~] | `disabled:text-*` | plain color |
+
+## DatePickerThemeData
+
+Date picker semantic color channels use explicit prefixes. State values are
+only applied when declared, for example `selected:date-day-bg-primary` or
+`hover:date-day-overlay-secondary`.
+
+| Property | Status | DACS source | Native state |
+| --- | --- | --- | --- |
+| backgroundColor | [~] | `bg-*` | plain color |
+| elevation | [~] | `shadow-*` blur radius | plain value |
+| shadowColor | [~] | `shadow-*` color | plain color |
+| surfaceTintColor | [~] | `indicator-*` | plain color |
+| shape | [~] | `rounded-*` | plain shape |
+| headerBackgroundColor | [~] | `date-header-bg-*` | plain color |
+| headerForegroundColor | [~] | `date-header-text-*` | plain color |
+| headerHeadlineStyle | [~] | text tokens | plain text style |
+| headerHelpStyle | [~] | text tokens | plain text style |
+| weekdayStyle | [~] | text tokens | plain text style |
+| dayStyle | [~] | text tokens | plain text style |
+| dayForegroundColor | [x] | `date-day-text-*` | `WidgetStateProperty` |
+| dayBackgroundColor | [x] | `date-day-bg-*` | `WidgetStateProperty` |
+| dayOverlayColor | [x] | `date-day-overlay-*` | `WidgetStateProperty` |
+| dayShape | [x] | `rounded-*` | `WidgetStateProperty` |
+| todayForegroundColor | [x] | `date-today-text-*` | `WidgetStateProperty` |
+| todayBackgroundColor | [x] | `date-today-bg-*` | `WidgetStateProperty` |
+| todayBorder | [~] | `border-*` | plain side |
+| yearStyle | [~] | text tokens | plain text style |
+| yearForegroundColor | [x] | `date-year-text-*` | `WidgetStateProperty` |
+| yearBackgroundColor | [x] | `date-year-bg-*` | `WidgetStateProperty` |
+| yearOverlayColor | [x] | `date-year-overlay-*` | `WidgetStateProperty` |
+| yearShape | [x] | `rounded-*` | `WidgetStateProperty` |
+| rangePickerBackgroundColor | [~] | `date-range-bg-*` or `bg-*` | plain color |
+| rangePickerElevation | [~] | `shadow-*` blur radius | plain value |
+| rangePickerShadowColor | [~] | `shadow-*` color | plain color |
+| rangePickerSurfaceTintColor | [~] | `indicator-*` | plain color |
+| rangePickerShape | [~] | `rounded-*` | plain shape |
+| rangePickerHeaderBackgroundColor | [~] | `date-range-header-bg-*` | plain color |
+| rangePickerHeaderForegroundColor | [~] | `date-range-header-text-*` | plain color |
+| rangePickerHeaderHeadlineStyle | [~] | text tokens | plain text style |
+| rangePickerHeaderHelpStyle | [~] | text tokens | plain text style |
+| rangeSelectionBackgroundColor | [~] | `date-range-selection-bg-*` | plain color |
+| rangeSelectionOverlayColor | [x] | `date-range-selection-overlay-*` | `WidgetStateProperty` |
+| dividerColor | [~] | `date-divider-*` or `border-*` | plain color |
+| inputDecorationTheme | [~] | InputDecoration tokens | `InputDecorationThemeData` |
+| cancelButtonStyle | [x] | ButtonStyle tokens | `ButtonStyle` |
+| confirmButtonStyle | [x] | ButtonStyle tokens | `ButtonStyle` |
+| toggleButtonTextStyle | [~] | text tokens | plain text style |
+| subHeaderForegroundColor | [~] | `date-sub-header-text-*` | plain color |
+| locale | [ ] | none | locale object |
+
+## TimePickerThemeData
+
+Some Flutter time picker fields are typed as `Color?` but accept
+`WidgetStateColor`. DACS only creates a stateful color for those fields when a
+base channel is explicit, such as `time-hour-minute-bg-surfaceVariant
+selected:time-hour-minute-bg-secondary`.
+
+| Property | Status | DACS source | Native state |
+| --- | --- | --- | --- |
+| backgroundColor | [~] | `bg-*` | plain color |
+| cancelButtonStyle | [x] | ButtonStyle tokens | `ButtonStyle` |
+| confirmButtonStyle | [x] | ButtonStyle tokens | `ButtonStyle` |
+| dayPeriodBorderSide | [~] | `time-day-period-border-*` or `border-*` | plain side |
+| dayPeriodColor | [x] | `time-day-period-bg-*` | `WidgetStateColor` when base is explicit |
+| dayPeriodShape | [~] | `rounded-*` | plain shape |
+| dayPeriodTextColor | [x] | `time-day-period-text-*` | `WidgetStateColor` when base is explicit |
+| dayPeriodTextStyle | [~] | text tokens | plain text style |
+| dialBackgroundColor | [~] | `time-dial-bg-*` | plain color |
+| dialHandColor | [~] | `time-dial-hand-*` | plain color |
+| dialTextColor | [x] | `time-dial-text-*` | `WidgetStateColor` when base is explicit |
+| dialTextStyle | [~] | text tokens | plain text style |
+| elevation | [~] | `shadow-*` blur radius | plain value |
+| entryModeIconColor | [~] | `time-entry-icon-*` or `text-*` | plain color |
+| helpTextStyle | [~] | text tokens | plain text style |
+| hourMinuteColor | [x] | `time-hour-minute-bg-*` | `WidgetStateColor` when base is explicit |
+| hourMinuteShape | [~] | `rounded-*` | plain shape |
+| hourMinuteTextColor | [x] | `time-hour-minute-text-*` | `WidgetStateColor` when base is explicit |
+| hourMinuteTextStyle | [~] | text tokens | plain text style |
+| inputDecorationTheme | [~] | InputDecoration tokens | `InputDecorationThemeData` |
+| padding | [~] | `p-*` | plain padding |
+| shape | [~] | `rounded-*` | plain shape |
+| timeSelectorSeparatorColor | [x] | `time-separator-*` | `WidgetStateProperty` |
+| timeSelectorSeparatorTextStyle | [x] | text tokens, `time-separator-*` | `WidgetStateProperty` |
 
 ## SearchBarThemeData
 

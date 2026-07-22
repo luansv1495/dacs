@@ -93,6 +93,10 @@ void main() {
     test('parses final widget-specific tokens', () {
       final style = DacsCompiler.compile(
         'button-bg-layer button-fg-layer thumb-icon-check '
+        'selected-icon-done bottom-appbar-notch '
+        'rail-label-selected rail-group-end rail-indicator popup-under '
+        'date-header-bg-primary date-day-bg-blue-500 '
+        'time-dial-hand-secondary '
         'tooltip-wait-500 tooltip-show-1500 tooltip-exit-100 '
         'snackbar-fixed object-cover image-asset-[assets/card.png]',
       ).base;
@@ -100,6 +104,18 @@ void main() {
       expect(style.buttonBackgroundLayer, isTrue);
       expect(style.buttonForegroundLayer, isTrue);
       expect(style.switchThumbIcon, Icons.check);
+      expect(style.selectedIconData, Icons.done);
+      expect(style.bottomAppBarShape, isA<CircularNotchedRectangle>());
+      expect(style.navigationRailLabelType, NavigationRailLabelType.selected);
+      expect(style.navigationRailGroupAlignment, 1);
+      expect(style.navigationRailUseIndicator, isTrue);
+      expect(style.popupMenuPosition, PopupMenuPosition.under);
+      expect(style.componentThemeColors?['dateHeaderBackground'], 'primary');
+      expect(
+        style.componentColors?['dateDayBackground'],
+        const Color(0xFF3B82F6),
+      );
+      expect(style.componentThemeColors?['timeDialHand'], 'secondary');
       expect(style.tooltipWaitDuration, const Duration(milliseconds: 500));
       expect(style.tooltipShowDuration, const Duration(milliseconds: 1500));
       expect(style.tooltipExitDuration, const Duration(milliseconds: 100));

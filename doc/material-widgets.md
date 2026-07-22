@@ -13,15 +13,22 @@ ElevatedButton(
 ## Supported Adapters
 
 - `dButton`
+- `dIconButton`
+- `dSegmentedButton`
 - `dCheckbox`
 - `dSwitch`
 - `dRadio`
 - `dChip`
+- `dBadge`
 - `dAppBar`
 - `dCard`
 - `dListTile`
 - `dTabBar`
 - `dBottomNav`
+- `dNavBar`
+- `dNavRail`
+- `dDrawer`
+- `dBottomAppBar`
 - `dInput` / `dInputOf`
 - `dProgress`
 - `dTooltip`
@@ -31,12 +38,15 @@ ElevatedButton(
 - `dDialog`
 - `dBottomSheet`
 - `dExpansionTile`
-- `dNavBar`
 - `dFab`
 - `dDataTable`
 - `dSearchBar`
 - `dMenu`
+- `dPopupMenu`
+- `dDropdownMenu`
 - `dSlider`
+- `dDatePicker`
+- `dTimePicker`
 - `dIcon`
 - `dShape`
 
@@ -66,4 +76,23 @@ Compound conditions are supported:
 
 ```dart
 'dark:md:hover:bg-red-500'
+```
+
+## Picker Themes
+
+Date and time pickers use explicit semantic color channels so adapters never
+derive interaction colors:
+
+```dart
+Theme.of(context).copyWith(
+  datePickerTheme:
+      'date-header-bg-primary date-header-text-onPrimary '
+      'date-day-text-onSurface selected:date-day-bg-primary'
+          .dDatePicker(context),
+  timePickerTheme:
+      'time-dial-bg-surfaceVariant time-dial-hand-primary '
+      'time-hour-minute-bg-surfaceVariant '
+      'selected:time-hour-minute-bg-secondary'
+          .dTimePicker(context),
+);
 ```

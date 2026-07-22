@@ -177,6 +177,23 @@ class DacsResolvedStyle {
   /// Theme color key for disabled action color.
   String? get disabledActionThemeColor => _style.disabledActionThemeColor;
 
+  /// Semantic component colors used by specialized adapters.
+  Map<String, Color>? get componentColors {
+    final colors = _style.componentColors;
+    if (colors == null) return null;
+    return Map.unmodifiable(colors);
+  }
+
+  /// Theme color keys for [componentColors].
+  Map<String, String>? get componentThemeColors {
+    final colors = _style.componentThemeColors;
+    if (colors == null) return null;
+    return Map.unmodifiable(colors);
+  }
+
+  /// Returns a semantic component color by [channel].
+  Color? componentColor(String channel) => _style.componentColor(channel);
+
   /// Mouse cursor for interactive Material components.
   MouseCursor? get mouseCursor => _style.mouseCursor;
 
@@ -311,6 +328,20 @@ class DacsResolvedStyle {
   NavigationDestinationLabelBehavior? get navigationLabelBehavior =>
       _style.navigationLabelBehavior;
 
+  /// Label type for navigation rail themes.
+  NavigationRailLabelType? get navigationRailLabelType =>
+      _style.navigationRailLabelType;
+
+  /// Whether navigation rail themes should use the selected indicator.
+  bool? get navigationRailUseIndicator => _style.navigationRailUseIndicator;
+
+  /// Destination group alignment for navigation rail themes.
+  double? get navigationRailGroupAlignment =>
+      _style.navigationRailGroupAlignment;
+
+  /// Popup menu anchor position.
+  PopupMenuPosition? get popupMenuPosition => _style.popupMenuPosition;
+
   /// Whether tooltips prefer rendering below their child.
   bool? get tooltipPreferBelow => _style.tooltipPreferBelow;
 
@@ -326,6 +357,9 @@ class DacsResolvedStyle {
 
   /// Thumb icon data for switch themes.
   IconData? get switchThumbIcon => _style.switchThumbIcon;
+
+  /// Selected icon data for segmented button themes.
+  IconData? get selectedIconData => _style.selectedIconData;
 
   /// Track shape preset for slider themes.
   SliderTrackShape? get sliderTrackShape => _style.sliderTrackShape;
@@ -366,6 +400,9 @@ class DacsResolvedStyle {
 
   /// Snack bar positioning behavior.
   SnackBarBehavior? get snackBehavior => _style.snackBehavior;
+
+  /// Shape preset for bottom app bars.
+  NotchedShape? get bottomAppBarShape => _style.bottomAppBarShape;
 
   /// Whether this style blocks conditional overrides.
   bool get isImportant => _style.isImportant;

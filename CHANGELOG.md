@@ -1,3 +1,13 @@
+## 0.5.0
+
+- **Material 3 theme expansion**: added adapters and string extensions for `IconButtonThemeData`, `SegmentedButtonThemeData`, `BadgeThemeData`, `DrawerThemeData`, `BottomAppBarThemeData`, `NavigationRailThemeData`, `PopupMenuThemeData`, `DropdownMenuThemeData`, `DatePickerThemeData`, and `TimePickerThemeData`.
+- **New Material extension methods**: added `.dIconButton(context)`, `.dSegmentedButton(context)`, `.dBadge(context)`, `.dDrawer(context)`, `.dBottomAppBar(context)`, `.dNavRail(context)`, `.dPopupMenu(context)`, `.dDropdownMenu(context)`, `.dDatePicker(context)`, and `.dTimePicker(context)`.
+- **Picker semantic color channels**: added explicit Date/Time picker utilities such as `date-header-bg-*`, `date-day-bg-*`, `date-range-selection-overlay-*`, `time-dial-bg-*`, `time-dial-hand-*`, and `time-hour-minute-bg-*`.
+- **State fidelity**: Material adapters continue to use only colors and states explicitly declared by the class string; no hover/focus/pressed alpha or disabled colors are derived by DACS.
+- **Component color channels**: added semantic component color support inside `DacsStyle` / `DacsResolvedStyle` for advanced adapters without adding one field per picker property.
+- **Widget support docs**: expanded `doc/widget-support.md` with support tables for the new Material 3 adapters and picker-specific channels.
+- **Tests**: added focused coverage for Phase 6A, Phase 6B, and Phase 7 adapters.
+
 ## 0.4.0
 
 - **Parser/resolver separation**: class strings now parse into `DacsStyleSheet`, with base styles separated from conditional rules before context/state resolution.

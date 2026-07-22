@@ -72,6 +72,7 @@ class ComponentParser extends DacsParser {
     )) {
       return true;
     }
+    if (_tryComponentColors(token, style)) return true;
 
     final cursor = _cursor(token);
     if (cursor != null) {
@@ -117,6 +118,12 @@ class ComponentParser extends DacsParser {
       return true;
     }
 
+    final selectedIcon = _selectedIcon(token);
+    if (selectedIcon != null) {
+      style.selectedIconData = selectedIcon;
+      return true;
+    }
+
     final textCapitalization = _textCapitalization(token);
     if (textCapitalization != null) {
       style.textCapitalization = textCapitalization;
@@ -126,6 +133,24 @@ class ComponentParser extends DacsParser {
     final navLabel = _navigationLabelBehavior(token);
     if (navLabel != null) {
       style.navigationLabelBehavior = navLabel;
+      return true;
+    }
+
+    final railLabel = _navigationRailLabelType(token);
+    if (railLabel != null) {
+      style.navigationRailLabelType = railLabel;
+      return true;
+    }
+
+    final railGroup = _navigationRailGroupAlignment(token);
+    if (railGroup != null) {
+      style.navigationRailGroupAlignment = railGroup;
+      return true;
+    }
+
+    final popupPosition = _popupMenuPosition(token);
+    if (popupPosition != null) {
+      style.popupMenuPosition = popupPosition;
       return true;
     }
 
@@ -190,6 +215,53 @@ class ComponentParser extends DacsParser {
     return true;
   }
 
+  bool _tryComponentColors(String token, DacsStyle style) {
+    const channels = {
+      'date-header-bg': 'dateHeaderBackground',
+      'date-header-text': 'dateHeaderForeground',
+      'date-day-bg': 'dateDayBackground',
+      'date-day-text': 'dateDayForeground',
+      'date-day-overlay': 'dateDayOverlay',
+      'date-today-bg': 'dateTodayBackground',
+      'date-today-text': 'dateTodayForeground',
+      'date-year-bg': 'dateYearBackground',
+      'date-year-text': 'dateYearForeground',
+      'date-year-overlay': 'dateYearOverlay',
+      'date-range-bg': 'dateRangeBackground',
+      'date-range-header-bg': 'dateRangeHeaderBackground',
+      'date-range-header-text': 'dateRangeHeaderForeground',
+      'date-range-selection-bg': 'dateRangeSelectionBackground',
+      'date-range-selection-overlay': 'dateRangeSelectionOverlay',
+      'date-divider': 'dateDivider',
+      'date-sub-header-text': 'dateSubHeaderForeground',
+      'time-day-period-bg': 'timeDayPeriodBackground',
+      'time-day-period-text': 'timeDayPeriodForeground',
+      'time-day-period-border': 'timeDayPeriodBorder',
+      'time-dial-bg': 'timeDialBackground',
+      'time-dial-hand': 'timeDialHand',
+      'time-dial-text': 'timeDialForeground',
+      'time-entry-icon': 'timeEntryModeIcon',
+      'time-hour-minute-bg': 'timeHourMinuteBackground',
+      'time-hour-minute-text': 'timeHourMinuteForeground',
+      'time-separator': 'timeSeparatorForeground',
+    };
+
+    for (final entry in channels.entries) {
+      final expected = '${entry.key}-';
+      if (!token.startsWith(expected)) continue;
+      final value = token.substring(expected.length);
+      if (_themeColors.contains(value)) {
+        style.setComponentThemeColor(entry.value, value);
+        return true;
+      }
+      final color = parseDacsColor(value);
+      if (color == null) return false;
+      style.setComponentColor(entry.value, color);
+      return true;
+    }
+    return false;
+  }
+
   MouseCursor? _cursor(String token) => switch (token) {
         'cursor-basic' => SystemMouseCursors.basic,
         'cursor-click' => SystemMouseCursors.click,
@@ -240,6 +312,15 @@ class ComponentParser extends DacsParser {
         _ => null,
       };
 
+  IconData? _selectedIcon(String token) => switch (token) {
+        'selected-icon-check' => Icons.check,
+        'selected-icon-close' => Icons.close,
+        'selected-icon-add' => Icons.add,
+        'selected-icon-remove' => Icons.remove,
+        'selected-icon-done' => Icons.done,
+        _ => null,
+      };
+
   TextCapitalization? _textCapitalization(String token) => switch (token) {
         'capitalize-none' => TextCapitalization.none,
         'capitalize-words' => TextCapitalization.words,
@@ -254,6 +335,27 @@ class ComponentParser extends DacsParser {
         'nav-label-selected' =>
           NavigationDestinationLabelBehavior.onlyShowSelected,
         'nav-label-never' => NavigationDestinationLabelBehavior.alwaysHide,
+        _ => null,
+      };
+
+  NavigationRailLabelType? _navigationRailLabelType(String token) =>
+      switch (token) {
+        'rail-label-none' => NavigationRailLabelType.none,
+        'rail-label-all' => NavigationRailLabelType.all,
+        'rail-label-selected' => NavigationRailLabelType.selected,
+        _ => null,
+      };
+
+  double? _navigationRailGroupAlignment(String token) => switch (token) {
+        'rail-group-start' => -1,
+        'rail-group-center' => 0,
+        'rail-group-end' => 1,
+        _ => null,
+      };
+
+  PopupMenuPosition? _popupMenuPosition(String token) => switch (token) {
+        'popup-over' => PopupMenuPosition.over,
+        'popup-under' => PopupMenuPosition.under,
         _ => null,
       };
 
@@ -356,6 +458,18 @@ class ComponentParser extends DacsParser {
         return true;
       case 'no-button-fg-layer':
         style.buttonForegroundLayer = false;
+        return true;
+      case 'bottom-appbar-notch':
+        style.bottomAppBarShape = const CircularNotchedRectangle();
+        return true;
+      case 'bottom-appbar-no-notch':
+        style.bottomAppBarShape = null;
+        return true;
+      case 'rail-indicator':
+        style.navigationRailUseIndicator = true;
+        return true;
+      case 'no-rail-indicator':
+        style.navigationRailUseIndicator = false;
         return true;
     }
     return false;

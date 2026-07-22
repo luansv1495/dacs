@@ -7,7 +7,7 @@ Flutter style objects.
 
 ```yaml
 dependencies:
-  dacs: ^0.4.0
+  dacs: ^0.5.0
 ```
 
 ```dart

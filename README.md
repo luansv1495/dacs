@@ -26,6 +26,7 @@ Text('Hello, World!', style: 'text-2xl font-medium text-sky-500'.dText)
 - **WidgetState variants** — `hover:`, `focus:`, `disabled:`, `pressed:`, `selected:`, `error:`, `dragged:`, `scrolledUnder:`
 - **Chained compound variants** — combine any prefixes: `dark:hover:`, `dark:md:focus:`, `light:lg:disabled:`
 - **Dark/Light mode & responsive variants** — `dark:`, `light:`, `sm:`, `md:`, `lg:`, `xl:`, `2xl:`
+- **Material 3 theme coverage** — includes buttons, inputs, menus, navigation, drawers, badges, sliders, date pickers, and time pickers
 
 ## Documentation
 
@@ -43,7 +44,7 @@ Text('Hello, World!', style: 'text-2xl font-medium text-sky-500'.dText)
 
 ```yaml
 dependencies:
-  dacs: ^0.4.0
+  dacs: ^0.5.0
 ```
 
 ## Usage
@@ -223,7 +224,7 @@ CardTheme(
 )
 ```
 
-All 27 Material widgets are supported: `dButton`, `dCheckbox`, `dSwitch`, `dRadio`, `dChip`, `dAppBar`, `dCard`, `dListTile`, `dTabBar`, `dBottomNav`, `dInput`, `dProgress`, `dTooltip`, `dDivider`, `dScrollbar`, `dSnackBar`, `dDialog`, `dBottomSheet`, `dExpansionTile`, `dNavBar`, `dFab`, `dDataTable`, `dSearchBar`, `dMenu`, `dSlider`, `dIcon`, `dShape`.
+All 37 Material adapters are supported: `dButton`, `dIconButton`, `dSegmentedButton`, `dCheckbox`, `dSwitch`, `dRadio`, `dChip`, `dBadge`, `dAppBar`, `dCard`, `dListTile`, `dTabBar`, `dBottomNav`, `dNavBar`, `dNavRail`, `dDrawer`, `dBottomAppBar`, `dInput`, `dProgress`, `dTooltip`, `dDivider`, `dScrollbar`, `dSnackBar`, `dDialog`, `dBottomSheet`, `dExpansionTile`, `dFab`, `dDataTable`, `dSearchBar`, `dMenu`, `dPopupMenu`, `dDropdownMenu`, `dSlider`, `dDatePicker`, `dTimePicker`, `dIcon`, `dShape`.
 
 For the detailed per-widget property matrix, see the
 [widget support matrix](https://github.com/luansv1495/dacs/blob/main/doc/widget-support.md).
@@ -244,6 +245,34 @@ const classes = 'text-onSurface label-[Email] hint-[you@example.com] '
 TextField(
   style: classes.dTextOf(context),
   decoration: classes.dInputOf(context),
+)
+```
+
+### Date and time picker themes
+
+Picker adapters use explicit semantic color channels, so DACS does not guess
+hover, selected, disabled, or overlay colors for you. Declare every visual state
+you want to control:
+
+```dart
+Theme(
+  data: Theme.of(context).copyWith(
+    datePickerTheme:
+        'bg-surface text-onSurface rounded-lg shadow-md '
+        'date-header-bg-primary date-header-text-onPrimary '
+        'date-day-text-onSurface selected:date-day-bg-primary '
+        'hover:date-day-overlay-secondary date-today-text-secondary'
+            .dDatePicker(context),
+    timePickerTheme:
+        'bg-surface text-onSurface rounded-lg shadow-md '
+        'time-dial-bg-surfaceVariant time-dial-hand-primary '
+        'time-hour-minute-bg-surfaceVariant '
+        'selected:time-hour-minute-bg-secondary '
+        'time-hour-minute-text-onSurface '
+        'selected:time-hour-minute-text-onSecondary'
+            .dTimePicker(context),
+  ),
+  child: const SizedBox.shrink(),
 )
 ```
 
@@ -355,16 +384,26 @@ For property-level support, see the
 | Method | Returns | WidgetState |
 |---|---|---|
 | `.dButton(context)` | `ButtonStyle` | full |
+| `.dIconButton(context)` | `IconButtonThemeData` | full through `ButtonStyle` |
+| `.dSegmentedButton(context)` | `SegmentedButtonThemeData` | full through `ButtonStyle` |
 | `.dCheckbox(context)` | `CheckboxThemeData` | partial |
 | `.dSwitch(context)` | `SwitchThemeData` | partial |
 | `.dRadio(context)` | `RadioThemeData` | partial |
 | `.dChip(context)` | `ChipThemeData` | only color |
+| `.dBadge(context)` | `BadgeThemeData` | — |
 | `.dScrollbar(context)` | `ScrollbarThemeData` | partial |
 | `.dNavBar(context)` | `NavigationBarThemeData` | only label |
+| `.dNavRail(context)` | `NavigationRailThemeData` | — |
+| `.dDrawer(context)` | `DrawerThemeData` | — |
+| `.dBottomAppBar(context)` | `BottomAppBarThemeData` | — |
 | `.dDataTable(context)` | `DataTableThemeData` | partial |
 | `.dSearchBar(context)` | `SearchBarThemeData` | partial |
 | `.dMenu(context)` | `MenuStyle` | partial |
+| `.dPopupMenu(context)` | `PopupMenuThemeData` | partial |
+| `.dDropdownMenu(context)` | `DropdownMenuThemeData` | partial |
 | `.dSlider(context)` | `SliderThemeData` | partial |
+| `.dDatePicker(context)` | `DatePickerThemeData` | partial |
+| `.dTimePicker(context)` | `TimePickerThemeData` | partial |
 | `.dAppBar(context)` | `AppBarTheme` | — |
 | `.dCard(context)` | `CardTheme` | — |
 | `.dListTile(context)` | `ListTileThemeData` | — |

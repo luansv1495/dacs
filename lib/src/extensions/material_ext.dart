@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
 import '../adapters/button_style_adapter.dart';
+import '../adapters/badge_theme_adapter.dart';
+import '../adapters/bottom_app_bar_theme_adapter.dart';
 import '../adapters/checkbox_theme_adapter.dart';
 import '../adapters/chip_theme_adapter.dart';
 import '../adapters/data_table_adapter.dart';
+import '../adapters/date_picker_theme_adapter.dart';
+import '../adapters/drawer_theme_adapter.dart';
+import '../adapters/dropdown_menu_theme_adapter.dart';
+import '../adapters/icon_button_theme_adapter.dart';
 import '../adapters/input_decoration_adapter.dart';
 import '../adapters/material_state.dart';
 import '../adapters/menu_style_adapter.dart';
 import '../adapters/navigation_bar_adapter.dart';
+import '../adapters/navigation_rail_adapter.dart';
+import '../adapters/popup_menu_theme_adapter.dart';
 import '../adapters/scrollbar_theme_adapter.dart';
 import '../adapters/search_bar_theme_adapter.dart';
+import '../adapters/segmented_button_theme_adapter.dart';
 import '../adapters/slider_theme_adapter.dart';
 import '../adapters/switch_theme_adapter.dart';
+import '../adapters/time_picker_theme_adapter.dart';
 import '../dacs_compiler.dart';
 import '../dacs_resolve_context.dart';
 import '../dacs_resolved_style.dart';
@@ -30,6 +40,15 @@ extension DacsWidgetExtensions on String {
   ButtonStyle dButton(BuildContext context) =>
       const DacsButtonStyleAdapter().build(_sheet(this), _context(context));
 
+  /// Builds [IconButtonThemeData] from this DACS class string.
+  IconButtonThemeData dIconButton(BuildContext context) =>
+      const DacsIconButtonThemeAdapter().build(_sheet(this), _context(context));
+
+  /// Builds [SegmentedButtonThemeData] from this DACS class string.
+  SegmentedButtonThemeData dSegmentedButton(BuildContext context) =>
+      const DacsSegmentedButtonThemeAdapter()
+          .build(_sheet(this), _context(context));
+
   /// Builds [CheckboxThemeData] from this DACS class string.
   CheckboxThemeData dCheckbox(BuildContext context) =>
       const DacsCheckboxThemeAdapter().build(_sheet(this), _context(context));
@@ -45,6 +64,19 @@ extension DacsWidgetExtensions on String {
   /// Builds [ChipThemeData] from this DACS class string.
   ChipThemeData dChip(BuildContext context) =>
       const DacsChipThemeAdapter().build(_sheet(this), _context(context));
+
+  /// Builds [BadgeThemeData] from this DACS class string.
+  BadgeThemeData dBadge(BuildContext context) =>
+      const DacsBadgeThemeAdapter().build(_sheet(this), _context(context));
+
+  /// Builds [DrawerThemeData] from this DACS class string.
+  DrawerThemeData dDrawer(BuildContext context) =>
+      const DacsDrawerThemeAdapter().build(_sheet(this), _context(context));
+
+  /// Builds [BottomAppBarThemeData] from this DACS class string.
+  BottomAppBarThemeData dBottomAppBar(BuildContext context) =>
+      const DacsBottomAppBarThemeAdapter()
+          .build(_sheet(this), _context(context));
 
   /// Builds an [AppBarTheme] from this DACS class string.
   AppBarTheme dAppBar(BuildContext context) {
@@ -283,6 +315,10 @@ extension DacsWidgetExtensions on String {
   NavigationBarThemeData dNavBar(BuildContext context) =>
       const DacsNavigationBarAdapter().build(_sheet(this), _context(context));
 
+  /// Builds [NavigationRailThemeData] from this DACS class string.
+  NavigationRailThemeData dNavRail(BuildContext context) =>
+      const DacsNavigationRailAdapter().build(_sheet(this), _context(context));
+
   /// Builds [FloatingActionButtonThemeData] from this DACS class string.
   FloatingActionButtonThemeData dFab(BuildContext context) {
     final sheet = _sheet(this);
@@ -332,6 +368,23 @@ extension DacsWidgetExtensions on String {
   /// Builds a [MenuStyle] from this DACS class string.
   MenuStyle dMenu(BuildContext context) =>
       const DacsMenuStyleAdapter().build(_sheet(this), _context(context));
+
+  /// Builds [PopupMenuThemeData] from this DACS class string.
+  PopupMenuThemeData dPopupMenu(BuildContext context) =>
+      const DacsPopupMenuThemeAdapter().build(_sheet(this), _context(context));
+
+  /// Builds [DropdownMenuThemeData] from this DACS class string.
+  DropdownMenuThemeData dDropdownMenu(BuildContext context) =>
+      const DacsDropdownMenuThemeAdapter()
+          .build(_sheet(this), _context(context));
+
+  /// Builds [DatePickerThemeData] from this DACS class string.
+  DatePickerThemeData dDatePicker(BuildContext context) =>
+      const DacsDatePickerThemeAdapter().build(_sheet(this), _context(context));
+
+  /// Builds [TimePickerThemeData] from this DACS class string.
+  TimePickerThemeData dTimePicker(BuildContext context) =>
+      const DacsTimePickerThemeAdapter().build(_sheet(this), _context(context));
 
   /// Builds [SliderThemeData] from this DACS class string.
   SliderThemeData dSlider(BuildContext context) =>

@@ -224,6 +224,16 @@ class DacsStyle {
   /// Theme color key for [disabledActionColor].
   String? disabledActionThemeColor;
 
+  /// Semantic component colors used by specialized adapters.
+  ///
+  /// These channels are intentionally explicit, for example
+  /// `dateHeaderBackground` or `timeDialHand`, so adapters do not derive
+  /// widget-specific colors from unrelated utilities.
+  Map<String, Color>? componentColors;
+
+  /// Theme color keys for [componentColors].
+  Map<String, String>? componentThemeColors;
+
   /// Mouse cursor for interactive Material components.
   MouseCursor? mouseCursor;
 
@@ -354,6 +364,18 @@ class DacsStyle {
   /// Label behavior for navigation bars.
   NavigationDestinationLabelBehavior? navigationLabelBehavior;
 
+  /// Label type for navigation rail themes.
+  NavigationRailLabelType? navigationRailLabelType;
+
+  /// Whether navigation rail themes should use the selected indicator.
+  bool? navigationRailUseIndicator;
+
+  /// Destination group alignment for navigation rail themes.
+  double? navigationRailGroupAlignment;
+
+  /// Popup menu anchor position.
+  PopupMenuPosition? popupMenuPosition;
+
   /// Whether tooltips prefer rendering below their child.
   bool? tooltipPreferBelow;
 
@@ -368,6 +390,9 @@ class DacsStyle {
 
   /// Thumb icon data for switch themes.
   IconData? switchThumbIcon;
+
+  /// Selected icon data for segmented button themes.
+  IconData? selectedIconData;
 
   /// Track shape preset for slider themes.
   SliderTrackShape? sliderTrackShape;
@@ -407,6 +432,9 @@ class DacsStyle {
 
   /// Snack bar positioning behavior.
   SnackBarBehavior? snackBehavior;
+
+  /// Shape preset for bottom app bars.
+  NotchedShape? bottomAppBarShape;
 
   /// When `true`, variant overrides are ignored for this style group
   /// (triggered by `!important` suffix).
@@ -604,7 +632,31 @@ class DacsStyle {
     barrierColor ??= _themeColor(scheme, barrierThemeColor);
     unselectedColor ??= _themeColor(scheme, unselectedThemeColor);
     disabledActionColor ??= _themeColor(scheme, disabledActionThemeColor);
+    final componentThemes = componentThemeColors;
+    if (componentThemes != null) {
+      for (final entry in componentThemes.entries) {
+        final color = _themeColor(scheme, entry.value);
+        if (color == null) continue;
+        componentColors ??= {};
+        componentColors!.putIfAbsent(entry.key, () => color);
+      }
+    }
   }
+
+  /// Sets a semantic component [color] channel.
+  void setComponentColor(String channel, Color color) {
+    componentColors ??= {};
+    componentColors![channel] = color;
+  }
+
+  /// Sets a semantic component theme color [key] channel.
+  void setComponentThemeColor(String channel, String key) {
+    componentThemeColors ??= {};
+    componentThemeColors![channel] = key;
+  }
+
+  /// Returns a semantic component color by [channel].
+  Color? componentColor(String channel) => componentColors?[channel];
 
   Color? _themeColor(ColorScheme s, String? key) {
     if (key == null) return null;
@@ -710,6 +762,14 @@ class DacsStyle {
     disabledActionColor = source.disabledActionColor ?? disabledActionColor;
     disabledActionThemeColor =
         source.disabledActionThemeColor ?? disabledActionThemeColor;
+    if (source.componentColors != null) {
+      componentColors ??= {};
+      componentColors!.addAll(source.componentColors!);
+    }
+    if (source.componentThemeColors != null) {
+      componentThemeColors ??= {};
+      componentThemeColors!.addAll(source.componentThemeColors!);
+    }
     mouseCursor = source.mouseCursor ?? mouseCursor;
     splashRadius = source.splashRadius ?? splashRadius;
     visualDensity = source.visualDensity ?? visualDensity;
@@ -762,6 +822,13 @@ class DacsStyle {
     textCapitalization = source.textCapitalization ?? textCapitalization;
     navigationLabelBehavior =
         source.navigationLabelBehavior ?? navigationLabelBehavior;
+    navigationRailLabelType =
+        source.navigationRailLabelType ?? navigationRailLabelType;
+    navigationRailUseIndicator =
+        source.navigationRailUseIndicator ?? navigationRailUseIndicator;
+    navigationRailGroupAlignment =
+        source.navigationRailGroupAlignment ?? navigationRailGroupAlignment;
+    popupMenuPosition = source.popupMenuPosition ?? popupMenuPosition;
     tooltipPreferBelow = source.tooltipPreferBelow ?? tooltipPreferBelow;
     snackShowCloseIcon = source.snackShowCloseIcon ?? snackShowCloseIcon;
     bottomSheetShowDragHandle =
@@ -769,6 +836,7 @@ class DacsStyle {
     sliderShowValueIndicator =
         source.sliderShowValueIndicator ?? sliderShowValueIndicator;
     switchThumbIcon = source.switchThumbIcon ?? switchThumbIcon;
+    selectedIconData = source.selectedIconData ?? selectedIconData;
     sliderTrackShape = source.sliderTrackShape ?? sliderTrackShape;
     sliderThumbShape = source.sliderThumbShape ?? sliderThumbShape;
     sliderOverlayShape = source.sliderOverlayShape ?? sliderOverlayShape;
@@ -783,6 +851,7 @@ class DacsStyle {
     tooltipShowDuration = source.tooltipShowDuration ?? tooltipShowDuration;
     tooltipExitDuration = source.tooltipExitDuration ?? tooltipExitDuration;
     snackBehavior = source.snackBehavior ?? snackBehavior;
+    bottomAppBarShape = source.bottomAppBarShape ?? bottomAppBarShape;
     if (source.isImportant) isImportant = true;
     if (source.variants != null) {
       variants ??= {};

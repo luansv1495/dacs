@@ -229,6 +229,60 @@ class _HomePageState extends State<HomePage>
                     .dInputOf(context),
           ),
 
+          SectionHeader(title: 'Date / Time Picker Themes'),
+          Theme(
+            data: Theme.of(context).copyWith(
+              datePickerTheme:
+                  ('bg-surface text-onSurface rounded-lg shadow-md '
+                          'date-header-bg-primary date-header-text-onPrimary '
+                          'date-day-text-onSurface selected:date-day-bg-primary '
+                          'hover:date-day-overlay-secondary '
+                          'date-today-text-secondary date-divider-outline')
+                      .dDatePicker(context),
+              timePickerTheme:
+                  ('bg-surface text-onSurface rounded-lg shadow-md p-4 '
+                          'time-dial-bg-surfaceVariant time-dial-hand-primary '
+                          'time-hour-minute-bg-surfaceVariant '
+                          'selected:time-hour-minute-bg-secondary '
+                          'time-hour-minute-text-onSurface '
+                          'selected:time-hour-minute-text-onSecondary '
+                          'time-separator-outline')
+                      .dTimePicker(context),
+            ),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ElevatedButton(
+                  style: 'bg-primary text-onPrimary rounded-lg'.dButton(
+                    context,
+                  ),
+                  onPressed: () {
+                    showDatePicker(
+                      context: context,
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime(2030),
+                      initialDate: DateTime.now(),
+                    );
+                  },
+                  child: const Text('Open date picker'),
+                ),
+                ElevatedButton(
+                  style: 'bg-secondary text-onSecondary rounded-lg'.dButton(
+                    context,
+                  ),
+                  onPressed: () {
+                    showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                    );
+                  },
+                  child: const Text('Open time picker'),
+                ),
+              ],
+            ),
+          ),
+
           SectionHeader(title: 'Dark / Light Mode'),
           Container(
             padding: 'p-4'.dPads,
